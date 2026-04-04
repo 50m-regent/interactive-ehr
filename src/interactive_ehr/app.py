@@ -2,6 +2,7 @@ import streamlit as st
 
 
 def main() -> None:
+    """Streamlitアプリのエントリポイント。ページ設定と初期UIを構築する。"""
     st.set_page_config(
         page_title="Interactive EHR",
         page_icon="🏥",
@@ -17,5 +18,4 @@ def main() -> None:
     st.info("システムは現在開発中です。")
 
 
-if __name__ == "__main__":
-    main()
+main()
