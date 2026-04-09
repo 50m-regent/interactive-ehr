@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, time
+from pydantic import Field
 
 from interactive_ehr.models._base import DwhBaseModel
 
@@ -36,7 +37,7 @@ class 検体検査(DwhBaseModel):
     採取時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -110,7 +111,7 @@ class 検体検査結果(DwhBaseModel):
     採取時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -175,14 +176,14 @@ class 検体検査結果(DwhBaseModel):
     検査項目: str = ""
     JLAC10コード: str = ""
     JLAC10名: str = ""
-    結果_文字列_: str = ""
-    結果_数値_: float | None = None
+    結果_文字列_: str = Field("", alias="結果(文字列)")
+    結果_数値_: float | None = Field(None, alias="結果(数値)")
     結果値単位: str = ""
     結果値コメント: str = ""
-    基準値上限_文字列_: str = ""
-    基準値下限_文字列_: str = ""
-    基準値上限_数値_: float | None = None
-    基準値下限_数値_: float | None = None
+    基準値上限_文字列_: str = Field("", alias="基準値上限(文字列)")
+    基準値下限_文字列_: str = Field("", alias="基準値下限(文字列)")
+    基準値上限_数値_: float | None = Field(None, alias="基準値上限(数値)")
+    基準値下限_数値_: float | None = Field(None, alias="基準値下限(数値)")
     異常値: str = ""
     検体コメント: str = ""
     結果画像の有無: str = ""
@@ -221,7 +222,7 @@ class 細菌検査(DwhBaseModel):
     採取時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -316,7 +317,7 @@ class 一般細菌塗抹鏡検結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -387,7 +388,7 @@ class 一般細菌培養同定検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -457,7 +458,7 @@ class 一般細菌感受性検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -529,8 +530,8 @@ class 一般細菌感受性検査結果(DwhBaseModel):
     菌株保存番号: str = ""
     感受性検査の有無: str = ""
     追加検査の有無: str = ""
-    JLAC10コード_感受性_: str = ""
-    JLAC10名_感受性_: str = ""
+    JLAC10コード_感受性_: str = Field("", alias="JLAC10コード(感受性)")
+    JLAC10名_感受性_: str = Field("", alias="JLAC10名(感受性)")
     抗菌薬コード: str = ""
     抗菌薬名: str = ""
     感受性判定コード: str = ""
@@ -569,7 +570,7 @@ class 抗酸菌塗抹鏡検結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -638,7 +639,7 @@ class 抗酸菌培養検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -708,7 +709,7 @@ class 抗酸菌遺伝子検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -779,7 +780,7 @@ class 抗酸菌同定検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -855,7 +856,7 @@ class その他細菌検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -928,7 +929,7 @@ class 病理検査(DwhBaseModel):
     依頼時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_依頼日_: date = date(1000, 1, 1)
+    検索日_依頼日_: date = Field(date(1000, 1, 1), alias="検索日(依頼日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -971,7 +972,7 @@ class 病理検査(DwhBaseModel):
     検査項目: str = ""
     摘出方法コード: str = ""
     摘出方法: str = ""
-    臓器_材料名: str = ""
+    臓器_材料名: str = Field("", alias="臓器・材料名")
     依頼病名: str = ""
     検査目的: str = ""
     臨床経過: str = ""
@@ -988,7 +989,7 @@ class 病理検査(DwhBaseModel):
     死亡理由: str = ""
     剖検コメント: str = ""
     用量: float | None = None
-    病理_標本_番号: str = ""
+    病理_標本_番号: str = Field("", alias="病理(標本)番号")
     状況: str = ""
     レポートURL: str = ""
 
@@ -1018,7 +1019,7 @@ class 病理検査レポート(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1096,7 +1097,7 @@ class 生理検査(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1192,7 +1193,7 @@ class 生理検査レポート(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1276,7 +1277,7 @@ class 内視鏡検査(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1371,7 +1372,7 @@ class 内視鏡検査レポート(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1458,7 +1459,7 @@ class 放射線検査オーダー(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1548,7 +1549,7 @@ class 放射線検査薬剤(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1647,7 +1648,7 @@ class 放射線検査材料(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1742,7 +1743,7 @@ class 放射線検査レポート(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1823,7 +1824,7 @@ class RI検査(DwhBaseModel):
     検査時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1917,7 +1918,7 @@ class RI検査レポート(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_検査日_: date = date(1000, 1, 1)
+    検索日_検査日_: date = Field(date(1000, 1, 1), alias="検索日(検査日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1994,7 +1995,7 @@ class 抗酸菌感受性検査結果(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_採取日_: date = date(1000, 1, 1)
+    検索日_採取日_: date = Field(date(1000, 1, 1), alias="検索日(採取日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -2060,8 +2061,8 @@ class 抗酸菌感受性検査結果(DwhBaseModel):
     厚労省菌量コード: str = ""
     検査方法コード: str = ""
     検査方法: str = ""
-    JLAC10コード_培養_: str = ""
-    JLAC10名_培養_: str = ""
+    JLAC10コード_培養_: str = Field("", alias="JLAC10コード(培養)")
+    JLAC10名_培養_: str = Field("", alias="JLAC10名(培養)")
     結果コード: str = ""
     結果: str = ""
     菌株保存番号: str = ""

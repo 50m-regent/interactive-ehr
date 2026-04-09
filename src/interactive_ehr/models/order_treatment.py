@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date, time
 from decimal import Decimal
+from pydantic import Field
 
 from interactive_ehr.models._base import DwhBaseModel
 
@@ -37,7 +38,7 @@ class 処方(DwhBaseModel):
     服薬時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_服薬開始日_: date = date(1000, 1, 1)
+    検索日_服薬開始日_: date = Field(date(1000, 1, 1), alias="検索日(服薬開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -61,7 +62,7 @@ class 処方(DwhBaseModel):
     オーナー職種: str = ""
     部門連係ID: str = ""
     院内院外区分: str = ""
-    時間外_休日区分: str = ""
+    時間外_休日区分: str = Field("", alias="時間外・休日区分")
     服薬開始日: date = date(1000, 1, 1)
     服薬終了日: date | None = None
     RP番号: int = 0
@@ -72,7 +73,7 @@ class 処方(DwhBaseModel):
     一日量: float | None = None
     一日量単位: str = ""
     処方日数: int | None = None
-    処方期間_日数_: int | None = None
+    処方期間_日数_: int | None = Field(None, alias="処方期間(日数)")
     指示用量: float | None = None
     指示単位: str = ""
     指示総量: float | None = None
@@ -88,9 +89,9 @@ class 処方(DwhBaseModel):
     用法種別: str = ""
     処置薬剤: str = ""
     不均等指示の有無: str = ""
-    依頼コメント_患者_: str = ""
-    依頼コメント_医事_: str = ""
-    依頼コメント_薬剤部_: str = ""
+    依頼コメント_患者_: str = Field("", alias="依頼コメント(患者)")
+    依頼コメント_医事_: str = Field("", alias="依頼コメント(医事)")
+    依頼コメント_薬剤部_: str = Field("", alias="依頼コメント(薬剤部)")
     薬剤SEQ: int = 0
     分類1コード: str = ""
     分類1: str = ""
@@ -155,7 +156,7 @@ class 処方指示(DwhBaseModel):
     服薬時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_服薬開始日_: date = date(1000, 1, 1)
+    検索日_服薬開始日_: date = Field(date(1000, 1, 1), alias="検索日(服薬開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -179,7 +180,7 @@ class 処方指示(DwhBaseModel):
     オーナー職種: str = ""
     部門連係ID: str = ""
     院内院外区分: str = ""
-    時間外_休日区分: str = ""
+    時間外_休日区分: str = Field("", alias="時間外・休日区分")
     服薬開始日: date = date(1000, 1, 1)
     服薬終了日: date | None = None
     RP番号: int = 0
@@ -189,7 +190,7 @@ class 処方指示(DwhBaseModel):
     一日量: float | None = None
     一日量単位: str = ""
     処方日数: int | None = None
-    処方期間_日数_: int | None = None
+    処方期間_日数_: int | None = Field(None, alias="処方期間(日数)")
     指示用量: float | None = None
     指示単位: str = ""
     指示総量: float | None = None
@@ -205,9 +206,9 @@ class 処方指示(DwhBaseModel):
     用法種別: str = ""
     処置薬剤: str = ""
     不均等指示の有無: str = ""
-    依頼コメント_患者_: str = ""
-    依頼コメント_医事_: str = ""
-    依頼コメント_薬剤部_: str = ""
+    依頼コメント_患者_: str = Field("", alias="依頼コメント(患者)")
+    依頼コメント_医事_: str = Field("", alias="依頼コメント(医事)")
+    依頼コメント_薬剤部_: str = Field("", alias="依頼コメント(薬剤部)")
     薬剤SEQ: int = 0
     分類1コード: str = ""
     分類1: str = ""
@@ -271,7 +272,7 @@ class 処方実施(DwhBaseModel):
     服薬時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_服用実施日_: date = date(1000, 1, 1)
+    検索日_服用実施日_: date = Field(date(1000, 1, 1), alias="検索日(服用実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -355,7 +356,7 @@ class 注射指示(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_実施日_: date = date(1000, 1, 1)
+    検索日_実施日_: date = Field(date(1000, 1, 1), alias="検索日(実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -394,7 +395,7 @@ class 注射指示(DwhBaseModel):
     頓用投与条件: str = ""
     頓用コメント: str = ""
     手技別コメント: str = ""
-    手技別コメント_器具_: str = ""
+    手技別コメント_器具_: str = Field("", alias="手技別コメント(器具)")
     依頼コメント: str = ""
     薬剤SEQ: int = 0
     薬剤コード: str = ""
@@ -466,7 +467,7 @@ class 注射実施(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_実施日_: date = date(1000, 1, 1)
+    検索日_実施日_: date = Field(date(1000, 1, 1), alias="検索日(実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -524,7 +525,7 @@ class 注射実施(DwhBaseModel):
     頓用投与条件: str = ""
     頓用コメント: str = ""
     手技別コメント: str = ""
-    手技別コメント_器具_: str = ""
+    手技別コメント_器具_: str = Field("", alias="手技別コメント(器具)")
     依頼コメント: str = ""
     薬剤SEQ: int = 0
     薬剤コード: str = ""
@@ -594,7 +595,7 @@ class 処置(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_実施開始日_: date = date(1000, 1, 1)
+    検索日_実施開始日_: date = Field(date(1000, 1, 1), alias="検索日(実施開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -693,7 +694,7 @@ class 歯科処置(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_実施開始日_: date = date(1000, 1, 1)
+    検索日_実施開始日_: date = Field(date(1000, 1, 1), alias="検索日(実施開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -790,7 +791,7 @@ class 手術依頼(DwhBaseModel):
     予定時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_手術予定日_: date = date(1000, 1, 1)
+    検索日_手術予定日_: date = Field(date(1000, 1, 1), alias="検索日(手術予定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -883,9 +884,9 @@ class 手術依頼(DwhBaseModel):
     予定入室日時: time | None = None
     予定手術開始日時: time | None = None
     予定手術終了日時: time | None = None
-    予定手術所要時間_分_: int | None = None
+    予定手術所要時間_分_: int | None = Field(None, alias="予定手術所要時間(分)")
     予定退室日時: time | None = None
-    予定手術室滞在時間_分_: int | None = None
+    予定手術室滞在時間_分_: int | None = Field(None, alias="予定手術室滞在時間(分)")
     予定術者1ID: str = ""
     予定術者1: str = ""
     予定術者2ID: str = ""
@@ -1005,8 +1006,8 @@ class 手術依頼(DwhBaseModel):
     予定輸血量10: int | None = None
     EGC異常の有無: str = ""
     心エコー異常の有無: str = ""
-    胸部X_P異常の有無: str = ""
-    筋_骨格疾患の有無: str = ""
+    胸部X_P異常の有無: str = Field("", alias="胸部X-P異常の有無")
+    筋_骨格疾患の有無: str = Field("", alias="筋・骨格疾患の有無")
     内分泌疾患の有無: str = ""
     脳血管障害の有無: str = ""
     他院手術歴の有無: str = ""
@@ -1015,11 +1016,11 @@ class 手術依頼(DwhBaseModel):
     全身状態: str = ""
     合併症: str = ""
     特殊薬剤コメント: str = ""
-    コメントコード_複数_: str = ""
+    コメントコード_複数_: str = Field("", alias="コメントコード(複数)")
     コメント: str = ""
     依頼コメント: str = ""
     アレルギーコメント: str = ""
-    現病歴_現症: str = ""
+    現病歴_現症: str = Field("", alias="現病歴・現症")
     実施状況: str = ""
 
 
@@ -1052,7 +1053,7 @@ class 手術実施(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_手術実施日_: date = date(1000, 1, 1)
+    検索日_手術実施日_: date = Field(date(1000, 1, 1), alias="検索日(手術実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1079,17 +1080,17 @@ class 手術実施(DwhBaseModel):
     主治医: str = ""
     入室日時: time | None = None
     退室日時: time | None = None
-    手術室滞在時間_分_: int | None = None
+    手術室滞在時間_分_: int | None = Field(None, alias="手術室滞在時間(分)")
     麻酔開始日時: time | None = None
     麻酔終了日時: time | None = None
-    麻酔時間_分_: int | None = None
+    麻酔時間_分_: int | None = Field(None, alias="麻酔時間(分)")
     手術開始日時: time | None = None
     手術終了日時: time | None = None
-    手術所要時間_分_: int | None = None
+    手術所要時間_分_: int | None = Field(None, alias="手術所要時間(分)")
     回復室入室日時: time | None = None
     回復室退室日時: time | None = None
-    回復室滞在時間_分_: int | None = None
-    手術予定所要時間_分_: int | None = None
+    回復室滞在時間_分_: int | None = Field(None, alias="回復室滞在時間(分)")
+    手術予定所要時間_分_: int | None = Field(None, alias="手術予定所要時間(分)")
     手術実施科コード: str = ""
     手術実施科: str = ""
     手術室コード: str = ""
@@ -1177,8 +1178,8 @@ class 手術実施(DwhBaseModel):
     体位5: str = ""
     体位6コード: str = ""
     体位6: str = ""
-    術者ID_執刀医_: str = ""
-    術者_執刀医_: str = ""
+    術者ID_執刀医_: str = Field("", alias="術者ID(執刀医)")
+    術者_執刀医_: str = Field("", alias="術者(執刀医)")
     術者1ID: str = ""
     術者1: str = ""
     術者2ID: str = ""
@@ -1358,7 +1359,7 @@ class 手術材料等(DwhBaseModel):
     実施時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_手術実施日_: date = date(1000, 1, 1)
+    検索日_手術実施日_: date = Field(date(1000, 1, 1), alias="検索日(手術実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1424,7 +1425,7 @@ class 手術記録(DwhBaseModel):
     手術開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_手術開始日_: date = date(1000, 1, 1)
+    検索日_手術開始日_: date = Field(date(1000, 1, 1), alias="検索日(手術開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日_TOPERCD: date | None = None
@@ -1581,19 +1582,19 @@ class 手術記録(DwhBaseModel):
     手術診断: str = ""
     麻酔1コード: str = ""
     麻酔1名: str = ""
-    麻酔1時間_分_: int | None = None
+    麻酔1時間_分_: int | None = Field(None, alias="麻酔1時間(分)")
     麻酔前投与薬1: str = ""
     麻酔薬1: str = ""
     麻酔1効果: str = ""
-    麻酔2時間_分_: int | None = None
-    麻酔3時間_分_: int | None = None
-    麻酔4時間_分_: int | None = None
-    麻酔5時間_分_: int | None = None
-    麻酔6時間_分_: int | None = None
-    麻酔7時間_分_: int | None = None
-    麻酔8時間_分_: int | None = None
-    麻酔9時間_分_: int | None = None
-    麻酔10時間_分_: int | None = None
+    麻酔2時間_分_: int | None = Field(None, alias="麻酔2時間(分)")
+    麻酔3時間_分_: int | None = Field(None, alias="麻酔3時間(分)")
+    麻酔4時間_分_: int | None = Field(None, alias="麻酔4時間(分)")
+    麻酔5時間_分_: int | None = Field(None, alias="麻酔5時間(分)")
+    麻酔6時間_分_: int | None = Field(None, alias="麻酔6時間(分)")
+    麻酔7時間_分_: int | None = Field(None, alias="麻酔7時間(分)")
+    麻酔8時間_分_: int | None = Field(None, alias="麻酔8時間(分)")
+    麻酔9時間_分_: int | None = Field(None, alias="麻酔9時間(分)")
+    麻酔10時間_分_: int | None = Field(None, alias="麻酔10時間(分)")
     出血量: int | None = None
     尿量: int | None = None
     輸血種別1コード: str = ""
@@ -1661,7 +1662,7 @@ class 手術所見(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1698,7 +1699,7 @@ class 手術所見(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
     実施状況: str = ""
     実施状況コード: str | None = None
@@ -1739,7 +1740,7 @@ class 透析実施(DwhBaseModel):
     透析開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_透析実施日_: date = date(1000, 1, 1)
+    検索日_透析実施日_: date = Field(date(1000, 1, 1), alias="検索日(透析実施日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1776,7 +1777,7 @@ class 透析実施(DwhBaseModel):
     指示者: str | None = None
     傷病名: str | None = None
     実施場所: str | None = None
-    D_W_: int | None = None
+    D_W_: int | None = Field(None, alias="D.W.")
     予定治療装置コード1: str | None = None
     予定治療装置識別ID1: str | None = None
     予定治療装置1: str | None = None
@@ -2024,7 +2025,7 @@ class 透析実施(DwhBaseModel):
     算出記入者: str | None = None
     算出確認者コード: str | None = None
     算出確認者: str | None = None
-    回路_返血生食: Decimal | None = None
+    回路_返血生食: Decimal | None = Field(None, alias="回路・返血生食")
     食事: int | None = None
     点滴: int | None = None
     昼食: int | None = None
@@ -2076,10 +2077,10 @@ class 透析実施(DwhBaseModel):
     開始時シャント音: str | None = None
     開始時スリルコード: str | None = None
     開始時スリル: str | None = None
-    開始時穿刺コード_A_: str | None = None
-    開始時穿刺_A_: str | None = None
-    開始時穿刺コード_V_: str | None = None
-    開始時穿刺_V_: str | None = None
+    開始時穿刺コード_A_: str | None = Field(None, alias="開始時穿刺コード(A)")
+    開始時穿刺_A_: str | None = Field(None, alias="開始時穿刺(A)")
+    開始時穿刺コード_V_: str | None = Field(None, alias="開始時穿刺コード(V)")
+    開始時穿刺_V_: str | None = Field(None, alias="開始時穿刺(V)")
     開始時カテーテル名称コード: str | None = None
     開始時カテーテル名称: str | None = None
     開始時カテーテル位置コード1: str | None = None
@@ -2102,8 +2103,10 @@ class 透析実施(DwhBaseModel):
     終了時看護師2: str | None = None
     終了時採血有無フラグ: str | None = None
     終了時採血本数: int | None = None
-    終了時圧迫止血フラグ_Ns_: str | None = None
-    終了時圧迫止血フラグ_自己_: str | None = None
+    終了時圧迫止血フラグ_Ns_: str | None = Field(None, alias="終了時圧迫止血フラグ(Ns)")
+    終了時圧迫止血フラグ_自己_: str | None = Field(
+        None, alias="終了時圧迫止血フラグ(自己)"
+    )
     終了時カテーテル名称コード: str | None = None
     終了時カテーテル名称: str | None = None
     終了時カテーテル位置コード1: str | None = None
@@ -2119,14 +2122,18 @@ class 透析実施(DwhBaseModel):
     終了時シャント音: str | None = None
     終了時スリルコード: str | None = None
     終了時スリル: str | None = None
-    終了時残血コード_A_: str | None = None
-    終了時残血_A_: str | None = None
-    終了時残血コード_V_: str | None = None
-    終了時残血_V_: str | None = None
-    終了時残血コード_ダイアライザー_: str | None = None
+    終了時残血コード_A_: str | None = Field(None, alias="終了時残血コード(A)")
+    終了時残血_A_: str | None = Field(None, alias="終了時残血(A)")
+    終了時残血コード_V_: str | None = Field(None, alias="終了時残血コード(V)")
+    終了時残血_V_: str | None = Field(None, alias="終了時残血(V)")
+    終了時残血コード_ダイアライザー_: str | None = Field(
+        None, alias="終了時残血コード(ダイアライザー)"
+    )
     終了時ロック: str | None = None
     終了時ロックその他: str | None = None
-    終了時残血_ダイアライザー_: str | None = None
+    終了時残血_ダイアライザー_: str | None = Field(
+        None, alias="終了時残血(ダイアライザー)"
+    )
     施行者コード: str | None = None
     施行者: str | None = None
     薬剤コード1: str | None = None
@@ -2210,7 +2217,7 @@ class 放射線治療実施(DwhBaseModel):
     治療開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_治療開始日_: date = date(1000, 1, 1)
+    検索日_治療開始日_: date = Field(date(1000, 1, 1), alias="検索日(治療開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -2242,7 +2249,7 @@ class 放射線治療実施(DwhBaseModel):
     検査種別名: str = ""
     治療SEQ: int | None = None
     基本情報KEY: str = ""
-    治療計画No_: str | None = None
+    治療計画No_: str | None = Field(None, alias="治療計画No.")
     実施日: date | None = None
     実施時刻: time | None = None
     部位コード: str | None = None
@@ -2293,8 +2300,8 @@ class 放射線治療実施(DwhBaseModel):
     加算項目名10: str | None = None
     操作室コード: str | None = None
     操作室名: str | None = None
-    装置_照射方法コード: str | None = None
-    装置_照射方法: str | None = None
+    装置_照射方法コード: str | None = Field(None, alias="装置・照射方法コード")
+    装置_照射方法: str | None = Field(None, alias="装置・照射方法")
     撮影実施装置コード: str | None = None
     撮影実施装置: str | None = None
     治療装置コード: str | None = None
@@ -2302,11 +2309,11 @@ class 放射線治療実施(DwhBaseModel):
     シミュレータ分類: str | None = None
     門数: int | None = None
     実施1回線量: Decimal | None = None
-    治療_照準撮影区分: str | None = None
-    撮影条件_LENG_: str | None = None
-    撮影条件_KV_: str | None = None
-    撮影条件_mA_: str | None = None
-    撮影条件_sec_: str | None = None
+    治療_照準撮影区分: str | None = Field(None, alias="治療・照準撮影区分")
+    撮影条件_LENG_: str | None = Field(None, alias="撮影条件(LENG)")
+    撮影条件_KV_: str | None = Field(None, alias="撮影条件(KV)")
+    撮影条件_mA_: str | None = Field(None, alias="撮影条件(mA)")
+    撮影条件_sec_: str | None = Field(None, alias="撮影条件(sec)")
     フィルムの種類CD1: str | None = None
     フィルムの種類1: str | None = None
     フィルムの分割数1: int | None = None
@@ -2369,7 +2376,7 @@ class 看護指示受け(DwhBaseModel):
     指示開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_指示日_: date = date(1000, 1, 1)
+    検索日_指示日_: date = Field(date(1000, 1, 1), alias="検索日(指示日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -2459,7 +2466,7 @@ class リハビリ(DwhBaseModel):
     実施開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_実施開始日_: date = date(1000, 1, 1)
+    検索日_実施開始日_: date = Field(date(1000, 1, 1), alias="検索日(実施開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -2496,7 +2503,7 @@ class リハビリ(DwhBaseModel):
     単位数: int | None = None
     起算日: date | None = None
     療法種別: str = ""
-    トータル実施時間_分_: int | None = None
+    トータル実施時間_分_: int | None = Field(None, alias="トータル実施時間(分)")
     トータル実施回数: int | None = None
     実施場所コード: str = ""
     実施場所: str = ""
@@ -2538,7 +2545,7 @@ class 輸血(DwhBaseModel):
     輸血開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_輸血開始日_: date = date(1000, 1, 1)
+    検索日_輸血開始日_: date = Field(date(1000, 1, 1), alias="検索日(輸血開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -2571,7 +2578,7 @@ class 輸血(DwhBaseModel):
     疾患名: str = ""
     製剤グループコード: str = ""
     製剤グループ名: str = ""
-    製剤グループ名_オーダー時_: str = ""
+    製剤グループ名_オーダー時_: str = Field("", alias="製剤グループ名(オーダー時)")
     投与方法: str = ""
     輸血予定開始日: date | None = None
     輸血予定開始時刻: time | None = None

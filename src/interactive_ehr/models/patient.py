@@ -123,20 +123,20 @@ class 患者プロフィール(DwhBaseModel):
     頭囲: float | None = None
     胸囲: float | None = None
     腹囲: float | None = None
-    矯正視力_右_: float | None = None
-    矯正視力_左_: float | None = None
-    裸眼視力_右_: float | None = None
-    裸眼視力_左_: float | None = None
-    矯正近視力_右_: float | None = None
-    矯正近視力_左_: float | None = None
-    眼圧_右_: float | None = None
-    眼圧_左_: float | None = None
-    聴力_右_: int | None = None
-    聴力_左_: int | None = None
-    握力_右_: float | None = None
-    握力_左_: float | None = None
-    筋力_右下肢_: float | None = None
-    筋力_左下肢_: float | None = None
+    矯正視力_右_: float | None = Field(None, alias="矯正視力(右)")
+    矯正視力_左_: float | None = Field(None, alias="矯正視力(左)")
+    裸眼視力_右_: float | None = Field(None, alias="裸眼視力(右)")
+    裸眼視力_左_: float | None = Field(None, alias="裸眼視力(左)")
+    矯正近視力_右_: float | None = Field(None, alias="矯正近視力(右)")
+    矯正近視力_左_: float | None = Field(None, alias="矯正近視力(左)")
+    眼圧_右_: float | None = Field(None, alias="眼圧(右)")
+    眼圧_左_: float | None = Field(None, alias="眼圧(左)")
+    聴力_右_: int | None = Field(None, alias="聴力(右)")
+    聴力_左_: int | None = Field(None, alias="聴力(左)")
+    握力_右_: float | None = Field(None, alias="握力(右)")
+    握力_左_: float | None = Field(None, alias="握力(左)")
+    筋力_右下肢_: float | None = Field(None, alias="筋力(右下肢)")
+    筋力_左下肢_: float | None = Field(None, alias="筋力(左下肢)")
     身体機能計測日: date | None = None
     身体装具: str = ""
     肝機能障害の有無: str = ""
@@ -159,23 +159,23 @@ class 患者プロフィール(DwhBaseModel):
     狭心症の有無: str = ""
     性病の有無: str = ""
     ツベルクリン反応の有無: str = ""
-    遺伝性疾患_家族_の有無: str = ""
-    成人病負荷_家族_の有無: str = ""
+    遺伝性疾患_家族_の有無: str = Field("", alias="遺伝性疾患(家族)の有無")
+    成人病負荷_家族_の有無: str = Field("", alias="成人病負荷(家族)の有無")
     精神神経疾患の有無: str = ""
     遺伝子型: str = ""
     入院の有無: str = ""
     手術の有無: str = ""
     輸血の有無: str = ""
-    MRSA_____: str = ""
-    B型肝炎_____: str = ""
-    C型肝炎_____: str = ""
-    HIV_____: str = ""
-    緑膿菌_____: str = ""
-    TB_____: str = ""
-    TPHA_____: str = ""
-    VRE_____: str = ""
-    クラミジアIgG_____: str = ""
-    クラミジアIgA_____: str = ""
+    MRSA_____: str = Field("", alias="MRSA(+,-)")
+    B型肝炎_____: str = Field("", alias="B型肝炎(+,-)")
+    C型肝炎_____: str = Field("", alias="C型肝炎(+,-)")
+    HIV_____: str = Field("", alias="HIV(+,-)")
+    緑膿菌_____: str = Field("", alias="緑膿菌(+,-)")
+    TB_____: str = Field("", alias="TB(+,-)")
+    TPHA_____: str = Field("", alias="TPHA(+,-)")
+    VRE_____: str = Field("", alias="VRE(+,-)")
+    クラミジアIgG_____: str = Field("", alias="クラミジアIgG(+,-)")
+    クラミジアIgA_____: str = Field("", alias="クラミジアIgA(+,-)")
     その他感染症1の定義: str = ""
     その他感染症1の有無: str = ""
     その他感染症2の定義: str = ""
@@ -188,8 +188,8 @@ class 患者プロフィール(DwhBaseModel):
     脈拍: int | None = None
     不整脈の有無: str = ""
     呼吸数: int | None = None
-    血圧_最高_: int | None = None
-    血圧_最低_: int | None = None
+    血圧_最高_: int | None = Field(None, alias="血圧(最高)")
+    血圧_最低_: int | None = Field(None, alias="血圧(最低)")
     中心静脈圧: int | None = None
     バイタル測定日: date | None = None
     ペースメーカーの有無: str = ""
@@ -201,7 +201,7 @@ class 患者プロフィール(DwhBaseModel):
     人工弁の有無: str = ""
     骨折接合材の有無: str = ""
     義歯の有無: str = ""
-    金属染色_刺青_の有無: str = ""
+    金属染色_刺青_の有無: str = Field("", alias="金属染色(刺青)の有無")
     眼内レンズの有無: str = ""
     その他の体内金属: str = ""
     インプラント装着日: date | None = None
@@ -310,7 +310,7 @@ class 患者プロフィール(DwhBaseModel):
     高度の有無: str | None = None
     その他の有無: str | None = None
     病理同意書有無: str | None = None
-    病理同意日付__: date | None = None
+    病理同意日付__: date | None = Field(None, alias="病理同意日付  ")
     MRI造影剤アレルギー: str | None = None
     造影剤アレルギーの症状: str | None = None
     アレルギー性鼻炎: str | None = None
@@ -333,15 +333,15 @@ class 患者プロフィール(DwhBaseModel):
     自助具コメント: str | None = None
     利き手: str | None = None
     利き手制限: str | None = None
-    ケアマネージャー_所属: str | None = None
-    ケアマネージャー_氏名: str | None = None
-    ケアマネージャー_TEL: str | None = None
+    ケアマネージャー_所属: str | None = Field(None, alias="ケアマネージャー・所属")
+    ケアマネージャー_氏名: str | None = Field(None, alias="ケアマネージャー・氏名")
+    ケアマネージャー_TEL: str | None = Field(None, alias="ケアマネージャー・TEL")
     介護保険: str | None = None
     判定区分: str | None = None
     身体障害者手帳: str | None = None
     等級: str | None = None
     聴覚_平衡機能障害_1: str | None = Field(None, alias="聴覚/平衡機能障害")
-    音声_言語_咀嚼: str | None = None
+    音声_言語_咀嚼: str | None = Field(None, alias="音声/言語/咀嚼")
     肢体不自由_1: str | None = Field(None, alias="肢体不自由")
     心臓機能障害_1: str | None = Field(None, alias="心臓機能障害")
     膀胱_直腸機能障害_1: str | None = Field(None, alias="膀胱/直腸機能障害")
@@ -353,7 +353,7 @@ class 患者プロフィール(DwhBaseModel):
     生活保護: str | None = None
     その他コメント: str | None = None
     活用しているサービス: str | None = None
-    窓口_担当者: str | None = None
+    窓口_担当者: str | None = Field(None, alias="窓口・担当者")
     連絡先: str | None = None
     在宅療養上での家族の負担: str | None = None
     在宅療養上での家族の負担コメント: str | None = None
@@ -363,17 +363,21 @@ class 患者プロフィール(DwhBaseModel):
     緊急連絡先2関係フリー: str | None = None
     キーパーソン連絡先関係フリー: str | None = None
     人工内耳: str = ""
-    人工内耳_機種: str = ""
-    人工内耳_設置日: date | None = None
-    体内インプラント_電子デバイス: str = ""
-    体内インプラント_電子デバイス_フリー: str = ""
-    造影剤アレルギ_MR_: str = ""
-    造影剤アレルギ_MR__コメント: str = ""
-    造影剤アレルギ_CT__コメント: str = ""
+    人工内耳_機種: str = Field("", alias="人工内耳 機種")
+    人工内耳_設置日: date | None = Field(None, alias="人工内耳 設置日")
+    体内インプラント_電子デバイス: str = Field(
+        "", alias="体内インプラント・電子デバイス"
+    )
+    体内インプラント_電子デバイス_フリー: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー"
+    )
+    造影剤アレルギ_MR_: str = Field("", alias="造影剤アレルギ(MR)")
+    造影剤アレルギ_MR__コメント: str = Field("", alias="造影剤アレルギ(MR) コメント")
+    造影剤アレルギ_CT__コメント: str = Field("", alias="造影剤アレルギ(CT) コメント")
     ビグアナイド系処方: str = ""
-    ビグアナイド系処方_コメント: str = ""
+    ビグアナイド系処方_コメント: str = Field("", alias="ビグアナイド系処方 コメント")
     βブロッカー服用: str = ""
-    βブロッカー服用_コメント: str = ""
+    βブロッカー服用_コメント: str = Field("", alias="βブロッカー服用 コメント")
     パワーボート: str = ""
     腎機能コメント: str = ""
     認知症: str = ""
@@ -382,8 +386,8 @@ class 患者プロフィール(DwhBaseModel):
     その他安全情報: str = ""
     ABO不適合移植患者: str = ""
     脳動脈クリップー機種等: str = ""
-    ICD_CRTD機種等: str = ""
-    ICD_CRTD設置日: date | None = None
+    ICD_CRTD機種等: str = Field("", alias="ICD・CRTD機種等")
+    ICD_CRTD設置日: date | None = Field(None, alias="ICD・CRTD設置日")
     判定済み: str = ""
     要支援: str = ""
     要介護: str = ""
@@ -394,60 +398,88 @@ class 患者プロフィール(DwhBaseModel):
     担当ケアマネージャー連絡先: str = ""
     担当ケアマネージャーその他情報: str = ""
     デイサービス: str = ""
-    デイサービス_フリーテキスト_: str = ""
+    デイサービス_フリーテキスト_: str = Field("", alias="デイサービス(フリーテキスト)")
     ショートステイ: str = ""
-    ショートステイ_フリーテキスト_: str = ""
-    訪問看護_往診_: str = ""
-    訪問看護_往診__フリーテキスト_: str = ""
+    ショートステイ_フリーテキスト_: str = Field(
+        "", alias="ショートステイ(フリーテキスト)"
+    )
+    訪問看護_往診_: str = Field("", alias="訪問看護(往診)")
+    訪問看護_往診__フリーテキスト_: str = Field(
+        "", alias="訪問看護(往診)(フリーテキスト)"
+    )
     訪問看護: str = ""
-    訪問看護_フリーテキスト_: str = ""
+    訪問看護_フリーテキスト_: str = Field("", alias="訪問看護(フリーテキスト)")
     訪問リハビリ: str = ""
-    訪問リハビリ_フリーテキスト_: str = ""
+    訪問リハビリ_フリーテキスト_: str = Field("", alias="訪問リハビリ(フリーテキスト)")
     ヘルパー: str = ""
-    ヘルパー_フリーテキスト_: str = ""
+    ヘルパー_フリーテキスト_: str = Field("", alias="ヘルパー(フリーテキスト)")
     福祉用具レンタル: str = ""
-    福祉用具レンタル_フリーテキスト_: str = ""
+    福祉用具レンタル_フリーテキスト_: str = Field(
+        "", alias="福祉用具レンタル(フリーテキスト)"
+    )
     その他_1: str = Field("", alias="その他")
     その他_フリーテキスト__1: str = Field("", alias="その他(フリーテキスト)")
     詳細情報: str = ""
     視覚障害: str = ""
-    視覚障害_フリーテキスト_: str = ""
+    視覚障害_フリーテキスト_: str = Field("", alias="視覚障害(フリーテキスト)")
     聴覚_平衡機能障害_2: str = Field("", alias="聴覚/平衡機能障害")
-    聴覚_平衡機能障害_フリーテキスト_: str = ""
-    音声機能_言語機能_咀嚼機能障害: str = ""
-    音声機能_言語機能_咀嚼機能障害_フリーテキスト_: str = ""
+    聴覚_平衡機能障害_フリーテキスト_: str = Field(
+        "", alias="聴覚/平衡機能障害(フリーテキスト)"
+    )
+    音声機能_言語機能_咀嚼機能障害: str = Field(
+        "", alias="音声機能・言語機能/咀嚼機能障害"
+    )
+    音声機能_言語機能_咀嚼機能障害_フリーテキスト_: str = Field(
+        "", alias="音声機能・言語機能/咀嚼機能障害(フリーテキスト)"
+    )
     肢体不自由_2: str = Field("", alias="肢体不自由")
-    肢体不自由_フリーテキスト_: str = ""
+    肢体不自由_フリーテキスト_: str = Field("", alias="肢体不自由(フリーテキスト)")
     腎機能障害: str = ""
-    腎機能障害_フリーテキスト_: str = ""
+    腎機能障害_フリーテキスト_: str = Field("", alias="腎機能障害(フリーテキスト)")
     心臓機能障害_2: str = Field("", alias="心臓機能障害")
-    心臓機能障害_フリーテキスト_: str = ""
+    心臓機能障害_フリーテキスト_: str = Field("", alias="心臓機能障害(フリーテキスト)")
     呼吸器機能障害_2: str = Field("", alias="呼吸器機能障害")
-    呼吸器機能障害_フリーテキスト_: str = ""
+    呼吸器機能障害_フリーテキスト_: str = Field(
+        "", alias="呼吸器機能障害(フリーテキスト)"
+    )
     膀胱_直腸機能障害_2: str = Field("", alias="膀胱/直腸機能障害")
-    膀胱_直腸機能障害_フリーテキスト_: str = ""
+    膀胱_直腸機能障害_フリーテキスト_: str = Field(
+        "", alias="膀胱/直腸機能障害(フリーテキスト)"
+    )
     小腸機能障害_2: str = Field("", alias="小腸機能障害")
-    小腸機能障害_フリーテキスト_: str = ""
+    小腸機能障害_フリーテキスト_: str = Field("", alias="小腸機能障害(フリーテキスト)")
     ヒト免疫不全ウイルスによる免疫機能障害: str = ""
-    ヒト免疫不全ウイルスによる免疫機能障害_フリーテキスト_: str = ""
+    ヒト免疫不全ウイルスによる免疫機能障害_フリーテキスト_: str = Field(
+        "", alias="ヒト免疫不全ウイルスによる免疫機能障害(フリーテキスト)"
+    )
     精神障害: str = ""
-    精神障害_フリーテキスト_: str = ""
+    精神障害_フリーテキスト_: str = Field("", alias="精神障害(フリーテキスト)")
     療育手帳: str = ""
     精神障害者保険福祉手帳_2: str = Field("", alias="精神障害者保険福祉手帳")
     特定疾患_2: str = Field("", alias="特定疾患")
-    特定疾患_フリーテキスト_: str = ""
-    _児_小児特定疾患: str = ""
-    _児_小児特定疾患_フリーテキスト_: str = ""
-    _児_育成医療: str = ""
-    _児_育成医療_フリーテキスト_: str = ""
-    _児_未熟児養育医療: str = ""
-    _児_未熟児養育医療_フリーテキスト_: str = ""
+    特定疾患_フリーテキスト_: str = Field("", alias="特定疾患(フリーテキスト)")
+    児_小児特定疾患: str = Field("", alias="(児)小児特定疾患")
+    児_小児特定疾患_フリーテキスト_: str = Field(
+        "", alias="(児)小児特定疾患(フリーテキスト)"
+    )
+    児_育成医療: str = Field("", alias="(児)育成医療")
+    児_育成医療_フリーテキスト_: str = Field("", alias="(児)育成医療(フリーテキスト)")
+    児_未熟児養育医療: str = Field("", alias="(児)未熟児養育医療")
+    児_未熟児養育医療_フリーテキスト_: str = Field(
+        "", alias="(児)未熟児養育医療(フリーテキスト)"
+    )
     生活保護受給者: str = ""
-    生活保護受給者_フリーテキスト_: str = ""
-    右上肢_処置禁止: str = ""
-    右上肢_処置禁止_フリーテキスト_: str = ""
-    左上肢_処置禁止: str = ""
-    左上肢_処置禁止_フリーテキスト_: str = ""
+    生活保護受給者_フリーテキスト_: str = Field(
+        "", alias="生活保護受給者(フリーテキスト)"
+    )
+    右上肢_処置禁止: str = Field("", alias="右上肢 処置禁止")
+    右上肢_処置禁止_フリーテキスト_: str = Field(
+        "", alias="右上肢 処置禁止(フリーテキスト)"
+    )
+    左上肢_処置禁止: str = Field("", alias="左上肢 処置禁止")
+    左上肢_処置禁止_フリーテキスト_: str = Field(
+        "", alias="左上肢 処置禁止(フリーテキスト)"
+    )
     その他_2: str = Field("", alias="その他")
     その他_フリーテキスト__2: str = Field("", alias="その他(フリーテキスト)")
     CT非対応: str = ""
@@ -455,25 +487,63 @@ class 患者プロフィール(DwhBaseModel):
     リードコメント: str = ""
     リード設置日: date | None = None
     パワーボート埋込日: date | None = None
-    体内インプラント_電子デバイス_フリー2: str = ""
-    体内インプラント_電子デバイス_フリー3: str = ""
-    体内インプラント_電子デバイス_フリー4: str = ""
-    体内インプラント_電子デバイス_フリー5: str = ""
-    体内インプラント_電子デバイス_フリー6: str = ""
-    体内インプラント_電子デバイス_フリー7: str = ""
-    体内インプラント_電子デバイス_フリー8: str = ""
-    体内インプラント_電子デバイス_フリー9: str = ""
-    体内インプラント_電子デバイス_フリー10: str = ""
-    体内インプラント_電子デバイス_フリー11: str = ""
-    体内インプラント_電子デバイス_フリー12: str = ""
-    体内インプラント_電子デバイス_フリー13: str = ""
-    体内インプラント_電子デバイス_フリー14: str = ""
-    体内インプラント_電子デバイス_フリー15: str = ""
-    体内インプラント_電子デバイス_フリー16: str = ""
-    体内インプラント_電子デバイス_フリー17: str = ""
-    体内インプラント_電子デバイス_フリー18: str = ""
-    体内インプラント_電子デバイス_フリー19: str = ""
-    体内インプラント_電子デバイス_フリー20: str = ""
+    体内インプラント_電子デバイス_フリー2: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー2"
+    )
+    体内インプラント_電子デバイス_フリー3: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー3"
+    )
+    体内インプラント_電子デバイス_フリー4: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー4"
+    )
+    体内インプラント_電子デバイス_フリー5: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー5"
+    )
+    体内インプラント_電子デバイス_フリー6: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー6"
+    )
+    体内インプラント_電子デバイス_フリー7: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー7"
+    )
+    体内インプラント_電子デバイス_フリー8: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー8"
+    )
+    体内インプラント_電子デバイス_フリー9: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー9"
+    )
+    体内インプラント_電子デバイス_フリー10: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー10"
+    )
+    体内インプラント_電子デバイス_フリー11: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー11"
+    )
+    体内インプラント_電子デバイス_フリー12: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー12"
+    )
+    体内インプラント_電子デバイス_フリー13: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー13"
+    )
+    体内インプラント_電子デバイス_フリー14: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー14"
+    )
+    体内インプラント_電子デバイス_フリー15: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー15"
+    )
+    体内インプラント_電子デバイス_フリー16: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー16"
+    )
+    体内インプラント_電子デバイス_フリー17: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー17"
+    )
+    体内インプラント_電子デバイス_フリー18: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー18"
+    )
+    体内インプラント_電子デバイス_フリー19: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー19"
+    )
+    体内インプラント_電子デバイス_フリー20: str = Field(
+        "", alias="体内インプラント・電子デバイス フリー20"
+    )
     その他の情報: str = ""
     死亡の有無: str = ""
     死亡日: date | None = None
@@ -500,7 +570,7 @@ class 身体測定情報(DwhBaseModel):
     測定時月齢: int | None = None
     測定時日齢: int | None = None
     検索日の定義: str = ""
-    検索日_測定日_: date = date(1000, 1, 1)
+    検索日_測定日_: date = Field(date(1000, 1, 1), alias="検索日(測定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -541,7 +611,7 @@ class 患者アレルギー情報(DwhBaseModel):
     診断時月齢: int | None = None
     診断時日齢: int | None = None
     検索日の定義: str = ""
-    検索日_診断日_: date = date(1000, 1, 1)
+    検索日_診断日_: date = Field(date(1000, 1, 1), alias="検索日(診断日)")
     入力日の定義: str = ""
     入力日: date | None = None
     入力時刻: time | None = None
@@ -599,7 +669,7 @@ class 患者感染症情報(DwhBaseModel):
     診断時月齢: int | None = None
     診断時日齢: int | None = None
     検索日の定義: str = ""
-    検索日_診断日_: date = date(1000, 1, 1)
+    検索日_診断日_: date = Field(date(1000, 1, 1), alias="検索日(診断日)")
     入力日の定義: str = ""
     入力日: date | None = None
     入力時刻: time | None = None
@@ -652,7 +722,7 @@ class 患者担当医師情報(DwhBaseModel):
     担当開始時月齢: int | None = None
     担当開始時日齢: int | None = None
     検索日の定義: str = ""
-    検索日_開始日_: date = date(1000, 1, 1)
+    検索日_開始日_: date = Field(date(1000, 1, 1), alias="検索日(開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -702,7 +772,7 @@ class 妊娠歴(DwhBaseModel):
     分娩時月齢: int | None = None
     分娩時日齢: int | None = None
     検索日の定義: str = ""
-    検索日_最終更新日_: date = date(1000, 1, 1)
+    検索日_最終更新日_: date = Field(date(1000, 1, 1), alias="検索日(最終更新日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -752,7 +822,7 @@ class 問診票病歴(DwhBaseModel):
     患者ID: str = ""
     患者番号: float = 0.0
     検索日の定義: str = ""
-    検索日_発病日_: date = date(1000, 1, 1)
+    検索日_発病日_: date = Field(date(1000, 1, 1), alias="検索日(発病日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -772,8 +842,8 @@ class 問診票病歴(DwhBaseModel):
     サブオーナー1職種: str = ""
     病歴SEQ: int = 0
     発病年齢: int | None = None
-    既往歴_病名コード_: str = ""
-    既往歴_病名_: str = ""
+    既往歴_病名コード_: str = Field("", alias="既往歴(病名コード)")
+    既往歴_病名_: str = Field("", alias="既往歴(病名)")
     病名開始日: date | None = None
     転帰: str = ""
     治療法: str = ""
@@ -811,7 +881,7 @@ class 予約_受診歴(DwhBaseModel):
     受診時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_受診日時_: date = date(1000, 1, 1)
+    検索日_受診日時_: date = Field(date(1000, 1, 1), alias="検索日(受診日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -864,7 +934,7 @@ class 予約_受診歴(DwhBaseModel):
     会計終了時刻: time | None = None
     入金終了時刻: time | None = None
     診察前検査の有無: str = ""
-    診察後検査_二度診_の有無: str = ""
+    診察後検査_二度診_の有無: str = Field("", alias="診察後検査(二度診)の有無")
     併科受診の有無: str = ""
     遅刻の有無: str = ""
     初再診区分: str = ""
@@ -905,7 +975,7 @@ class 紹介(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_紹介日時_: date = date(1000, 1, 1)
+    検索日_紹介日時_: date = Field(date(1000, 1, 1), alias="検索日(紹介日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -947,7 +1017,7 @@ class 紹介(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
     紹介元医療機関コード: str = ""
     紹介元医療機関名: str = ""
@@ -997,7 +1067,7 @@ class 入退院歴(DwhBaseModel):
     入院時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_入院日_: date = date(1000, 1, 1)
+    検索日_入院日_: date = Field(date(1000, 1, 1), alias="検索日(入院日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1086,7 +1156,7 @@ class 入院カレンダー(DwhBaseModel):
     入院時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_暦日_: date = date(1000, 1, 1)
+    検索日_暦日_: date = Field(date(1000, 1, 1), alias="検索日(暦日)")
     検索時刻: time = time(0, 0, 0)
     更新日の定義: str = ""
     更新日: date | None = None
@@ -1228,7 +1298,7 @@ class 食事(DwhBaseModel):
     開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_開始日_: date = date(1000, 1, 1)
+    検索日_開始日_: date = Field(date(1000, 1, 1), alias="検索日(開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1292,8 +1362,8 @@ class 食事(DwhBaseModel):
     塩分表示単位: str | None = None
     副食コード: str | None = None
     副食: str | None = None
-    経管_調乳: str = ""
-    経管栄養_調乳回数: int | None = None
+    経管_調乳: str = Field("", alias="経管・調乳")
+    経管栄養_調乳回数: int | None = Field(None, alias="経管栄養・調乳回数")
     飲み物コード: str | None = None
     飲み物: str | None = None
     選択食: str = ""
@@ -1360,7 +1430,7 @@ class 栄養指導(DwhBaseModel):
     指導時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_指導日_: date = date(1000, 1, 1)
+    検索日_指導日_: date = Field(date(1000, 1, 1), alias="検索日(指導日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1468,7 +1538,7 @@ class 入院予約(DwhBaseModel):
     依頼時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_入院予約日_: date = date(1000, 1, 1)
+    検索日_入院予約日_: date = Field(date(1000, 1, 1), alias="検索日(入院予約日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None

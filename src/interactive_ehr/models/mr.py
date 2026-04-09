@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, time
+from pydantic import Field
 
 from interactive_ehr.models._base import DwhBaseModel
 
@@ -36,7 +37,7 @@ class カルテ記事DR(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -71,7 +72,7 @@ class カルテ記事DR(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -104,7 +105,7 @@ class カルテ記事NS(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -139,7 +140,7 @@ class カルテ記事NS(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -172,7 +173,7 @@ class カルテ記事スタッフ(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -207,7 +208,7 @@ class カルテ記事スタッフ(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -240,7 +241,7 @@ class カルテ記事その他(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -275,7 +276,7 @@ class カルテ記事その他(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -308,7 +309,7 @@ class オーダ記事(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -347,7 +348,7 @@ class オーダ記事(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -380,7 +381,7 @@ class カルテテンプレート(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -414,7 +415,7 @@ class カルテテンプレート(DwhBaseModel):
     表示フォーマット: str = ""
     入力値: str = ""
     表示テキスト: str = ""
-    項目詳細_タイトル_: str | None = None
+    項目詳細_タイトル_: str | None = Field(None, alias="項目詳細(タイトル)")
     項目詳細値: str | None = None
     項目詳細数値型: float | None = None
     項目詳細DATE型: date | None = None

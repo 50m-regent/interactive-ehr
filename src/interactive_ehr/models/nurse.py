@@ -31,7 +31,7 @@ class 病棟看護日誌(DwhBaseModel):
     施設コード: str = ""
     施設名: str = ""
     検索日の定義: str = ""
-    検索日_集計対象日_: date = date(1000, 1, 1)
+    検索日_集計対象日_: date = Field(date(1000, 1, 1), alias="検索日(集計対象日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -79,18 +79,18 @@ class 病棟看護日誌(DwhBaseModel):
     新生児数: int | None = None
     新生児出生数: int | None = None
     新生児退院数: int | None = None
-    A_I患者数: int | None = None
-    A_II患者数: int | None = None
-    A_III患者数: int | None = None
-    A_IV患者数: int | None = None
-    B_I患者数: int | None = None
-    B_II患者数: int | None = None
-    B_III患者数: int | None = None
-    B_IV患者数: int | None = None
-    C_I患者数: int | None = None
-    C_II患者数: int | None = None
-    C_III患者数: int | None = None
-    C_IV患者数: int | None = None
+    A_I患者数: int | None = Field(None, alias="A-I患者数")
+    A_II患者数: int | None = Field(None, alias="A-II患者数")
+    A_III患者数: int | None = Field(None, alias="A-III患者数")
+    A_IV患者数: int | None = Field(None, alias="A-IV患者数")
+    B_I患者数: int | None = Field(None, alias="B-I患者数")
+    B_II患者数: int | None = Field(None, alias="B-II患者数")
+    B_III患者数: int | None = Field(None, alias="B-III患者数")
+    B_IV患者数: int | None = Field(None, alias="B-IV患者数")
+    C_I患者数: int | None = Field(None, alias="C-I患者数")
+    C_II患者数: int | None = Field(None, alias="C-II患者数")
+    C_III患者数: int | None = Field(None, alias="C-III患者数")
+    C_IV患者数: int | None = Field(None, alias="C-IV患者数")
     I度患者数: int | None = None
     II度患者数: int | None = None
     III度患者数: int | None = None
@@ -108,11 +108,11 @@ class 病棟看護日誌(DwhBaseModel):
     HIV重症者等療養環境特別加算: int | None = None
     無菌室加算: int | None = None
     放射線治療病室管理加算: int | None = None
-    予約_一般_: int | None = None
-    予約_個室_: int | None = None
-    予約_多床室_: int | None = None
-    手術_予定_件数: int | None = None
-    手術_緊急_件数: int | None = None
+    予約_一般_: int | None = Field(None, alias="予約(一般)")
+    予約_個室_: int | None = Field(None, alias="予約(個室)")
+    予約_多床室_: int | None = Field(None, alias="予約(多床室)")
+    手術_予定_件数: int | None = Field(None, alias="手術(予定)件数")
+    手術_緊急_件数: int | None = Field(None, alias="手術(緊急)件数")
     検査件数: int | None = None
     透析件数: int | None = None
     分娩件数: int | None = None
@@ -151,7 +151,7 @@ class バイタル(DwhBaseModel):
     測定時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_測定日_: date = date(1000, 1, 1)
+    検索日_測定日_: date = Field(date(1000, 1, 1), alias="検索日(測定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -177,8 +177,8 @@ class バイタル(DwhBaseModel):
     脈拍: int | None = None
     心拍数: int | None = None
     呼吸数: int | None = None
-    血圧_最高_: int | None = None
-    血圧_最低_: int | None = None
+    血圧_最高_: int | None = Field(None, alias="血圧(最高)")
+    血圧_最低_: int | None = Field(None, alias="血圧(最低)")
     SPO2: float | None = None
     トレンドコメント: str = ""
     測定値1の定義: str = ""
@@ -222,7 +222,7 @@ class 経過記録(DwhBaseModel):
     観察時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_観察日時_: date = date(1000, 1, 1)
+    検索日_観察日時_: date = Field(date(1000, 1, 1), alias="検索日(観察日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -254,7 +254,7 @@ class 経過記録(DwhBaseModel):
     項目コード: str = ""
     項目名: str = ""
     入力値: str = ""
-    入力値_数値_: float | None = None
+    入力値_数値_: float | None = Field(None, alias="入力値(数値)")
     表示フォーマット: str = ""
     表示テキスト: str = ""
     単位: str = ""
@@ -290,7 +290,7 @@ class 看護診断(DwhBaseModel):
     診断時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_診断日時_: date = date(1000, 1, 1)
+    検索日_診断日時_: date = Field(date(1000, 1, 1), alias="検索日(診断日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -363,7 +363,7 @@ class 看護診断因子(DwhBaseModel):
     診断時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_診断日時_: date = date(1000, 1, 1)
+    検索日_診断日時_: date = Field(date(1000, 1, 1), alias="検索日(診断日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -443,7 +443,7 @@ class 看護診断指標(DwhBaseModel):
     診断時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_診断日時_: date = date(1000, 1, 1)
+    検索日_診断日時_: date = Field(date(1000, 1, 1), alias="検索日(診断日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -522,7 +522,7 @@ class 看護診断NOC(DwhBaseModel):
     診断時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_診断日時_: date = date(1000, 1, 1)
+    検索日_診断日時_: date = Field(date(1000, 1, 1), alias="検索日(診断日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -613,7 +613,7 @@ class 看護診断NIC(DwhBaseModel):
     診断時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_診断日時_: date = date(1000, 1, 1)
+    検索日_診断日時_: date = Field(date(1000, 1, 1), alias="検索日(診断日時)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -694,7 +694,7 @@ class 看護必要度I(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_評価日_: date = date(1000, 1, 1)
+    検索日_評価日_: date = Field(date(1000, 1, 1), alias="検索日(評価日)")
     検索時刻: time = time(0, 0, 0)
     入力日: date | None = None
     入力時刻: time | None = None
@@ -757,19 +757,31 @@ class 看護必要度I(DwhBaseModel):
     重症度D評価項目数: int | None = None
     重症度E評価項目数: int | None = None
     重症度F評価項目数: int | None = None
-    一般病棟_10_1_基準対象: str = ""
-    一般病棟_10_1_A得点: int | None = None
-    一般病棟_10_1_B得点: int | None = None
-    一般病棟_10_1_C得点: int | None = None
-    一般病棟_10_1_D得点: int | None = None
-    一般病棟_10_1_E得点: int | None = None
-    一般病棟_10_1_F得点: int | None = None
-    一般病棟_10_1_A評価項目数: int | None = None
-    一般病棟_10_1_B評価項目数: int | None = None
-    一般病棟_10_1_C評価項目数: int | None = None
-    一般病棟_10_1_D評価項目数: int | None = None
-    一般病棟_10_1_E評価項目数: int | None = None
-    一般病棟_10_1_F評価項目数: int | None = None
+    一般病棟_10_1_基準対象: str = Field("", alias="一般病棟(10:1)基準対象")
+    一般病棟_10_1_A得点: int | None = Field(None, alias="一般病棟(10:1)A得点")
+    一般病棟_10_1_B得点: int | None = Field(None, alias="一般病棟(10:1)B得点")
+    一般病棟_10_1_C得点: int | None = Field(None, alias="一般病棟(10:1)C得点")
+    一般病棟_10_1_D得点: int | None = Field(None, alias="一般病棟(10:1)D得点")
+    一般病棟_10_1_E得点: int | None = Field(None, alias="一般病棟(10:1)E得点")
+    一般病棟_10_1_F得点: int | None = Field(None, alias="一般病棟(10:1)F得点")
+    一般病棟_10_1_A評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)A評価項目数"
+    )
+    一般病棟_10_1_B評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)B評価項目数"
+    )
+    一般病棟_10_1_C評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)C評価項目数"
+    )
+    一般病棟_10_1_D評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)D評価項目数"
+    )
+    一般病棟_10_1_E評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)E評価項目数"
+    )
+    一般病棟_10_1_F評価項目数: int | None = Field(
+        None, alias="一般病棟(10:1)F評価項目数"
+    )
     地域包括ケア基準対象: str = ""
     地域包括ケアA得点: int | None = None
     地域包括ケアB得点: int | None = None
@@ -866,7 +878,7 @@ class 看護必要度II(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_評価日_: date = date(1000, 1, 1)
+    検索日_評価日_: date = Field(date(1000, 1, 1), alias="検索日(評価日)")
     検索時刻: time = time(0, 0, 0)
     入力日: date | None = None
     入力時刻: time | None = None
@@ -1015,7 +1027,7 @@ class 看護DB_一般(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1043,8 +1055,8 @@ class 看護DB_一般(DwhBaseModel):
     身長測定日: date | None = None
     体重: Decimal | None = None
     体重測定日: date | None = None
-    在胎_週_: int | None = None
-    在胎_日_: int | None = None
+    在胎_週_: int | None = Field(None, alias="在胎(週)")
+    在胎_日_: int | None = Field(None, alias="在胎(日)")
     子数: int | None = None
     胎児数: int | None = None
     出生施設区分: str = ""
@@ -1070,7 +1082,7 @@ class 看護DB_ヘルスプロモーション(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1099,25 +1111,29 @@ class 看護DB_ヘルスプロモーション(DwhBaseModel):
     IC本人治療方針説明の有無: str = ""
     IC本人予後説明の有無: str = ""
     IC本人反応: str = ""
-    ICコメント_本人_: str = ""
+    ICコメント_本人_: str = Field("", alias="ICコメント(本人)")
     IC説明: str = ""
     ICその他説明者内容: str = ""
-    IC日_代表者_: date | None = None
+    IC日_代表者_: date | None = Field(None, alias="IC日(代表者)")
     IC家族病名説明の有無: str = ""
     IC家族症状説明の有無: str = ""
     IC家族検査結果説明の有無: str = ""
     IC家族治療方針説明の有無: str = ""
     IC家族予後の有無: str = ""
-    ICコメント_家族_: str = ""
+    ICコメント_家族_: str = Field("", alias="ICコメント(家族)")
     食事療法の有無: str = ""
-    食事療法_実施率: int | None = None
+    食事療法_実施率: int | None = Field(None, alias="食事療法-実施率")
     食事療法コメント: str = ""
     運動の有無: str = ""
     運動に対するコメント: str = ""
     健康上の注意点の有無: str = ""
     健康上の注意点コメント: str = ""
-    食事で気をつけていること_味付け: str = ""
-    食事で気をつけていること_規則性: str = ""
+    食事で気をつけていること_味付け: str = Field(
+        "", alias="食事で気をつけていること-味付け"
+    )
+    食事で気をつけていること_規則性: str = Field(
+        "", alias="食事で気をつけていること-規則性"
+    )
     喫煙本数: int | None = None
     喫煙開始年齢: int | None = None
     喫煙中止年齢: int | None = None
@@ -1125,7 +1141,7 @@ class 看護DB_ヘルスプロモーション(DwhBaseModel):
     飲酒量: int | None = None
     飲酒開始年齢: int | None = None
     飲酒中止年齢: int | None = None
-    飲酒歴_年数_: int | None = None
+    飲酒歴_年数_: int | None = Field(None, alias="飲酒歴(年数)")
     陣痛発来日: date | None = None
     陣痛発来時刻: time | None = None
     破水状態: str = ""
@@ -1133,17 +1149,17 @@ class 看護DB_ヘルスプロモーション(DwhBaseModel):
     破水時刻: time | None = None
     羊水混濁の有無: str = ""
     妊娠中合併症の有無: str = ""
-    妊娠合併症_中毒症_の有無: str = ""
-    妊娠合併症_尿蛋白_の有無: str = ""
+    妊娠合併症_中毒症_の有無: str = Field("", alias="妊娠合併症(中毒症)の有無")
+    妊娠合併症_尿蛋白_の有無: str = Field("", alias="妊娠合併症(尿蛋白)の有無")
     尿糖の有無: str = ""
     切迫流早産の有無: str = ""
     貧血の有無: str = ""
     その他合併症内容: str = ""
-    妊娠中毒症_最高血圧_: str = ""
-    妊娠中毒症_最低血圧_: str = ""
-    妊娠中毒症_浮腫_の有無: str = ""
-    受け止め方_妊娠について: str = ""
-    受け止め方_分娩について: str = ""
+    妊娠中毒症_最高血圧_: str = Field("", alias="妊娠中毒症(最高血圧)")
+    妊娠中毒症_最低血圧_: str = Field("", alias="妊娠中毒症(最低血圧)")
+    妊娠中毒症_浮腫_の有無: str = Field("", alias="妊娠中毒症(浮腫)の有無")
+    受け止め方_妊娠について: str = Field("", alias="受け止め方-妊娠について")
+    受け止め方_分娩について: str = Field("", alias="受け止め方-分娩について")
     妊娠中喫煙状況: str = ""
     妊娠中喫煙本数: int | None = None
     母親喫煙開始年齢: int | None = None
@@ -1157,16 +1173,16 @@ class 看護DB_ヘルスプロモーション(DwhBaseModel):
     出生時身長: Decimal | None = None
     出生時頭囲: Decimal | None = None
     出生時胸囲: Decimal | None = None
-    アプガースコア_1分_: int | None = None
-    アプガースコア_5分_: int | None = None
+    アプガースコア_1分_: int | None = Field(None, alias="アプガースコア(1分)")
+    アプガースコア_5分_: int | None = Field(None, alias="アプガースコア(5分)")
     蘇生の有無: str = ""
     蘇生法内容: str = ""
     外表奇形の有無: str = ""
     外表奇形内容: str = ""
     清潔方法: str = ""
-    入浴_回数_: int | None = None
+    入浴_回数_: int | None = Field(None, alias="入浴(回数)")
     入浴単位: str = ""
-    洗髪_回数_: int | None = None
+    洗髪_回数_: int | None = Field(None, alias="洗髪(回数)")
 
 
 class 看護DB_栄養(DwhBaseModel):
@@ -1188,7 +1204,7 @@ class 看護DB_栄養(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1228,7 +1244,7 @@ class 看護DB_栄養(DwhBaseModel):
     食事摂取の変化: str = ""
     食事摂取変化内容: str = ""
     ミルク区分: str = ""
-    ミルク量_1回量_: int | None = None
+    ミルク量_1回量_: int | None = Field(None, alias="ミルク量(1回量)")
     ミルク回数: int | None = None
     母乳対象: str = ""
     離乳食対象: str = ""
@@ -1243,13 +1259,13 @@ class 看護DB_栄養(DwhBaseModel):
     摂取状況コメント: str = ""
     嗜好品の有無: str = ""
     嗜好品コメント: str = ""
-    食事_ミルク要望の有無: str = ""
-    食事_ミルク要望内容: str = ""
+    食事_ミルク要望の有無: str = Field("", alias="食事・ミルク要望の有無")
+    食事_ミルク要望内容: str = Field("", alias="食事・ミルク要望内容")
     偏食の有無: str = ""
     偏食内容: str = ""
     悪心の有無: str = ""
     嘔吐の有無: str = ""
-    嘔吐_回数_: int | None = None
+    嘔吐_回数_: int | None = Field(None, alias="嘔吐(回数)")
     食に対する影響: str = ""
     間食回数: int | None = None
     義歯の有無: str = ""
@@ -1275,7 +1291,7 @@ class 看護DB_排泄(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1295,25 +1311,29 @@ class 看護DB_排泄(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    排便回数_回_: int | None = None
-    排便回数_日_: int | None = None
-    排便_性状_: str = ""
-    排便_色_: str = ""
+    排便回数_回_: int | None = Field(None, alias="排便回数(回)")
+    排便回数_日_: int | None = Field(None, alias="排便回数(日)")
+    排便_性状_: str = Field("", alias="排便(性状)")
+    排便_色_: str = Field("", alias="排便(色)")
     最終排便日: date | None = None
     最終排便時刻: time | None = None
-    最終排便_性状_: str = ""
-    最終排便_色_: str = ""
+    最終排便_性状_: str = Field("", alias="最終排便(性状)")
+    最終排便_色_: str = Field("", alias="最終排便(色)")
     排便時の状態: str = ""
     排便コメント: str = ""
     便通のための対処の有無: str = ""
     排便のコミュニケーション: str = ""
-    排便のコミュニケーション_言葉_: str = ""
-    排便のコミュニケーション_しぐさ_: str = ""
+    排便のコミュニケーション_言葉_: str = Field(
+        "", alias="排便のコミュニケーション(言葉)"
+    )
+    排便のコミュニケーション_しぐさ_: str = Field(
+        "", alias="排便のコミュニケーション(しぐさ)"
+    )
     ストーマの有無: str = ""
     便失禁の有無: str = ""
-    排尿回数_回_日_: int | None = None
-    夜尿_回数_: int | None = None
-    排尿_性状_: str = ""
+    排尿回数_回_日_: int | None = Field(None, alias="排尿回数(回/日)")
+    夜尿_回数_: int | None = Field(None, alias="夜尿(回数)")
+    排尿_性状_: str = Field("", alias="排尿(性状)")
     第一排尿の有無: str = ""
     最終排尿日: date | None = None
     最終排尿時刻: time | None = None
@@ -1321,13 +1341,17 @@ class 看護DB_排泄(DwhBaseModel):
     排尿に伴う症状: str = ""
     夜尿の有無: str = ""
     夜尿内容: str = ""
-    夜尿誘導要_不要: str = ""
+    夜尿誘導要_不要: str = Field("", alias="夜尿誘導要・不要")
     トイレットトレーニング: str = ""
     排尿のコミュニケーション: str = ""
-    排尿のコミュニケーション_言葉_: str = ""
-    排尿のコミュニケーション_しぐさ_: str = ""
+    排尿のコミュニケーション_言葉_: str = Field(
+        "", alias="排尿のコミュニケーション(言葉)"
+    )
+    排尿のコミュニケーション_しぐさ_: str = Field(
+        "", alias="排尿のコミュニケーション(しぐさ)"
+    )
     尿路変更の有無: str = ""
-    排尿の方法_その他_: str = ""
+    排尿の方法_その他_: str = Field("", alias="排尿の方法(その他)")
     皮膚異常の有無: str = ""
     皮膚異常コメント: str = ""
 
@@ -1351,7 +1375,7 @@ class 看護DB_活動休息(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1371,22 +1395,22 @@ class 看護DB_活動休息(DwhBaseModel):
     サマリー種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    痙攣_生後日数_: int | None = None
+    痙攣_生後日数_: int | None = Field(None, alias="痙攣(生後日数)")
     筋緊張状態: str = ""
     筋緊張状態コメント: str = ""
     筋緊張左右差の有無: str = ""
     活動性: str = ""
     活動性詳細: str = ""
     啼泣: str = ""
-    好きな遊び_テレビ: str = ""
+    好きな遊び_テレビ: str = Field("", alias="好きな遊び・テレビ")
     習い事の有無: str = ""
     習い事内容: str = ""
     食事レベル: str = ""
     食事方法: str = ""
     食事コメント: str = ""
-    更衣_整容レベル: str = ""
-    更衣_整容方法: str = ""
-    更衣_整容コメント: str = ""
+    更衣_整容レベル: str = Field("", alias="更衣・整容レベル")
+    更衣_整容方法: str = Field("", alias="更衣・整容方法")
+    更衣_整容コメント: str = Field("", alias="更衣・整容コメント")
     排泄レベル: str = ""
     排泄方法: str = ""
     排泄コメント: str = ""
@@ -1396,11 +1420,11 @@ class 看護DB_活動休息(DwhBaseModel):
     寝返りレベル: str = ""
     寝返りコメント: str = ""
     自助具内容: str = ""
-    利手_右_左_: str = ""
-    睡眠時間_昼_: int | None = None
-    睡眠時間_夜_: int | None = None
-    午睡_開始時刻_: int | None = None
-    午睡_終了時刻_: int | None = None
+    利手_右_左_: str = Field("", alias="利手(右/左)")
+    睡眠時間_昼_: int | None = Field(None, alias="睡眠時間(昼)")
+    睡眠時間_夜_: int | None = Field(None, alias="睡眠時間(夜)")
+    午睡_開始時刻_: int | None = Field(None, alias="午睡(開始時刻)")
+    午睡_終了時刻_: int | None = Field(None, alias="午睡(終了時刻)")
     就寝時間: str = ""
     起床時間: str = ""
     熟睡感の有無: str = ""
@@ -1411,8 +1435,8 @@ class 看護DB_活動休息(DwhBaseModel):
     睡眠薬の使用の有無: str = ""
     睡眠薬使用コメント: str = ""
     大泉門の状態: str = ""
-    血圧_最高_: int | None = None
-    血圧_最低_: int | None = None
+    血圧_最高_: int | None = Field(None, alias="血圧(最高)")
+    血圧_最低_: int | None = Field(None, alias="血圧(最低)")
     脈拍数: int | None = None
     動悸の有無: str = ""
     動悸コメント: str = ""
@@ -1422,8 +1446,8 @@ class 看護DB_活動休息(DwhBaseModel):
     チアノーゼコメント: str = ""
     ペースメーカーの設定: str = ""
     倦怠感の有無: str = ""
-    浮腫_循環_の有無: str = ""
-    浮腫_循環_の内容: str = ""
+    浮腫_循環_の有無: str = Field("", alias="浮腫(循環)の有無")
+    浮腫_循環_の内容: str = Field("", alias="浮腫(循環)の内容")
     呼吸数: int | None = None
     呼吸音: str = ""
     呼吸困難の有無: str = ""
@@ -1433,7 +1457,7 @@ class 看護DB_活動休息(DwhBaseModel):
     陥没呼吸の有無: str = ""
     咳嗽の有無: str = ""
     呼吸障害の有無: str = ""
-    酸素療法_器具使用の有無: str = ""
+    酸素療法_器具使用の有無: str = Field("", alias="酸素療法・器具使用の有無")
     酸素吸入の有無: str = ""
     吸引器の有無: str = ""
     人工呼吸器の有無: str = ""
@@ -1460,7 +1484,7 @@ class 看護DB_知覚認知(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1480,21 +1504,21 @@ class 看護DB_知覚認知(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    見当識_人物_の有無: str = ""
-    見当識_場所_の有無: str = ""
-    見当識_時間_の有無: str = ""
-    見当識_環境_の有無: str = ""
+    見当識_人物_の有無: str = Field("", alias="見当識(人物)の有無")
+    見当識_場所_の有無: str = Field("", alias="見当識(場所)の有無")
+    見当識_時間_の有無: str = Field("", alias="見当識(時間)の有無")
+    見当識_環境_の有無: str = Field("", alias="見当識(環境)の有無")
     幻覚障害の有無: str = ""
     幻覚障害コメント: str = ""
     行動障害の有無: str = ""
     行動障害コメント: str = ""
     瞳孔障害の有無: str = ""
-    瞳孔異常_不同_の有無: str = ""
-    瞳孔異常_散大_の有無: str = ""
-    瞳孔異常_縮小_の有無: str = ""
+    瞳孔異常_不同_の有無: str = Field("", alias="瞳孔異常(不同)の有無")
+    瞳孔異常_散大_の有無: str = Field("", alias="瞳孔異常(散大)の有無")
+    瞳孔異常_縮小_の有無: str = Field("", alias="瞳孔異常(縮小)の有無")
     対光反射障害の有無: str = ""
-    瞳孔大きさ_左_: int | None = None
-    瞳孔大きさ_右_: int | None = None
+    瞳孔大きさ_左_: int | None = Field(None, alias="瞳孔大きさ(左)")
+    瞳孔大きさ_右_: int | None = Field(None, alias="瞳孔大きさ(右)")
     対光反射障害コメント: str = ""
     吸啜反射の有無: str = ""
     開口反射障害コメント: str = ""
@@ -1537,7 +1561,7 @@ class 看護DB_自己知覚(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1557,15 +1581,17 @@ class 看護DB_自己知覚(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    自分の性格_本人_: str = ""
-    母の性格_新生児_保護者の性格_小児_: str = ""
+    自分の性格_本人_: str = Field("", alias="自分の性格(本人)")
+    母の性格_新生児_保護者の性格_小児_: str = Field(
+        "", alias="母の性格(新生児)保護者の性格(小児)"
+    )
     自分の長所: str = ""
     自分の短所: str = ""
-    病気の受け止め_本人_: str = ""
-    病気の受け止め_親_: str = ""
+    病気の受け止め_本人_: str = Field("", alias="病気の受け止め(本人)")
+    病気の受け止め_親_: str = Field("", alias="病気の受け止め(親)")
     ボディイメージ変化内容: str = ""
-    気がかりなこと_本人_: str = ""
-    気がかりなこと_親_: str = ""
+    気がかりなこと_本人_: str = Field("", alias="気がかりなこと(本人)")
+    気がかりなこと_親_: str = Field("", alias="気がかりなこと(親)")
     過去の喪失や変化の有無: str = ""
     過去の喪失や変化内容: str = ""
 
@@ -1589,7 +1615,7 @@ class 看護DB_役割関係(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1609,15 +1635,15 @@ class 看護DB_役割関係(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     家庭での役割: str = ""
-    家庭での役割_その他_: str = ""
+    家庭での役割_その他_: str = Field("", alias="家庭での役割(その他)")
     職業の有無: str = ""
-    通院時間_分_: Decimal | None = None
+    通院時間_分_: Decimal | None = Field(None, alias="通院時間(分)")
     交通機関コード: str = ""
     交通機関コメント: str = ""
     主な保育者コード: str = ""
     主な保育者内容: str = ""
     就学状況: str = ""
-    就学状況_学年_: str = ""
+    就学状況_学年_: str = Field("", alias="就学状況(学年)")
     家庭内での問題の有無: str = ""
     家庭内での問題内容: str = ""
     学校での問題の有無: str = ""
@@ -1628,12 +1654,12 @@ class 看護DB_役割関係(DwhBaseModel):
     育児に対しての問題内容: str = ""
     母親学級の受講の有無: str = ""
     訪問回数: int | None = None
-    身体障害者手帳_級_: str = ""
+    身体障害者手帳_級_: str = Field("", alias="身体障害者手帳(級)")
     精神障害者保険福祉手帳の有無: str = ""
     生活保護の有無: str = ""
-    デイサービス_回数_: int | None = None
-    ショートステイ_回数_: int | None = None
-    訪問看護_回数_: int | None = None
+    デイサービス_回数_: int | None = Field(None, alias="デイサービス(回数)")
+    ショートステイ_回数_: int | None = Field(None, alias="ショートステイ(回数)")
+    訪問看護_回数_: int | None = Field(None, alias="訪問看護(回数)")
 
 
 class 看護DB_セクシャリティ(DwhBaseModel):
@@ -1655,7 +1681,7 @@ class 看護DB_セクシャリティ(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1679,8 +1705,8 @@ class 看護DB_セクシャリティ(DwhBaseModel):
     月経周期: int | None = None
     月経持続日数: int | None = None
     閉経年齢: int | None = None
-    更年期障害の有無_女性_: str = ""
-    更年期障害コメント_女性_: str = ""
+    更年期障害の有無_女性_: str = Field("", alias="更年期障害の有無(女性)")
+    更年期障害コメント_女性_: str = Field("", alias="更年期障害コメント(女性)")
 
 
 class 看護DB_コーピング(DwhBaseModel):
@@ -1702,7 +1728,7 @@ class 看護DB_コーピング(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1722,7 +1748,9 @@ class 看護DB_コーピング(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    ストレスに対するコーピング_新生児の場合は母親_: str = ""
+    ストレスに対するコーピング_新生児の場合は母親_: str = Field(
+        "", alias="ストレスに対するコーピング(新生児の場合は母親)"
+    )
 
 
 class 看護DB_生活原理(DwhBaseModel):
@@ -1744,7 +1772,7 @@ class 看護DB_生活原理(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1765,8 +1793,10 @@ class 看護DB_生活原理(DwhBaseModel):
     確定日: date | None = None
     確定時刻: time | None = None
     宗教的な配慮の必要性有無: str = ""
-    宗教に関する配慮の必要性_保護者の言葉: str = ""
-    趣味_特技コメント: str = ""
+    宗教に関する配慮の必要性_保護者の言葉: str = Field(
+        "", alias="宗教に関する配慮の必要性-保護者の言葉"
+    )
+    趣味_特技コメント: str = Field("", alias="趣味・特技コメント")
     人生において重要と考えていること: str = ""
 
 
@@ -1789,7 +1819,7 @@ class 看護DB_安全防御(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1811,11 +1841,13 @@ class 看護DB_安全防御(DwhBaseModel):
     確定時刻: time | None = None
     自傷他害行為の既往コメント: str = ""
     創傷_皮膚の問題内容_1: str = Field("", alias="創傷・皮膚の問題内容")
-    転倒_転落アセススコア: str = ""
+    転倒_転落アセススコア: str = Field("", alias="転倒・転落アセススコア")
     低体温対象: str = ""
     末梢の冷感の有無: str = ""
-    ブレーデンスケール_合計点数_: int | None = None
-    創傷_皮膚の問題の有無: str = ""
+    ブレーデンスケール_合計点数_: int | None = Field(
+        None, alias="ブレーデンスケール(合計点数)"
+    )
+    創傷_皮膚の問題の有無: str = Field("", alias="創傷・皮膚の問題の有無")
     創傷_皮膚の問題内容_2: str = Field("", alias="創傷・皮膚の問題内容")
 
 
@@ -1838,7 +1870,7 @@ class 看護DB_安楽(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1860,12 +1892,12 @@ class 看護DB_安楽(DwhBaseModel):
     確定時刻: time | None = None
     父親面会頻度: int | None = None
     母親面会頻度: int | None = None
-    主に面会する人_面会頻度: int | None = None
+    主に面会する人_面会頻度: int | None = Field(None, alias="主に面会する人-面会頻度")
     疼痛の有無: str = ""
-    疼痛_部位: str = ""
+    疼痛_部位: str = Field("", alias="疼痛-部位")
     掻痒の有無: str = ""
     掻痒感部位: str = ""
-    嘔気_嘔吐の有無: str = ""
+    嘔気_嘔吐の有無: str = Field("", alias="嘔気・嘔吐の有無")
     身体的苦痛倦怠感の有無: str = ""
 
 
@@ -1888,7 +1920,7 @@ class 看護DB_成長発達(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_確定日_: date = date(1000, 1, 1)
+    検索日_確定日_: date = Field(date(1000, 1, 1), alias="検索日(確定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -1908,13 +1940,17 @@ class 看護DB_成長発達(DwhBaseModel):
     アセスメント種別: str = ""
     確定日: date | None = None
     確定時刻: time | None = None
-    発育_頚定____: int | None = None
-    発育_ひとりだち_: int | None = None
-    発育_ひとりあるき_: int | None = None
-    週数相当の発達状態_吸啜反射の有無: str = ""
-    週数相当の発達状態_嚥下反射の有無: str = ""
-    修正週数_週_: int | None = None
-    修正週数_日_: int | None = None
+    発育_頚定____: int | None = Field(None, alias="発育(頚定)   ")
+    発育_ひとりだち_: int | None = Field(None, alias="発育(ひとりだち)")
+    発育_ひとりあるき_: int | None = Field(None, alias="発育(ひとりあるき)")
+    週数相当の発達状態_吸啜反射の有無: str = Field(
+        "", alias="週数相当の発達状態-吸啜反射の有無"
+    )
+    週数相当の発達状態_嚥下反射の有無: str = Field(
+        "", alias="週数相当の発達状態-嚥下反射の有無"
+    )
+    修正週数_週_: int | None = Field(None, alias="修正週数(週)")
+    修正週数_日_: int | None = Field(None, alias="修正週数(日)")
     情報提供者1続柄: str = ""
     情報提供者1: str = ""
     記録者1: str = ""

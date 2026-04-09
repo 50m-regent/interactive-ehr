@@ -6,6 +6,7 @@ Usage:
 
 from __future__ import annotations
 
+import keyword
 import re
 import subprocess
 import sys
@@ -134,11 +135,18 @@ def read_xlsx(path: Path) -> dict[str, TableInfo]:
     """xlsxファイルからテーブル情報を読み込む."""
     wb = openpyxl.load_workbook(path, read_only=True)
 
+    for sheet_name in ("テーブル一覧", "項目一覧"):
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f"シート '{sheet_name}' が {path} に存在しません")
+
     # テーブル一覧シートからグループ・説明を取得
     tables: dict[str, TableInfo] = {}
     ws_tables = wb["テーブル一覧"]
     for row in ws_tables.iter_rows(min_row=2, values_only=True):
-        group, table_name, desc, unit = row
+        cells = tuple(row)
+        if len(cells) < 4:
+            continue
+        group, table_name, desc, unit = cells[0], cells[1], cells[2], cells[3]
         if table_name is not None:
             tables[table_name] = TableInfo(
                 name=table_name,
@@ -150,7 +158,11 @@ def read_xlsx(path: Path) -> dict[str, TableInfo]:
     # 項目一覧シートからカラム情報を取得
     ws_columns = wb["項目一覧"]
     for row in ws_columns.iter_rows(min_row=2, values_only=True):
-        table_name, col_name, data_type, default_val, description, _update_date = row
+        cells = tuple(row)
+        if len(cells) < 6:
+            continue
+        table_name, col_name, data_type = cells[0], cells[1], cells[2]
+        default_val, description, _update_date = cells[3], cells[4], cells[5]
         if table_name is None or col_name is None:
             continue
 
@@ -181,15 +193,22 @@ def _sanitize_field_name(name: str) -> str:
     sanitized = name.replace("\n", "_").replace("\r", "_")
     # 先頭が数字の場合はプレフィックスを付ける
     if sanitized and sanitized[0].isdigit():
-        sanitized = f"_{sanitized}"
+        sanitized = f"n{sanitized}"
     # スペースをアンダースコアに
     sanitized = sanitized.replace(" ", "_").replace("　", "_")
     # Pythonの識別子として無効な文字を除去（日本語・英数字・アンダースコア以外）
     sanitized = re.sub(r"[^\w]", "_", sanitized)
+    # Pydanticはアンダースコア始まりのフィールド名を禁止するため除去（最終チェック）
+    sanitized = sanitized.lstrip("_") or "field"
+    # Python予約語の衝突回避
+    if keyword.iskeyword(sanitized):
+        sanitized = f"{sanitized}_"
     return sanitized
 
 
-def _format_default_value(sql_type: str, default_val: object) -> str | None:
+def _format_default_value(
+    sql_type: str, default_val: str | int | float | date | time | None
+) -> str | None:
     """デフォルト値をPythonリテラルに変換する. Noneなら返さない."""
     if default_val is None:
         return None
@@ -250,39 +269,26 @@ def _resolve_duplicates(columns: list[ColumnInfo]) -> list[tuple[ColumnInfo, str
     Returns:
         (ColumnInfo, resolved_field_name) のリスト
     """
-    name_count: dict[str, int] = {}
+    # 1パス目: 重複している名前を特定
+    name_counts: dict[str, int] = {}
+    for col in columns:
+        sanitized = _sanitize_field_name(col.name)
+        name_counts[sanitized] = name_counts.get(sanitized, 0) + 1
+    duplicated = {name for name, count in name_counts.items() if count > 1}
+
+    # 2パス目: サフィックス付与
+    occurrence: dict[str, int] = {}
     result: list[tuple[ColumnInfo, str]] = []
-
     for col in columns:
         sanitized = _sanitize_field_name(col.name)
-        name_count[sanitized] = name_count.get(sanitized, 0) + 1
-        if name_count[sanitized] > 1:
-            resolved = f"{sanitized}_{name_count[sanitized]}"
-        else:
-            resolved = sanitized
+        occurrence[sanitized] = occurrence.get(sanitized, 0) + 1
+        resolved = (
+            f"{sanitized}_{occurrence[sanitized]}"
+            if sanitized in duplicated
+            else sanitized
+        )
         result.append((col, resolved))
-
-    # 最初の出現にも番号を付ける（重複がある場合のみ）
-    final_counts: dict[str, int] = {}
-    for col in columns:
-        sanitized = _sanitize_field_name(col.name)
-        final_counts[sanitized] = final_counts.get(sanitized, 0) + 1
-
-    duplicated_names = {name for name, count in final_counts.items() if count > 1}
-
-    # 再走査：最初の出現に _1 を付ける
-    name_count2: dict[str, int] = {}
-    result2: list[tuple[ColumnInfo, str]] = []
-    for col in columns:
-        sanitized = _sanitize_field_name(col.name)
-        name_count2[sanitized] = name_count2.get(sanitized, 0) + 1
-        if sanitized in duplicated_names:
-            resolved = f"{sanitized}_{name_count2[sanitized]}"
-        else:
-            resolved = sanitized
-        result2.append((col, resolved))
-
-    return result2
+    return result
 
 
 def _table_name_to_class_name(table_name: str) -> str:
@@ -296,7 +302,10 @@ def _table_name_to_class_name(table_name: str) -> str:
     return name
 
 
-def generate_model_code(table: TableInfo) -> str:
+def generate_model_code(
+    table: TableInfo,
+    resolved_columns: list[tuple[ColumnInfo, str]],
+) -> str:
     """1テーブル分のPydanticモデルコードを生成する."""
     class_name = _table_name_to_class_name(table.name)
     lines: list[str] = []
@@ -305,11 +314,9 @@ def generate_model_code(table: TableInfo) -> str:
     doc = table.description or table.name
     if table.record_unit:
         doc += f"（{table.record_unit}）"
-    lines.append(f'class {class_name}(DwhBaseModel):')
+    lines.append(f"class {class_name}(DwhBaseModel):")
     lines.append(f'    """{doc}."""')
     lines.append("")
-
-    resolved_columns = _resolve_duplicates(table.columns)
 
     if not resolved_columns:
         lines.append("    pass")
@@ -318,7 +325,7 @@ def generate_model_code(table: TableInfo) -> str:
     for col, field_name in resolved_columns:
         python_type = SQL_TYPE_MAP.get(col.sql_type, "str")
         default_literal = _format_default_value(col.sql_type, col.default_value)
-        needs_alias = field_name != _sanitize_field_name(col.name)
+        needs_alias = field_name != col.name
 
         if default_literal is not None:
             # デフォルト値あり → nullable ではない
@@ -342,13 +349,14 @@ def generate_model_code(table: TableInfo) -> str:
     return "\n".join(lines)
 
 
-def _collect_imports(tables: list[TableInfo]) -> set[str]:
+def _collect_imports(
+    resolved_by_table: list[list[tuple[ColumnInfo, str]]],
+) -> set[str]:
     """テーブル群から必要なimportを収集する."""
     imports: set[str] = set()
     needs_field = False
 
-    for table in tables:
-        resolved = _resolve_duplicates(table.columns)
+    for resolved in resolved_by_table:
         for col, field_name in resolved:
             sql_type = col.sql_type
             if sql_type == "DATE":
@@ -357,7 +365,7 @@ def _collect_imports(tables: list[TableInfo]) -> set[str]:
                 imports.add("time")
             elif sql_type == "DECIMAL":
                 imports.add("Decimal")
-            if field_name != _sanitize_field_name(col.name):
+            if field_name != col.name:
                 needs_field = True
 
     return imports | ({"Field"} if needs_field else set())
@@ -395,7 +403,10 @@ def _get_file_key(table: TableInfo) -> str:
     """テーブルの出力先ファイルキーを決定する."""
     group = table.group
 
-    if group == "ORDER" or table.name in ORDER_EXAM_TABLES | ORDER_TREATMENT_TABLES | ORDER_RECORD_TABLES:
+    # ORDER グループ、またはテーブル一覧にないがORDER系テーブル名に一致するもの
+    if group == "ORDER" or table.name in (
+        ORDER_EXAM_TABLES | ORDER_TREATMENT_TABLES | ORDER_RECORD_TABLES
+    ):
         if table.name in ORDER_EXAM_TABLES:
             return "order_exam"
         if table.name in ORDER_TREATMENT_TABLES:
@@ -421,12 +432,17 @@ def generate_all(tables: dict[str, TableInfo]) -> dict[str, str]:
     generated_files: dict[str, str] = {}
 
     for file_key, table_list in sorted(file_tables.items()):
-        type_imports = _collect_imports(table_list)
+        # resolved_columns を一度だけ計算して共有
+        resolved_by_table = [
+            _resolve_duplicates(table.columns) for table in table_list
+        ]
+
+        type_imports = _collect_imports(resolved_by_table)
         import_block = _build_import_block(type_imports)
 
         model_blocks: list[str] = []
-        for table in table_list:
-            model_blocks.append(generate_model_code(table))
+        for table, resolved in zip(table_list, resolved_by_table):
+            model_blocks.append(generate_model_code(table, resolved))
 
         content = import_block + "\n\n\n" + "\n\n\n".join(model_blocks) + "\n"
         generated_files[file_key] = content
@@ -443,9 +459,17 @@ def generate_init_py(tables: dict[str, TableInfo]) -> str:
     lines.append("")
 
     file_classes: dict[str, list[str]] = {}
+    seen_classes: dict[str, str] = {}  # class_name → table_name
     for table in tables.values():
         file_key = _get_file_key(table)
         class_name = _table_name_to_class_name(table.name)
+        if class_name in seen_classes:
+            print(
+                f"WARNING: クラス名 '{class_name}' が重複 "
+                f"('{seen_classes[class_name]}' と '{table.name}')",
+                file=sys.stderr,
+            )
+        seen_classes[class_name] = table.name
         if file_key not in file_classes:
             file_classes[file_key] = []
         file_classes[file_key].append(class_name)
@@ -499,11 +523,14 @@ def main() -> None:
 
     # ruff format
     print("ruff format 実行中...")
-    subprocess.run(
-        ["uv", "run", "ruff", "format", str(MODELS_DIR)],
-        check=True,
-        cwd=PROJECT_ROOT,
-    )
+    try:
+        subprocess.run(
+            ["uv", "run", "ruff", "format", str(MODELS_DIR)],
+            check=True,
+            cwd=PROJECT_ROOT,
+        )
+    except FileNotFoundError:
+        print("WARNING: uv が見つかりません。ruff format をスキップします。", file=sys.stderr)
     print("完了!")
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, time
+from pydantic import Field
 
 from interactive_ehr.models._base import DwhBaseModel
 
@@ -36,7 +37,7 @@ class 病名(DwhBaseModel):
     開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_病名開始日_: date = date(1000, 1, 1)
+    検索日_病名開始日_: date = Field(date(1000, 1, 1), alias="検索日(病名開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -59,7 +60,7 @@ class 病名(DwhBaseModel):
     オーナー職種: str = ""
     病名コード: str = ""
     病名: str = ""
-    病名__修飾語_: str = ""
+    病名__修飾語_: str = Field("", alias="病名(+修飾語)")
     接頭語1コード: str = ""
     接頭語1: str = ""
     接頭語2コード: str = ""
@@ -76,8 +77,8 @@ class 病名(DwhBaseModel):
     接尾語3: str = ""
     歯式1: str = ""
     歯式2: str = ""
-    ICD10コード_基礎疾患_: str = ""
-    ICD10コード_症状発現_: str = ""
+    ICD10コード_基礎疾患_: str = Field("", alias="ICD10コード(基礎疾患)")
+    ICD10コード_症状発現_: str = Field("", alias="ICD10コード(症状発現)")
     レセ電算傷病名コード: str = ""
     病名管理番号: str = ""
     歯科部位の有無: str = ""
@@ -127,7 +128,7 @@ class サマリ管理(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -200,7 +201,7 @@ class サマリ病名(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -270,7 +271,7 @@ class サマリ記事(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -301,7 +302,7 @@ class サマリ記事(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -334,7 +335,7 @@ class インフォームドコンセント(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_説明日_: date = date(1000, 1, 1)
+    検索日_説明日_: date = Field(date(1000, 1, 1), alias="検索日(説明日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -369,7 +370,7 @@ class インフォームドコンセント(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -402,7 +403,7 @@ class 文書(DwhBaseModel):
     記載時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -434,7 +435,7 @@ class 文書(DwhBaseModel):
     記事データ種別: str = ""
     記事: str = ""
     未整形記事の有無: str = ""
-    記事_未整形_: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
     プロブレム: str = ""
 
 
@@ -467,7 +468,7 @@ class 患者適用クリニカルパス(DwhBaseModel):
     適用開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_適用開始日_: date = date(1000, 1, 1)
+    検索日_適用開始日_: date = Field(date(1000, 1, 1), alias="検索日(適用開始日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -532,7 +533,7 @@ class 患者適用クリニカルパス項目(DwhBaseModel):
     適用開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_項目予定日_: date = date(1000, 1, 1)
+    検索日_項目予定日_: date = Field(date(1000, 1, 1), alias="検索日(項目予定日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
@@ -626,7 +627,7 @@ class 患者適用クリニカルパス記事(DwhBaseModel):
     適用開始時日齢: int | None = None
     性別: str = ""
     検索日の定義: str = ""
-    検索日_記載日_: date = date(1000, 1, 1)
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
     検索時刻: time = time(0, 0, 0)
     入力日の定義: str = ""
     入力日: date | None = None
