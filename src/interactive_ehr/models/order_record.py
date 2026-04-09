@@ -1,0 +1,690 @@
+"""自動生成されたDWHテーブルモデル."""
+
+from __future__ import annotations
+
+from datetime import date, time
+from pydantic import Field
+
+from interactive_ehr.models._base import DwhBaseModel
+
+
+class 病名(DwhBaseModel):
+    """病名（1病名1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    開始時年齢: int | None = None
+    開始時月齢: int | None = None
+    開始時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_病名開始日_: date = Field(date(1000, 1, 1), alias="検索日(病名開始日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    キャンセル日: date | None = None
+    キャンセル理由: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    グループコード: str = ""
+    グループ: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    病名コード: str = ""
+    病名: str = ""
+    病名__修飾語_: str = Field("", alias="病名(+修飾語)")
+    接頭語1コード: str = ""
+    接頭語1: str = ""
+    接頭語2コード: str = ""
+    接頭語2: str = ""
+    接頭語3コード: str = ""
+    接頭語3: str = ""
+    接頭語4コード: str = ""
+    接頭語4: str = ""
+    接尾語コード1: str = ""
+    接尾語1: str = ""
+    接尾語コード2: str = ""
+    接尾語2: str = ""
+    接尾語コード3: str = ""
+    接尾語3: str = ""
+    歯式1: str = ""
+    歯式2: str = ""
+    ICD10コード_基礎疾患_: str = Field("", alias="ICD10コード(基礎疾患)")
+    ICD10コード_症状発現_: str = Field("", alias="ICD10コード(症状発現)")
+    レセ電算傷病名コード: str = ""
+    病名管理番号: str = ""
+    歯科部位の有無: str = ""
+    疑い対象: str = ""
+    病名開始日: date = date(1000, 1, 1)
+    転帰日: date | None = None
+    転帰区分コード: str = ""
+    転帰区分: str = ""
+    病名区分: str = ""
+    主病名区分: str = ""
+    特定疾患区分: str = ""
+    悪性腫瘍対象: str = ""
+    慢性疾患対象: str = ""
+    ウイルス疾患対象: str = ""
+    特定薬剤対象: str = ""
+    有効月数: int | None = None
+    優先順位: int | None = None
+    プロブレム: str = ""
+
+
+class サマリ管理(DwhBaseModel):
+    """サマリ管理情報（1サマリにつき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    記載時年齢: int | None = None
+    記載時月齢: int | None = None
+    記載時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    サマリ種別コード: str = ""
+    サマリ種別: str = ""
+    記載日: date = date(1000, 1, 1)
+    記載時刻: time | None = None
+    確定日: date | None = None
+    承認日: date | None = None
+    入院日: date | None = None
+    転科日: date | None = None
+    転科先診療科コード: str = ""
+    転科先診療科: str = ""
+    転棟日: date | None = None
+    退院日: date | None = None
+    入院経路コード: str = ""
+    入院経路: str = ""
+    退院経路コード: str = ""
+    退院経路: str = ""
+    転帰: str = ""
+    記載状況: str = ""
+    サマリコメント: str = ""
+
+
+class サマリ病名(DwhBaseModel):
+    """サマリ病名登録情報（1サマリ1病名につき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    記載時年齢: int | None = None
+    記載時月齢: int | None = None
+    記載時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    サマリ種別コード: str = ""
+    サマリ種別: str = ""
+    記載日: date = date(1000, 1, 1)
+    記載時刻: time | None = None
+    確定日: date | None = None
+    承認日: date | None = None
+    入院日: date | None = None
+    転科日: date | None = None
+    転科先診療科コード: str = ""
+    転科先診療科: str = ""
+    転棟日: date | None = None
+    退院日: date | None = None
+    病名SEQ: int = 0
+    病名コード: str = ""
+    病名: str = ""
+    転帰: str = ""
+
+
+class サマリ記事(DwhBaseModel):
+    """サマリ記事内容（1サマリ1記事につき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    記載時年齢: int | None = None
+    記載時月齢: int | None = None
+    記載時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    記事種別コード: str = ""
+    記事種別: str = ""
+    記事連番: int = 0
+    記事内表示連番: int | None = None
+    記事データ種別コード: str = ""
+    記事データ種別: str = ""
+    記事: str = ""
+    未整形記事の有無: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
+    プロブレム: str = ""
+
+
+class インフォームドコンセント(DwhBaseModel):
+    """インフォームドコンセント情報（1記事につき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    記載時年齢: int | None = None
+    記載時月齢: int | None = None
+    記載時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_説明日_: date = Field(date(1000, 1, 1), alias="検索日(説明日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    記載日: date = date(1000, 1, 1)
+    記載時刻: time | None = None
+    確定日: date | None = None
+    承認日: date | None = None
+    記事種別コード: str = ""
+    記事種別: str = ""
+    記事連番: int = 0
+    記事内表示連番: int | None = None
+    記事データ種別コード: str = ""
+    記事データ種別: str = ""
+    記事: str = ""
+    未整形記事の有無: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
+    プロブレム: str = ""
+
+
+class 文書(DwhBaseModel):
+    """文書情報（1記事につき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    記載時年齢: int | None = None
+    記載時月齢: int | None = None
+    記載時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    文書ID: str = ""
+    文書名: str = ""
+    記載日: date = date(1000, 1, 1)
+    記載時刻: time | None = None
+    確定日: date | None = None
+    記事種別コード: str = ""
+    記事種別: str = ""
+    記事連番: int = 0
+    記事内表示連番: int | None = None
+    記事データ種別コード: str = ""
+    記事データ種別: str = ""
+    記事: str = ""
+    未整形記事の有無: str = ""
+    記事_未整形_: str = Field("", alias="記事(未整形)")
+    プロブレム: str = ""
+
+
+class 患者適用クリニカルパス(DwhBaseModel):
+    """患者に適用したクリニカルパス情報（患者適用の1CPにつき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    適用開始時年齢: int | None = None
+    適用開始時月齢: int | None = None
+    適用開始時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_適用開始日_: date = Field(date(1000, 1, 1), alias="検索日(適用開始日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    キャンセル日: date | None = None
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    CP連番: int = 0
+    CP種別コード: str = ""
+    CP種別: str = ""
+    CPコード: str = ""
+    CP名: str = ""
+    CP説明: str = ""
+    CPバージョン: int | None = None
+    CP適用開始日: date | None = None
+    CP適用終了日: date | None = None
+    CP適用予定終了日: date | None = None
+    適用予定期間: int | None = None
+    適用予定診療回数: int | None = None
+    CP完了状況: str = ""
+    在院期間: int | None = None
+    DPC点数: int | None = None
+
+
+class 患者適用クリニカルパス項目(DwhBaseModel):
+    """患者に適用したクリニカルパス項目と結果情報（1項目(アウトカム・アセス・バリアンスなど)ごとに1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    適用開始時年齢: int | None = None
+    適用開始時月齢: int | None = None
+    適用開始時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_項目予定日_: date = Field(date(1000, 1, 1), alias="検索日(項目予定日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    キャンセル日の定義: str = ""
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    サブオーナー2の定義: str = ""
+    サブオーナー2ID: str = ""
+    サブオーナー2: str = ""
+    サブオーナー2職種: str = ""
+    部門連係ID: str = ""
+    CP連番: int = 0
+    CP種別コード: str = ""
+    CP種別: str = ""
+    CP名: str = ""
+    CPコード: str = ""
+    CPバージョン: int | None = None
+    CP適用開始日: date | None = None
+    CP適用終了日: date | None = None
+    CPステップコード: str = ""
+    CPステップ: str = ""
+    CPステップ説明: str = ""
+    ステップ開始日: date | None = None
+    ステップ終了日: date | None = None
+    対象アウトカム分類コード: str = ""
+    対象アウトカム分類: str = ""
+    対象アウトカムコード: str = ""
+    対象アウトカム: str = ""
+    対象アウトカムクリティカルインディケータ対象: str = ""
+    対象アウトカム結果: str = ""
+    CP項目種別コード: str = ""
+    CP項目種別: str = ""
+    CP項目種別サブコード: str = ""
+    CP項目種別サブ名: str = ""
+    CP項目コード: str = ""
+    CP項目: str = ""
+    CP項目関連オーダーキー: str = ""
+    予定日: date | None = None
+    実施日: date | None = None
+    判定結果: str = ""
+    CP項目状況: str = ""
+    ゴール達成日: date | None = None
+    バリアンス登録必須対象: str = ""
+    バリアンス発生の有無: str = ""
+    バリアンス登録の有無: str = ""
+    CP項目コメント: str = ""
+
+
+class 患者適用クリニカルパス記事(DwhBaseModel):
+    """患者に適用したクリニカルパスの記事(SOAP)情報（1記事につき1レコード）."""
+
+    ROW_ID: str = ""
+    件数: int = 1
+    シーケンスID: str = ""
+    トランザクション名: str = ""
+    キー1: str = ""
+    キー2: str = ""
+    キー3: str = ""
+    キー4: str = ""
+    キー5: str = ""
+    キー6: str = ""
+    キー7: int = 0
+    キー8: int = 0
+    キー9: date = date(1000, 1, 1)
+    キー10: time = time(0, 0, 0)
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    匿名ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    適用開始時年齢: int | None = None
+    適用開始時月齢: int | None = None
+    適用開始時日齢: int | None = None
+    性別: str = ""
+    検索日の定義: str = ""
+    検索日_記載日_: date = Field(date(1000, 1, 1), alias="検索日(記載日)")
+    検索時刻: time = time(0, 0, 0)
+    入力日の定義: str = ""
+    入力日: date | None = None
+    入力時刻: time | None = None
+    更新日の定義: str = ""
+    更新日: date | None = None
+    更新時刻: time | None = None
+    入外区分: str = ""
+    保険分類: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    病棟コード: str = ""
+    病棟: str = ""
+    オーナーの定義: str = ""
+    オーナーID: str = ""
+    オーナー: str = ""
+    オーナー職種: str = ""
+    サブオーナー1の定義: str = ""
+    サブオーナー1ID: str = ""
+    サブオーナー1: str = ""
+    サブオーナー1職種: str = ""
+    サブオーナー2の定義: str = ""
+    サブオーナー2ID: str = ""
+    サブオーナー2: str = ""
+    サブオーナー2職種: str = ""
+    CP連番: int | None = None
+    CP種別コード: str = ""
+    CP種別: str = ""
+    CP名: str = ""
+    CPコード: str = ""
+    CPバージョン: int | None = None
+    CP適用開始日: date | None = None
+    CP適用終了日: date | None = None
+    CPステップコード: str = ""
+    CPステップ: str = ""
+    CPステップ説明: str = ""
+    ステップ開始日: date | None = None
+    ステップ終了日: date | None = None
+    CP項目種別コード: str = ""
+    CP項目種別: str = ""
+    CP項目種別サブコード: str = ""
+    CP項目種別サブ名: str = ""
+    CP項目コード: str = ""
+    CP項目: str = ""
+    CP項目関連オーダーキー: str = ""
+    予定日: date | None = None
+    実施日: date | None = None
+    CP項目状況: str = ""
+    ゴール達成日: date | None = None
+    記載日: date = date(1000, 1, 1)
+    記載時刻: time | None = None
+    確定日: date | None = None
+    記事種別コード: str = ""
+    記事種別: str = ""
+    記事連番: int = 0
+    記事内表示連番: int | None = None
+    記事データ種別コード: str = ""
+    記事データ種別: str = ""
+    記事: str = ""
+    未整形記事の有無: str = ""

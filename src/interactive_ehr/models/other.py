@@ -1,0 +1,5359 @@
+"""自動生成されたDWHテーブルモデル."""
+
+from __future__ import annotations
+
+from datetime import date, time
+from decimal import Decimal
+from pydantic import Field
+
+from interactive_ehr.models._base import DwhBaseModel
+
+
+class 家族歴(DwhBaseModel):
+    """家族歴(MDV_PTPROFILEとTFAMILYを結合したビュー)（1患者家族歴分のレコード）."""
+
+    ETL更新日: date = date(1000, 1, 1)
+    件数: int | None = None
+    ETL更新時刻: time | None = None
+    匿名ID: str | None = None
+    施設コード: str | None = None
+    施設名: str | None = None
+    患者ID: str | None = None
+    患者番号: float | None = None
+    発生日: date | None = None
+    SEQ番号: str | None = None
+    WS番号: str | None = None
+    入力順番: int | None = None
+    続柄: str | None = None
+    家族歴: str | None = None
+    家族歴コメント: str | None = None
+    診療科コード: str | None = None
+    診療科名: str | None = None
+    最終更新オペレータID: str | None = None
+    最終更新者: str | None = None
+    最終更新日: date | None = None
+    最終更新時刻: time | None = None
+
+
+class オンコロジーエピソード(DwhBaseModel):
+    """オンコロジーエピソード."""
+
+    ROW_ID: str = ""
+    EPISODE_ID: Decimal | None = Field(None, alias="EPISODE ID")
+    患者ID: str | None = None
+    匿名ID: str = ""
+    重複番号: Decimal | None = None
+    がんカテゴリコード: str | None = None
+    がんカテゴリ名: str | None = None
+    部位群コード: str | None = None
+    部位群名: str | None = None
+    癌コード: str | None = None
+    癌名: str | None = None
+    病理コード: str | None = None
+    組織名_英名_: str | None = Field(None, alias="組織名(英名)")
+    組織名_和名_: str | None = Field(None, alias="組織名(和名)")
+    優先順位: str | None = None
+    形態コード: str | None = None
+    側性コード: Decimal | None = None
+    側性名: str | None = None
+    分化度_1: Decimal | None = Field(None, alias="分化度")
+    分化度_2: str | None = Field(None, alias="分化度")
+    Performance_Status: str | None = Field(None, alias="Performance Status")
+    腫瘍情報コメント_: str | None = Field(None, alias="腫瘍情報コメント ")
+    診断確定日: date | None = None
+    診療科コード: str | None = None
+    診療科名: str | None = None
+    主治医コード: str | None = None
+    主治医名: str | None = None
+    観察日: date | None = None
+    調査方法コード: str | None = None
+    調査方法名: str | None = None
+    状態: str | None = None
+    生存時状態: str | None = None
+    死亡日: date | None = None
+    コメント: str | None = None
+    次回調査通知フラグ: str | None = None
+    次回調査日: date | None = None
+    アクティブフラグ: str | None = None
+    削除フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class オンコロジー治療内容(DwhBaseModel):
+    """オンコロジー治療内容."""
+
+    ROW_ID: str = ""
+    治療内容ID: Decimal | None = None
+    EPISODE_ID: Decimal | None = Field(None, alias="EPISODE ID")
+    患者ID: str | None = None
+    匿名ID: str = ""
+    期間開始: date | None = None
+    期間終了: date | None = None
+    Performance_Status: Decimal | None = Field(None, alias="Performance Status")
+    治療法マスタID: Decimal | None = None
+    治療法名: str | None = None
+    治療法詳細: str | None = None
+    治療目的: Decimal | None = None
+    治療目的名: str | None = None
+    レジメンコード: str | None = None
+    レジメン名: str | None = None
+    旧レジメンコード: Decimal | None = None
+    旧レジメン名: str | None = None
+    サイクル: Decimal | None = None
+    RT_部位コード: Decimal | None = Field(None, alias="RT 部位コード")
+    部位名: str | None = None
+    RT_総量: float | None = Field(None, alias="RT 総量")
+    効果コード: Decimal | None = None
+    効果名: str | None = None
+    効果判定日: date | None = None
+    コメント: str | None = None
+    過去データフラグ: str | None = None
+    削除フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class オンコロジー副作用(DwhBaseModel):
+    """オンコロジー副作用."""
+
+    ROW_ID: str = ""
+    EPISODE_ID: Decimal | None = Field(None, alias="EPISODE ID")
+    SEQ_NO: Decimal | None = None
+    患者ID: str | None = None
+    匿名ID: str = ""
+    観察日: date | None = None
+    副作用マスタコード_1: str | None = Field(None, alias="副作用マスタコード")
+    副作用名_英語_: str | None = Field(None, alias="副作用名(英語)")
+    副作用名: str | None = None
+    副作用マスタコード_2: str | None = Field(None, alias="副作用マスタコード")
+    発現日: date | None = None
+    ピーク日: date | None = None
+    アクション日: date | None = None
+    程度: Decimal | None = None
+    収束日: date | None = None
+    因果関係: str | None = None
+    因果関係レベル: str | None = None
+    コメント: str | None = None
+    データバージョン: str | None = None
+    継続フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class オンコロジーLMS_LINE(DwhBaseModel):
+    """オンコロジーLMS LINE."""
+
+    ROW_ID: str = ""
+    LMS_LINE_ID: Decimal | None = Field(None, alias="LMS LINE ID")
+    患者ID: str | None = None
+    匿名ID: str = ""
+    EPISODE_ID: Decimal | None = Field(None, alias="EPISODE ID")
+    ライン: str | None = None
+    ライン順序: Decimal | None = None
+    格納サーバ: Decimal | None = None
+    サーバ: str | None = None
+    バージョン番号: str | None = None
+    最終更新日: time | None = None
+    削除フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class オンコロジーLMS_TIME_POINT(DwhBaseModel):
+    """オンコロジーLMS TIME POINT."""
+
+    ROW_ID: str = ""
+    LMS_TIME_POINT_ID: Decimal | None = Field(None, alias="LMS TIME POINT ID")
+    LMS_LINE_ID: Decimal | None = Field(None, alias="LMS LINE ID")
+    患者ID: str | None = None
+    匿名ID: str = ""
+    Visit_Name: str | None = Field(None, alias="Visit Name")
+    調査日: time | None = None
+    初回訪問日: time | None = None
+    ベースライン: str | None = None
+    病変の直径の合計: Decimal | None = None
+    リンパ節でない病変の直径の合計: Decimal | None = None
+    病変の体積の合計_CM3_: str | None = Field(None, alias="病変の体積の合計(CM3)")
+    リンパ節でない病変の体積の合計: str | None = None
+    新病変の評価: Decimal | None = None
+    新病変評価: str | None = None
+    最下点__DIAMETER_ALL_FINALIZED_: str | None = Field(
+        None, alias="最下点 (DIAMETER_ALL_FINALIZED)"
+    )
+    ベースラインからの変化: str | None = None
+    最下点からの変化: str | None = None
+    非標的病変の評価ID: Decimal | None = None
+    非標的病変の評価: str | None = None
+    標的病変の評価ID: Decimal | None = None
+    標的病変の評価: str | None = None
+    総合評価ID: Decimal | None = None
+    総合評価: str | None = None
+    取得日: time | None = None
+    New_Lesionコメント: str | None = Field(None, alias="New Lesionコメント")
+    NonTarget_Lesionコメント: str | None = Field(None, alias="NonTarget Lesionコメント")
+    Overallコメント: str | None = None
+    削除フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class オンコロジーLMS_LESION(DwhBaseModel):
+    """オンコロジーLMS LESION."""
+
+    ROW_ID: str = ""
+    LMS_TP_LESION_ID: Decimal | None = None
+    LMS_TIME_POINT_ID: Decimal | None = Field(None, alias="LMS TIME POINT ID")
+    患者ID: str | None = None
+    匿名ID: str = ""
+    病変SEQ: Decimal | None = None
+    病変名: str | None = None
+    病変タイプ: Decimal | None = None
+    病変種類: str | None = None
+    臓器病変の位置: str | None = None
+    腫瘍の測定方法: Decimal | None = None
+    測定方法: str | None = None
+    臓器: Decimal | None = None
+    部位: str | None = None
+    スライス厚: str | None = None
+    長径: Decimal | None = None
+    短径: Decimal | None = None
+    病変体積: str | None = None
+    直径: Decimal | None = None
+    リンパ節のタイプ: Decimal | None = None
+    リンパ節タイプ: str | None = None
+    標的病変の状態ID: Decimal | None = None
+    標的病変の状態: str | None = None
+    非標的病変の状態ID: Decimal | None = None
+    非標的病変の状態: str | None = None
+    新病変の状態ID: Decimal | None = None
+    新病変の状態: str | None = None
+    病変の統合: str | None = None
+    病変評価の有無: str | None = None
+    削除フラグ: str | None = None
+    作成日: time | None = None
+    作成者コード: str | None = None
+    作成者名: str | None = None
+    更新日: time | None = None
+    更新者コード: str | None = None
+    更新者名: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class カンファレンス患者(DwhBaseModel):
+    """カンファレンス患者."""
+
+    ROW_ID: str = ""
+    ステーションコード: str | None = None
+    ユニットID: str | None = None
+    会議名: str | None = None
+    開催日時: time | None = None
+    患者ID: str | None = None
+    匿名ID: str = ""
+    資料抽出ステータス: str | None = None
+    抽出条件ID: str | None = None
+    抽出条件名: str | None = None
+    患者日時: time | None = None
+    資料ユーザID: str | None = None
+    資料ユーザ氏名01: str | None = None
+    資料ユーザ氏名02: str | None = None
+    資料ユーザ氏名03: str | None = None
+    有効フラグ: str | None = None
+    患者診療科コード: str | None = None
+    患者診療科名称: str | None = None
+    患者診療科略称: str | None = None
+    エンティティ患者コメント: str | None = None
+    最終アクセス端末ID: str | None = None
+    最終アクセス者ID: str | None = None
+    最終アクセス日時: time | None = None
+    最終更新端末ID: str | None = None
+    最終更新者ID: str | None = None
+    最終更新者名: str | None = None
+    最終更新日時: time | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class カンファレンスユーザー(DwhBaseModel):
+    """カンファレンスユーザー."""
+
+    ROW_ID: str = ""
+    ステーションコード: str | None = None
+    ユニットID: str | None = None
+    会議名: str | None = None
+    ユーザID: str | None = None
+    ユーザ漢字氏名: str | None = None
+    ユーザカナ氏名: str | None = None
+    有効フラグ: str | None = None
+    権限コード: str | None = None
+    ユニット基本情報設定_利用フラグ: str | None = Field(
+        None, alias="ユニット基本情報設定 利用フラグ"
+    )
+    ユニットユーザ情報設定_利用フラグ: str | None = Field(
+        None, alias="ユニットユーザ情報設定 利用フラグ"
+    )
+    ユニットユーザグループ情報設定_利用フラグ: str | None = Field(
+        None, alias="ユニットユーザグループ情報設定 利用フラグ"
+    )
+    患者抽出条件設定_利用フラグ: str | None = Field(
+        None, alias="患者抽出条件設定 利用フラグ"
+    )
+    資料抽出条件設定_利用フラグ: str | None = Field(
+        None, alias="資料抽出条件設定 利用フラグ"
+    )
+    最終更新端末ID: str | None = None
+    最終更新者ID: str | None = None
+    最終更新者名: str | None = None
+    最終更新日時: time | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class がん登録(DwhBaseModel):
+    """がん登録."""
+
+    ROW_ID: str = ""
+    患者ID: str | None = None
+    匿名ID: str = ""
+    性別: str | None = None
+    生年月日: str | None = None
+    出生地コード: str | None = None
+    新_基本情報テキスト: str | None = Field(None, alias="(新)基本情報テキスト")
+    初回入院日: date | None = None
+    腫瘍番号: Decimal | None = None
+    診断時郵便番号: str | None = None
+    都道府県コード: str | None = None
+    診断時住所: str | None = None
+    診断時住所_市区町村_: str | None = Field(None, alias="診断時住所(市区町村)")
+    当該腫瘍初診日: str | None = None
+    診断日0_発端日_: str | None = Field(None, alias="診断日0(発端日)")
+    他施設診断日: str | None = None
+    自施設診断日: str | None = None
+    起算日: str | None = None
+    来院経路: str | None = None
+    発見前自覚症状: str | None = None
+    発見経緯: str | None = None
+    来院_発見の経緯: str | None = Field(None, alias="来院・発見の経緯")
+    診断区分_診断結果_: str | None = Field(None, alias="診断区分(診断結果)")
+    治療方針: str | None = None
+    新_治療施設: str | None = Field(None, alias="(新)治療施設")
+    診断施設: str | None = None
+    症例区分: str | None = None
+    受診目的: str | None = None
+    診断及び初回治療_経過観察が行われた施設の別: str | None = Field(
+        None, alias="診断及び初回治療・経過観察が行われた施設の別"
+    )
+    病名の告知: str | None = None
+    部位コード: str | None = None
+    部位テキスト: str | None = None
+    部位の側性: str | None = None
+    臨床病期: str | None = None
+    治療前のステージ_主要5部位_: str | None = Field(
+        None, alias="治療前のステージ(主要5部位)"
+    )
+    cT分類: str | None = None
+    cN分類: str | None = None
+    cM分類: str | None = None
+    新_c付加因子: str | None = Field(None, alias="(新)c付加因子")
+    肝癌のステージ: str | None = None
+    臨床的進展度: str | None = None
+    病理病期: str | None = None
+    pT分類: str | None = None
+    pN分類: str | None = None
+    pM分類: str | None = None
+    新_p付加因子: str | None = Field(None, alias="(新)p付加因子")
+    病理学的進展度: str | None = None
+    壁深達度: str | None = None
+    組織型コード: str | None = None
+    組織型テキスト: str | None = None
+    分化度: str | None = None
+    診断根拠: str | None = None
+    病理組織標本由来: str | None = None
+    診断に寄与した検査: str | None = None
+    X線検査: str | None = None
+    内視鏡検査: str | None = None
+    超音波検査: str | None = None
+    腫瘍マーカー検査: str | None = None
+    CT_MRI検査: str | None = Field(None, alias="CT/MRI検査")
+    RI検査: str | None = None
+    細胞診: str | None = None
+    組織診: str | None = None
+    取り扱い臨床病期: str | None = None
+    取り扱いcT分類: str | None = None
+    取り扱いcN分類: str | None = None
+    取り扱いcM分類: str | None = None
+    取り扱い病理病期: str | None = None
+    取り扱いpT分類: str | None = None
+    取り扱いpN分類: str | None = None
+    取り扱いpM分類: str | None = None
+    腫瘍情報_テキスト_: str | None = Field(None, alias="腫瘍情報《テキスト》")
+    初回治療開始日: date | None = None
+    入院日_初回治療_: date | None = Field(None, alias="入院日(初回治療)")
+    退院日_初回治療_: date | None = Field(None, alias="退院日(初回治療)")
+    外科的治療_自施設_: str | None = Field(None, alias="外科的治療(自施設)")
+    外科的治療開始日_自施設_: str | None = Field(None, alias="外科的治療開始日(自施設)")
+    新_外科的治療_前_他施設_: str | None = Field(
+        None, alias="(新)外科的治療(前・他施設)"
+    )
+    新_外科的治療_後_他施設_: str | None = Field(
+        None, alias="(新)外科的治療(後・他施設)"
+    )
+    鏡視下治療_自施設_: str | None = Field(None, alias="鏡視下治療(自施設)")
+    鏡視下治療開始日_自施設_: str | None = Field(None, alias="鏡視下治療開始日(自施設)")
+    新_鏡視下治療_前_他施設_: str | None = Field(
+        None, alias="(新)鏡視下治療(前・他施設)"
+    )
+    新_鏡視下治療_後_他施設_: str | None = Field(
+        None, alias="(新)鏡視下治療(後・他施設)"
+    )
+    内視鏡的治療_自施設_: str | None = Field(None, alias="内視鏡的治療(自施設)")
+    内視鏡的治療開始日_自施設_: str | None = Field(
+        None, alias="内視鏡的治療開始日(自施設)"
+    )
+    新_内視鏡的治療_前_他施設_: str | None = Field(
+        None, alias="(新)内視鏡的治療(前・他施設)"
+    )
+    新_内視鏡的治療_後_他施設_: str | None = Field(
+        None, alias="(新)内視鏡的治療(後・他施設)"
+    )
+    観血的治療の範囲: str | None = None
+    放射線療法_自施設_: str | None = Field(None, alias="放射線療法(自施設)")
+    新_放射線療法開始日_自施設_: str | None = Field(
+        None, alias="(新)放射線療法開始日(自施設)"
+    )
+    新_放射線療法_前_他施設_: str | None = Field(
+        None, alias="(新)放射線療法(前・他施設)"
+    )
+    新_放射線療法_後_他施設_: str | None = Field(
+        None, alias="(新)放射線療法(後・他施設)"
+    )
+    化学療法_自施設_: str | None = Field(None, alias="化学療法(自施設)")
+    新_化学療法開始日_自施設_: str | None = Field(
+        None, alias="(新)化学療法開始日(自施設)"
+    )
+    新_化学療法_前_他施設_: str | None = Field(None, alias="(新)化学療法(前・他施設)")
+    新_化学療法_後_他施設_: str | None = Field(None, alias="(新)化学療法(後・他施設)")
+    免疫療法_BRMの有無: str | None = Field(None, alias="免疫療法・BRMの有無")
+    内分泌療法_自施設_: str | None = Field(None, alias="内分泌療法(自施設)")
+    新_内分泌療法開始日_自施設_: str | None = Field(
+        None, alias="(新)内分泌療法開始日(自施設)"
+    )
+    新_内分泌療法_前_他施設_: str | None = Field(
+        None, alias="(新)内分泌療法(前・他施設)"
+    )
+    新_内分泌療法_後_他施設_: str | None = Field(
+        None, alias="(新)内分泌療法(後・他施設)"
+    )
+    TAEの有無: str | None = None
+    PEITの有無: str | None = None
+    温熱療法の有無: str | None = None
+    レーザー等治療_焼灼_の有無: str | None = Field(
+        None, alias="レーザー等治療(焼灼)の有無"
+    )
+    その他治療_自施設_: str | None = Field(None, alias="その他治療(自施設)")
+    新_その他治療_前_他施設_: str | None = Field(
+        None, alias="(新)その他治療(前・他施設)"
+    )
+    新_その他治療_後_他施設_: str | None = Field(
+        None, alias="(新)その他治療(後・他施設)"
+    )
+    新_経過観察開始_自施設_: str | None = Field(None, alias="(新)経過観察開始(自施設)")
+    新_症状緩和的治療_自施設_: str | None = Field(
+        None, alias="(新)症状緩和的治療(自施設)"
+    )
+    治療情報テキスト: str | None = None
+    診療科テキスト: str | None = None
+    病棟: str | None = None
+    主治医テキスト: str | None = None
+    紹介元テキスト: str | None = None
+    紹介先テキスト: str | None = None
+    新_紹介状況テキスト: str | None = Field(None, alias="(新)紹介状況テキスト")
+    初回登録日: str | None = None
+    最新修正日: str | None = None
+    定義バージョン: str | None = None
+    診断年: str | None = None
+    年齢: Decimal | None = None
+    入院日_初回治療__初診後_: date | None = Field(
+        None, alias="入院日(初回治療)(初診後)"
+    )
+    退院日_初回治療__初診後_: date | None = Field(
+        None, alias="退院日(初回治療)(初診後)"
+    )
+    外科的治療の有無_初診後_: str | None = Field(None, alias="外科的治療の有無(初診後)")
+    外科的治療の施行日_初診後_: date | None = Field(
+        None, alias="外科的治療の施行日(初診後)"
+    )
+    体腔鏡的治療の有無_初診後_: str | None = Field(
+        None, alias="体腔鏡的治療の有無(初診後)"
+    )
+    体腔鏡的治療の施行日_初診後_: date | None = Field(
+        None, alias="体腔鏡的治療の施行日(初診後)"
+    )
+    内視鏡的治療の有無_初診後_: str | None = Field(
+        None, alias="内視鏡的治療の有無(初診後)"
+    )
+    内視鏡的治療の施行日_初診後_: date | None = Field(
+        None, alias="内視鏡的治療の施行日(初診後)"
+    )
+    外科的_体腔鏡的_内視鏡的治療の結果_初診後_: str | None = Field(
+        None, alias="外科的・体腔鏡的・内視鏡的治療の結果(初診後)"
+    )
+    放射線治療の有無_初診後_: str | None = Field(None, alias="放射線治療の有無(初診後)")
+    化学療法の有無_初診後_: str | None = Field(None, alias="化学療法の有無(初診後)")
+    免疫療法_BRMの有無_初診後_: str | None = Field(
+        None, alias="免疫療法・BRMの有無(初診後)"
+    )
+    内分泌療法の有無_初診後_: str | None = Field(None, alias="内分泌療法の有無(初診後)")
+    TAEの有無_初診後_: str | None = Field(None, alias="TAEの有無(初診後)")
+    PEITの有無_初診後_: str | None = Field(None, alias="PEITの有無(初診後)")
+    温熱療法の有無_初診後_: str | None = Field(None, alias="温熱療法の有無(初診後)")
+    レーザー等治療_焼灼_の有無_初診後_: str | None = Field(
+        None, alias="レーザー等治療(焼灼)の有無(初診後)"
+    )
+    その他の治療の有無_初診後_: str | None = Field(
+        None, alias="その他の治療の有無(初診後)"
+    )
+    治療情報自由記載欄_初診後_: str | None = Field(
+        None, alias="治療情報自由記載欄(初診後)"
+    )
+    追跡期間: str | None = None
+    新_届出状況: str | None = Field(None, alias="(新)届出状況")
+    新_最新届出日: str | None = Field(None, alias="(新)最新届出日")
+    生存最終確認日: str | None = None
+    死亡日: str | None = None
+    死亡確定日: str | None = None
+    生存状況: str | None = None
+    予後調査方法: str | None = None
+    死因: str | None = None
+    死因部位: str | None = None
+    死因テキスト: str | None = None
+    死亡診断書発行: str | None = None
+    死亡場所: str | None = None
+    解剖の有無: str | None = None
+    新_死因コード: str | None = Field(None, alias="(新)死因コード")
+    新_予後調査基準日: str | None = Field(None, alias="(新)予後調査基準日")
+    予後調査実施日: str | None = None
+    国籍: str | None = None
+    最新郵便番号: str | None = None
+    最新住所: str | None = None
+    新_生存状況テキスト: str | None = Field(None, alias="(新)生存状況テキスト")
+    生存最終確認日_院内: str | None = None
+    死亡日_院内: str | None = None
+    生存状況_院内: str | None = None
+    予後調査方法_院内: str | None = None
+    更新日_院内: str | None = None
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+
+
+class DPC様式1(DwhBaseModel):
+    """DPC様式1."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC施設コード: str = ""
+    DPC症例番号: str = ""
+    様式1開始日: date = date(1000, 1, 1)
+    様式1終了日: date = date(1000, 1, 1)
+    統括診療情報番号: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    性別コード: str = ""
+    性別: str = ""
+    生年月日: date | None = None
+    郵便番号: str = ""
+    入院中診療目的コード: str = ""
+    入院中診療目的: str = ""
+    治験実施の有無: str = ""
+    入院日: date | None = None
+    退院日: date | None = None
+    転科の有無: str = ""
+    入院経路コード: str = ""
+    入院経路: str = ""
+    他院より紹介の有無: str = ""
+    自院から入院の有無: str = ""
+    予定緊急入院区分コード: str = ""
+    予定緊急入院: str = ""
+    救急車搬送の有無: str = ""
+    退院先区分コード: str = ""
+    退院先: str = ""
+    退院時転帰区分コード: str = ""
+    退院時転帰区分名: str = ""
+    n24時間以内死有無コード: str = Field("", alias="24時間以内死有無コード")
+    n24時間以内死有無区分: str = Field("", alias="24時間以内死有無区分")
+    前回退院日: date | None = None
+    同一疾病入院日: date | None = None
+    一般病棟入院の有無: str = ""
+    精神病棟入院の有無: str = ""
+    その他病棟入院の有無: str = ""
+    主病名ICD10: str = ""
+    主傷病名コード: str = ""
+    主傷病名修飾語コード1: str = ""
+    主傷病名修飾語コード2: str = ""
+    主傷病名修飾語コード3: str = ""
+    主傷病名修飾語コード4: str = ""
+    主病名: str = ""
+    入院契機病名ICD10: str = ""
+    入院契機傷病名コード: str = ""
+    入院契機傷病名修飾語コード1: str = ""
+    入院契機傷病名修飾語コード2: str = ""
+    入院契機傷病名修飾語コード3: str = ""
+    入院契機傷病名修飾語コード4: str = ""
+    入院契機病名: str = ""
+    医療資源病名1ICD10: str = ""
+    医療資源傷病名コード: str = ""
+    医療資源傷病修飾語コード1: str = ""
+    医療資源傷病修飾語コード2: str = ""
+    医療資源傷病修飾語コード3: str = ""
+    医療資源傷病修飾語コード4: str = ""
+    医療資源病名1: str = ""
+    医療資源病名2ICD10: str = ""
+    医療資源2傷病名コード: str = ""
+    医療資源2傷病修飾語コード1: str = ""
+    医療資源2傷病修飾語コード2: str = ""
+    医療資源2傷病修飾語コード3: str = ""
+    医療資源2傷病修飾語コード4: str = ""
+    医療資源病名2: str = ""
+    入院時併存症1ICD10: str = ""
+    入院時併存症1傷病名コード: str = ""
+    入院時併存症1修飾語コード1: str = ""
+    入院時併存症1修飾語コード2: str = ""
+    入院時併存症1修飾語コード3: str = ""
+    入院時併存症1修飾語コード4: str = ""
+    入院時併存症1: str = ""
+    入院時併存症2ICD10: str = ""
+    入院時併存症2傷病名コード: str = ""
+    入院時併存症2修飾語コード1: str = ""
+    入院時併存症2修飾語コード2: str = ""
+    入院時併存症2修飾語コード3: str = ""
+    入院時併存症2修飾語コード4: str = ""
+    入院時併存症2: str = ""
+    入院時併存症3ICD10: str = ""
+    入院時併存症3傷病名コード: str = ""
+    入院時併存症3修飾語コード1: str = ""
+    入院時併存症3修飾語コード2: str = ""
+    入院時併存症3修飾語コード3: str = ""
+    入院時併存症3修飾語コード4: str = ""
+    入院時併存症3: str = ""
+    入院時併存症4ICD10: str = ""
+    入院時併存症4傷病名コード: str = ""
+    入院時併存症4修飾語コード1: str = ""
+    入院時併存症4修飾語コード2: str = ""
+    入院時併存症4修飾語コード3: str = ""
+    入院時併存症4修飾語コード4: str = ""
+    入院時併存症4: str = ""
+    入院時併存症5ICD10: str = ""
+    入院時併存症5傷病名コード: str = ""
+    入院時併存症5修飾語コード1: str = ""
+    入院時併存症5修飾語コード2: str = ""
+    入院時併存症5修飾語コード3: str = ""
+    入院時併存症5修飾語コード4: str = ""
+    入院時併存症5: str = ""
+    入院時併存症6ICD10: str = ""
+    入院時併存症6傷病名コード: str = ""
+    入院時併存症6修飾語コード1: str = ""
+    入院時併存症6修飾語コード2: str = ""
+    入院時併存症6修飾語コード3: str = ""
+    入院時併存症6修飾語コード4: str = ""
+    入院時併存症6: str = ""
+    入院時併存症7ICD10: str = ""
+    入院時併存症7傷病名コード: str = ""
+    入院時併存症7修飾語コード1: str = ""
+    入院時併存症7修飾語コード2: str = ""
+    入院時併存症7修飾語コード3: str = ""
+    入院時併存症7修飾語コード4: str = ""
+    入院時併存症7: str = ""
+    入院時併存症8ICD10: str = ""
+    入院時併存症8傷病名コード: str = ""
+    入院時併存症8修飾語コード1: str = ""
+    入院時併存症8修飾語コード2: str = ""
+    入院時併存症8修飾語コード3: str = ""
+    入院時併存症8修飾語コード4: str = ""
+    入院時併存症8: str = ""
+    入院時併存症9ICD10: str = ""
+    入院時併存症9傷病名コード: str = ""
+    入院時併存症9修飾語コード1: str = ""
+    入院時併存症9修飾語コード2: str = ""
+    入院時併存症9修飾語コード3: str = ""
+    入院時併存症9修飾語コード4: str = ""
+    入院時併存症9: str = ""
+    入院時併存症10ICD10: str = ""
+    入院時併存症10傷病名コード: str = ""
+    入院時併存症10修飾語コード1: str = ""
+    入院時併存症10修飾語コード2: str = ""
+    入院時併存症10修飾語コード3: str = ""
+    入院時併存症10修飾語コード4: str = ""
+    入院時併存症10: str = ""
+    入院後発症疾患1ICD10: str = ""
+    入院後発症疾患1傷病名コード: str = ""
+    入院後発症疾患1修飾語コード1: str = ""
+    入院後発症疾患1修飾語コード2: str = ""
+    入院後発症疾患1修飾語コード3: str = ""
+    入院後発症疾患1修飾語コード4: str = ""
+    入院後発症疾患1: str = ""
+    入院後発症疾患2ICD10: str = ""
+    入院後発症疾患2傷病名コード: str = ""
+    入院後発症疾患2修飾語コード1: str = ""
+    入院後発症疾患2修飾語コード2: str = ""
+    入院後発症疾患2修飾語コード3: str = ""
+    入院後発症疾患2修飾語コード4: str = ""
+    入院後発症疾患2: str = ""
+    入院後発症疾患3ICD10: str = ""
+    入院後発症疾患3傷病名コード: str = ""
+    入院後発症疾患3修飾語コード1: str = ""
+    入院後発症疾患3修飾語コード2: str = ""
+    入院後発症疾患3修飾語コード3: str = ""
+    入院後発症疾患3修飾語コード4: str = ""
+    入院後発症疾患3: str = ""
+    入院後発症疾患4ICD10: str = ""
+    入院後発症疾患4傷病名コード: str = ""
+    入院後発症疾患4修飾語コード1: str = ""
+    入院後発症疾患4修飾語コード2: str = ""
+    入院後発症疾患4修飾語コード3: str = ""
+    入院後発症疾患4修飾語コード4: str = ""
+    入院後発症疾患4: str = ""
+    入院後発症疾患5ICD10: str = ""
+    入院後発症疾患5傷病名コード: str = ""
+    入院後発症疾患5修飾語コード1: str = ""
+    入院後発症疾患5修飾語コード2: str = ""
+    入院後発症疾患5修飾語コード3: str = ""
+    入院後発症疾患5修飾語コード4: str = ""
+    入院後発症疾患5: str = ""
+    入院後発症疾患6ICD10: str = ""
+    入院後発症疾患6傷病名コード: str = ""
+    入院後発症疾患6修飾語コード1: str = ""
+    入院後発症疾患6修飾語コード2: str = ""
+    入院後発症疾患6修飾語コード3: str = ""
+    入院後発症疾患6修飾語コード4: str = ""
+    入院後発症疾患6: str = ""
+    入院後発症疾患7ICD10: str = ""
+    入院後発症疾患7傷病名コード: str = ""
+    入院後発症疾患7修飾語コード1: str = ""
+    入院後発症疾患7修飾語コード2: str = ""
+    入院後発症疾患7修飾語コード3: str = ""
+    入院後発症疾患7修飾語コード4: str = ""
+    入院後発症疾患7: str = ""
+    入院後発症疾患8ICD10: str = ""
+    入院後発症疾患8傷病名コード: str = ""
+    入院後発症疾患8修飾語コード1: str = ""
+    入院後発症疾患8修飾語コード2: str = ""
+    入院後発症疾患8修飾語コード3: str = ""
+    入院後発症疾患8修飾語コード4: str = ""
+    入院後発症疾患8: str = ""
+    入院後発症疾患9ICD10: str = ""
+    入院後発症疾患9傷病名コード: str = ""
+    入院後発症疾患9修飾語コード1: str = ""
+    入院後発症疾患9修飾語コード2: str = ""
+    入院後発症疾患9修飾語コード3: str = ""
+    入院後発症疾患9修飾語コード4: str = ""
+    入院後発症疾患9: str = ""
+    入院後発症疾患10ICD10: str = ""
+    入院後発症疾患10傷病名コード: str = ""
+    入院後発症疾患10修飾語コード1: str = ""
+    入院後発症疾患10修飾語コード2: str = ""
+    入院後発症疾患10修飾語コード3: str = ""
+    入院後発症疾患10修飾語コード4: str = ""
+    入院後発症疾患10: str = ""
+    手術1: str = ""
+    手術1コメント: str = ""
+    手術1点数表コード: str = ""
+    手術1手術基幹コード: str = ""
+    手術1回数コード: str = ""
+    手術1回数: str = ""
+    手術1側数コード: str = ""
+    手術1側数: str = ""
+    手術日1: date | None = None
+    手術1麻酔コード: str = ""
+    手術1麻酔: str = ""
+    手術1予防的抗菌薬投与コード: str = ""
+    手術1予防的抗菌薬投与: str = ""
+    手術2: str = ""
+    手術2コメント: str = ""
+    手術2点数表コード: str = ""
+    手術2手術基幹コード: str = ""
+    手術2回数コード: str = ""
+    手術2回数: str = ""
+    手術2側数コード: str = ""
+    手術2側数: str = ""
+    手術日2: date | None = None
+    手術2麻酔コード: str = ""
+    手術2麻酔: str = ""
+    手術2予防的抗菌薬投与コード: str = ""
+    手術2予防的抗菌薬投与: str = ""
+    手術3: str = ""
+    手術3コメント: str = ""
+    手術3点数表コード: str = ""
+    手術3手術基幹コード: str = ""
+    手術3回数コード: str = ""
+    手術3回数: str = ""
+    手術3側数コード: str = ""
+    手術3側数: str = ""
+    手術日3: date | None = None
+    手術3麻酔コード: str = ""
+    手術3麻酔: str = ""
+    手術3予防的抗菌薬投与コード: str = ""
+    手術3予防的抗菌薬投与: str = ""
+    手術4: str = ""
+    手術4コメント: str = ""
+    手術4点数表コード: str = ""
+    手術4手術基幹コード: str = ""
+    手術4回数コード: str = ""
+    手術4回数: str = ""
+    手術4側数コード: str = ""
+    手術4側数: str = ""
+    手術日4: date | None = None
+    手術4麻酔コード: str = ""
+    手術4麻酔: str = ""
+    手術4予防的抗菌薬投与コード: str = ""
+    手術4予防的抗菌薬投与: str = ""
+    手術5: str = ""
+    手術5コメント: str = ""
+    手術5点数表コード: str = ""
+    手術5手術基幹コード: str = ""
+    手術5回数コード: str = ""
+    手術5回数: str = ""
+    手術5側数コード: str = ""
+    手術5側数: str = ""
+    手術日5: date | None = None
+    手術5麻酔コード: str = ""
+    手術5麻酔: str = ""
+    手術5予防的抗菌薬投与コード: str = ""
+    手術5予防的抗菌薬投与: str = ""
+    現在の妊娠の有無コード: str = ""
+    現在の妊娠の有無区分: str = ""
+    出生時体重: Decimal | None = None
+    出生時妊娠週数: Decimal | None = None
+    身長_cm_: Decimal | None = Field(None, alias="身長(cm)")
+    入院時体重_kg_: float | None = Field(None, alias="入院時体重(kg)")
+    退院時体重_kg_: float | None = Field(None, alias="退院時体重(kg)")
+    喫煙指数: Decimal | None = None
+    入院時JCSコード: str = ""
+    救急受診時意識障害がある場合のJCSコード: str = ""
+    救急受診時意識障害がある場合のJCS: str = ""
+    治療室又は病棟入室時意識障害がある場合のJCSコード: str = ""
+    治療室又は病棟入室時意識障害がある場合のJCS: str = ""
+    入院時JCS: str = ""
+    退院時JCSコード: str = ""
+    退院時JCS: str = ""
+    入院時ADL: str = ""
+    入院時ADL食事: str = ""
+    入院時ADL移乗: str = ""
+    入院時ADL整容: str = ""
+    入院時ADLトイレの動作_使用: str = Field("", alias="入院時ADLトイレの動作/使用")
+    入院時ADL入浴: str = ""
+    入院時ADL平地歩行: str = ""
+    入院時ADL階段: str = ""
+    入院時ADL更衣: str = ""
+    入院時ADL排便管理: str = ""
+    入院時ADL排尿管理: str = ""
+    退院時ADL: str = ""
+    退院時ADL食事: str = ""
+    退院時ADL移乗: str = ""
+    退院時ADL整容: str = ""
+    退院時ADLトイレの動作_使用: str = Field("", alias="退院時ADLトイレの動作/使用")
+    退院時ADL入浴: str = ""
+    退院時ADL平地歩行: str = ""
+    退院時ADL階段: str = ""
+    退院時ADL更衣: str = ""
+    退院時ADL排便管理: str = ""
+    退院時ADL排尿管理: str = ""
+    地域包括ケア入棟時ADL1: str = ""
+    地域包括ケア入棟時ADL食事1: str = ""
+    地域包括ケア入棟時ADL移乗1: str = ""
+    地域包括ケア入棟時ADL整容1: str = ""
+    地域包括ケア入棟時ADLトイレの動作_使用1: str = Field(
+        "", alias="地域包括ケア入棟時ADLトイレの動作/使用1"
+    )
+    地域包括ケア入棟時ADL入浴1: str = ""
+    地域包括ケア入棟時ADL平地歩行1: str = ""
+    地域包括ケア入棟時ADL階段1: str = ""
+    地域包括ケア入棟時ADL更衣1: str = ""
+    地域包括ケア入棟時ADL排便管理1: str = ""
+    地域包括ケア入棟時ADL排尿管理1: str = ""
+    地域包括ケア入棟時ADL2: str = ""
+    地域包括ケア入棟時ADL食事2: str = ""
+    地域包括ケア入棟時ADL移乗2: str = ""
+    地域包括ケア入棟時ADL整容2: str = ""
+    地域包括ケア入棟時ADLトイレの動作_使用2: str = Field(
+        "", alias="地域包括ケア入棟時ADLトイレの動作/使用2"
+    )
+    地域包括ケア入棟時ADL入浴2: str = ""
+    地域包括ケア入棟時ADL平地歩行2: str = ""
+    地域包括ケア入棟時ADL階段2: str = ""
+    地域包括ケア入棟時ADL更衣2: str = ""
+    地域包括ケア入棟時ADL排便管理2: str = ""
+    地域包括ケア入棟時ADL排尿管理2: str = ""
+    地域包括ケア入棟時ADL3: str = ""
+    地域包括ケア入棟時ADL食事3: str = ""
+    地域包括ケア入棟時ADL移乗3: str = ""
+    地域包括ケア入棟時ADL整容3: str = ""
+    地域包括ケア入棟時ADLトイレの動作_使用3: str = Field(
+        "", alias="地域包括ケア入棟時ADLトイレの動作/使用3"
+    )
+    地域包括ケア入棟時ADL入浴3: str = ""
+    地域包括ケア入棟時ADL平地歩行3: str = ""
+    地域包括ケア入棟時ADL階段3: str = ""
+    地域包括ケア入棟時ADL更衣3: str = ""
+    地域包括ケア入棟時ADL排便管理3: str = ""
+    地域包括ケア入棟時ADL排尿管理3: str = ""
+    地域包括ケア退棟時ADL1: str = ""
+    地域包括ケア退棟時ADL食事1: str = ""
+    地域包括ケア退棟時ADL移乗1: str = ""
+    地域包括ケア退棟時ADL整容1: str = ""
+    地域包括ケア退棟時ADLトイレの動作_使用1: str = Field(
+        "", alias="地域包括ケア退棟時ADLトイレの動作/使用1"
+    )
+    地域包括ケア退棟時ADL入浴1: str = ""
+    地域包括ケア退棟時ADL平地歩行1: str = ""
+    地域包括ケア退棟時ADL階段1: str = ""
+    地域包括ケア退棟時ADL更衣1: str = ""
+    地域包括ケア退棟時ADL排便管理1: str = ""
+    地域包括ケア退棟時ADL排尿管理1: str = ""
+    地域包括ケア退棟時ADL2: str = ""
+    地域包括ケア退棟時ADL食事2: str = ""
+    地域包括ケア退棟時ADL移乗2: str = ""
+    地域包括ケア退棟時ADL整容2: str = ""
+    地域包括ケア退棟時ADLトイレの動作_使用2: str = Field(
+        "", alias="地域包括ケア退棟時ADLトイレの動作/使用2"
+    )
+    地域包括ケア退棟時ADL入浴2: str = ""
+    地域包括ケア退棟時ADL平地歩行2: str = ""
+    地域包括ケア退棟時ADL階段2: str = ""
+    地域包括ケア退棟時ADL更衣2: str = ""
+    地域包括ケア退棟時ADL排便管理2: str = ""
+    地域包括ケア退棟時ADL排尿管理2: str = ""
+    地域包括ケア退棟時ADL3: str = ""
+    地域包括ケア退棟時ADL食事3: str = ""
+    地域包括ケア退棟時ADL移乗3: str = ""
+    地域包括ケア退棟時ADL整容3: str = ""
+    地域包括ケア退棟時ADLトイレの動作_使用3: str = Field(
+        "", alias="地域包括ケア退棟時ADLトイレの動作/使用3"
+    )
+    地域包括ケア退棟時ADL入浴3: str = ""
+    地域包括ケア退棟時ADL平地歩行3: str = ""
+    地域包括ケア退棟時ADL階段3: str = ""
+    地域包括ケア退棟時ADL更衣3: str = ""
+    地域包括ケア退棟時ADL排便管理3: str = ""
+    地域包括ケア退棟時ADL排尿管理3: str = ""
+    がん初発再発区分: str = ""
+    がん初発再発: str = ""
+    UICC病期分類_版_: str = Field("", alias="UICC病期分類(版)")
+    UICC_T記号: str = Field("", alias="UICC・T記号")
+    UICC_T: str = Field("", alias="UICC・T")
+    UICC_N記号: str = Field("", alias="UICC・N記号")
+    UICC_N: str = Field("", alias="UICC・N")
+    UICC_M記号: str = Field("", alias="UICC・M記号")
+    UICC_M: str = Field("", alias="UICC・M")
+    がんStage分類コード: str = ""
+    がんStage分類: str = ""
+    発症前RankinScaleコード: str = ""
+    発症前RankinScale: str = ""
+    退院時modifiedRankinScaleコード: str = ""
+    退院時modifiedRankinScale: str = ""
+    脳卒中の発症時期コード: str = ""
+    脳卒中の発症時期: str = ""
+    HughJones分類コード: str = ""
+    HughJones分類: str = ""
+    心不全のNYHA心機能分類コード: str = ""
+    心不全のNYHA心機能分類: str = ""
+    救急受診時のNYHA心機能分類コード_1: str = Field(
+        "", alias="救急受診時のNYHA心機能分類コード"
+    )
+    救急受診時のNYHA心機能分類_1: str = Field("", alias="救急受診時のNYHA心機能分類")
+    治療室又は病棟入室時のNYHA心機能分類コード: str = ""
+    治療室又は病棟入室時のNYHA心機能分類: str = ""
+    救急受診時のNYHA心機能分類コード_2: str = Field(
+        "", alias="救急受診時のNYHA心機能分類コード"
+    )
+    救急受診時のNYHA心機能分類_2: str = Field("", alias="救急受診時のNYHA心機能分類")
+    治療室又は病棟入室時のNYHA_心機能分類コード: str = Field(
+        "", alias="治療室又は病棟入室時のNYHA 心機能分類コード"
+    )
+    治療室又は病棟入室時のNYHA_心機能分類: str = Field(
+        "", alias="治療室又は病棟入室時のNYHA 心機能分類"
+    )
+    重症度_CCS分類コード: str = ""
+    重症度_CCS分類: str = ""
+    重症度Killip分類コード: str = ""
+    重症度Killip分類: str = ""
+    肺炎の重症度分類コード: str = ""
+    肺炎の重症度分類_性別年齢: str = ""
+    肺炎の重症度分類_BUN: str = ""
+    肺炎の重症度分類_SpO2: str = ""
+    肺炎の重症度分類_意識障害: str = ""
+    肺炎の重症度分類_血圧: str = ""
+    肺炎の重症度分類_免疫不全状態: str = ""
+    肺炎の重症度分類_肺炎重症度規定因子: str = ""
+    肺炎の重症度分類_院内肺炎又は市中肺炎: str = ""
+    医療介護関連肺炎に該当の有無: str = ""
+    肝硬変_ChildPugh分類コード: str = ""
+    肝硬変_ChildPugh分類_Bil_mg_dl_: str = Field(
+        "", alias="肝硬変_ChildPugh分類_Bil(mg/dl)"
+    )
+    肝硬変_ChildPugh分類_Alb_g_dl_: str = Field(
+        "", alias="肝硬変_ChildPugh分類_Alb(g/dl)"
+    )
+    肝硬変_ChildPugh分類_腹水: str = ""
+    肝硬変_ChildPugh分類_脳症: str = ""
+    肝硬変_ChildPugh分類_PT___: str = Field("", alias="肝硬変_ChildPugh分類_PT(%)")
+    重症度_急性膵炎コード: str = ""
+    BurnIndex: Decimal | None = None
+    重症度_その他: str = ""
+    重症度_その他記号: str = ""
+    入院時妊娠週数: Decimal | None = None
+    入院形態コード: str = ""
+    入院形態: str = ""
+    隔離日数: Decimal | None = None
+    身体拘束日数: Decimal | None = None
+    GAF尺度_入院時: Decimal | None = None
+    病名付加コード: str = ""
+    化学療法コード: str = ""
+    化学療法名: str = ""
+    テモゾロミドの有無: str = ""
+    入院周辺の分娩の有無コード: str = ""
+    入院周辺の分娩の有無区分: str = ""
+    分娩時出血量_ml_: Decimal | None = Field(None, alias="分娩時出血量(ml)")
+    再入院種別コード: str = ""
+    再入院種別: str = ""
+    再入院理由の種別コード: str = ""
+    再入院理由の種別: str = ""
+    再入院自由記載欄: str = ""
+    再転棟種別コード: str = ""
+    再転棟種別: str = ""
+    再転棟理由の種別コード: str = ""
+    再転棟理由の種別: str = ""
+    再転棟自由記載欄: str = ""
+    前回退院日_DPC形式_: str = Field("", alias="前回退院日(DPC形式)")
+    同一疾病入院日_DPC形式_: str = Field("", alias="同一疾病入院日(DPC形式)")
+    回数管理番号: Decimal | None = None
+    バージョン: str = ""
+    入院前の在宅医療の有無コード: str = ""
+    入院前の在宅医療の有無: str = ""
+    退院後の在宅医療の有無コード: str = ""
+    退院後の在宅医療の有無: str = ""
+    入院時の褥瘡の有無コード_1: str = Field("", alias="入院時の褥瘡の有無コード")
+    入院時の褥瘡の有無: str = ""
+    退院時の褥瘡の有無コード_1: str = Field("", alias="退院時の褥瘡の有無コード")
+    退院時の褥瘡の有無: str = ""
+    認知症高齢者の日常生活自立度判定基準コード: str = ""
+    認知症高齢者の日常生活自立度判定基準: str = ""
+    持参薬の使用の有無コード: str = ""
+    持参薬の使用の有無: str = ""
+    抗リウマチ分子標的薬の初回導入治療の有無コード: str = ""
+    抗リウマチ分子標的薬の初回導入治療の有無: str = ""
+    自傷行為_自殺企図の有無コード: str = Field(
+        "", alias="自傷行為・自殺企図の有無コード"
+    )
+    過去の自傷行為_自殺企図の有無コード: str = Field(
+        "", alias="過去の自傷行為・自殺企図の有無コード"
+    )
+    過去の自傷行為_自殺企図の有無: str = Field(
+        "", alias="過去の自傷行為・自殺企図の有無"
+    )
+    自傷行為_自殺企図の有無: str = Field("", alias="自傷行為・自殺企図の有無")
+    入棟日1: date | None = None
+    退棟日1: date | None = None
+    入棟時の褥瘡の有無1コード: str = ""
+    入棟時の褥瘡深さ1: str = ""
+    入棟時の褥瘡滲出液1: str = ""
+    入棟時の褥瘡大きさ1: str = ""
+    入棟時の褥瘡炎症_感染1: str = Field("", alias="入棟時の褥瘡炎症・感染1")
+    入棟時の褥瘡肉芽形成1: str = ""
+    入棟時の褥瘡壊死組織1: str = ""
+    入棟時の褥瘡ポケット1: str = ""
+    退棟時の褥瘡の有無1コード: str = ""
+    退棟時の褥瘡深さ1: str = ""
+    退棟時の褥瘡滲出液1: str = ""
+    退棟時の褥瘡大きさ1: str = ""
+    退棟時の褥瘡炎症_感染1: str = Field("", alias="退棟時の褥瘡炎症・感染1")
+    退棟時の褥瘡肉芽形成1: str = ""
+    退棟時の褥瘡壊死組織1: str = ""
+    退棟時の褥瘡ポケット1: str = ""
+    入棟日2: date | None = None
+    退棟日2: date | None = None
+    入棟時の褥瘡の有無2コード: str = ""
+    入棟時の褥瘡深さ2: str = ""
+    入棟時の褥瘡滲出液2: str = ""
+    入棟時の褥瘡大きさ2: str = ""
+    入棟時の褥瘡炎症_感染2: str = Field("", alias="入棟時の褥瘡炎症・感染2")
+    入棟時の褥瘡肉芽形成2: str = ""
+    入棟時の褥瘡壊死組織2: str = ""
+    入棟時の褥瘡ポケット2: str = ""
+    退棟時の褥瘡の有無2コード: str = ""
+    退棟時の褥瘡深さ2: str = ""
+    退棟時の褥瘡滲出液2: str = ""
+    退棟時の褥瘡大きさ2: str = ""
+    退棟時の褥瘡炎症_感染2: str = Field("", alias="退棟時の褥瘡炎症・感染2")
+    退棟時の褥瘡肉芽形成2: str = ""
+    退棟時の褥瘡壊死組織2: str = ""
+    退棟時の褥瘡ポケット2: str = ""
+    入棟日3: date | None = None
+    退棟日3: date | None = None
+    入棟時の褥瘡の有無3コード: str = ""
+    入棟時の褥瘡深さ3: str = ""
+    入棟時の褥瘡滲出液3: str = ""
+    入棟時の褥瘡大きさ3: str = ""
+    入棟時の褥瘡炎症_感染3: str = Field("", alias="入棟時の褥瘡炎症・感染3")
+    入棟時の褥瘡肉芽形成3: str = ""
+    入棟時の褥瘡壊死組織3: str = ""
+    入棟時の褥瘡ポケット3: str = ""
+    退棟時の褥瘡の有無3コード: str = ""
+    退棟時の褥瘡深さ3: str = ""
+    退棟時の褥瘡滲出液3: str = ""
+    退棟時の褥瘡大きさ3: str = ""
+    退棟時の褥瘡炎症_感染3: str = Field("", alias="退棟時の褥瘡炎症・感染3")
+    退棟時の褥瘡肉芽形成3: str = ""
+    退棟時の褥瘡壊死組織3: str = ""
+    退棟時の褥瘡ポケット3: str = ""
+    入院時の褥瘡の有無コード_2: str = Field("", alias="入院時の褥瘡の有無コード")
+    入院時の褥瘡深さ: str = ""
+    入院時の褥瘡滲出液: str = ""
+    入院時の褥瘡大きさ: str = ""
+    入院時の褥瘡炎症_感染: str = Field("", alias="入院時の褥瘡炎症・感染")
+    入院時の褥瘡肉芽形成: str = ""
+    入院時の褥瘡壊死組織: str = ""
+    入院時の褥瘡ポケット: str = ""
+    退院時の褥瘡の有無コード_2: str = Field("", alias="退院時の褥瘡の有無コード")
+    退院時の褥瘡深さ: str = ""
+    退院時の褥瘡滲出液: str = ""
+    退院時の褥瘡大きさ: str = ""
+    退院時の褥瘡炎症_感染: str = Field("", alias="退院時の褥瘡炎症・感染")
+    退院時の褥瘡肉芽形成: str = ""
+    退院時の褥瘡壊死組織: str = ""
+    退院時の褥瘡ポケット: str = ""
+    入院中の褥瘡の最大深度等コード: str = ""
+    入院中の褥瘡深さ_最大_: str = Field("", alias="入院中の褥瘡深さ(最大)")
+    入院中の褥瘡滲出液_最大_: str = Field("", alias="入院中の褥瘡滲出液(最大)")
+    入院中の褥瘡大きさ_最大_: str = Field("", alias="入院中の褥瘡大きさ(最大)")
+    入院中の褥瘡炎症_感染_最大_: str = Field("", alias="入院中の褥瘡炎症・感染(最大)")
+    入院中の褥瘡肉芽形成_最大_: str = Field("", alias="入院中の褥瘡肉芽形成(最大)")
+    入院中の褥瘡壊死組織_最大_: str = Field("", alias="入院中の褥瘡壊死組織(最大)")
+    入院中の褥瘡ポケット_最大_: str = Field("", alias="入院中の褥瘡ポケット(最大)")
+    入院中の褥瘡の最大深度等の日付: date | None = None
+    難病の告示番号1: str = ""
+    医療費助成の有無1: str = ""
+    難病の告示番号2: str = ""
+    医療費助成の有無2: str = ""
+    入棟日_FIM_1: date | None = Field(None, alias="入棟日(FIM)1")
+    入棟時FIM_食事_所見コード1: str = Field("", alias="入棟時FIM/食事_所見コード1")
+    入棟時FIM_食事_所見1: str = Field("", alias="入棟時FIM/食事_所見1")
+    入棟時FIM_整容_所見コード1: str = Field("", alias="入棟時FIM/整容_所見コード1")
+    入棟時FIM_整容_所見1: str = Field("", alias="入棟時FIM/整容_所見1")
+    入棟時FIM_清拭_所見コード1: str = Field("", alias="入棟時FIM/清拭_所見コード1")
+    入棟時FIM_清拭_所見1: str = Field("", alias="入棟時FIM/清拭_所見1")
+    入棟時FIM_更衣_上半身__所見コード1: str = Field(
+        "", alias="入棟時FIM/更衣(上半身)_所見コード1"
+    )
+    入棟時FIM_更衣_上半身__所見1: str = Field("", alias="入棟時FIM/更衣(上半身)_所見1")
+    入棟時FIM_更衣_下半身__所見コード1: str = Field(
+        "", alias="入棟時FIM/更衣(下半身)_所見コード1"
+    )
+    入棟時FIM_更衣_下半身__所見1: str = Field("", alias="入棟時FIM/更衣(下半身)_所見1")
+    入棟時FIM_トイレ_所見コード1: str = Field("", alias="入棟時FIM/トイレ_所見コード1")
+    入棟時FIM_トイレ_所見1: str = Field("", alias="入棟時FIM/トイレ_所見1")
+    入棟時FIM_排尿コントロール_所見コード1: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見コード1"
+    )
+    入棟時FIM_排尿コントロール_所見1: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見1"
+    )
+    入棟時FIM_排便コントロール_所見コード1: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見コード1"
+    )
+    入棟時FIM_排便コントロール_所見1: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見1"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見コード1: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見コード1"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見1: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見1"
+    )
+    入棟時FIM_トイレ移乗_所見コード1: str = Field(
+        "", alias="入棟時FIM/トイレ移乗_所見コード1"
+    )
+    入棟時FIM_トイレ移乗_所見1: str = Field("", alias="入棟時FIM/トイレ移乗_所見1")
+    入棟時FIM_浴槽_シャワー移乗_所見コード1: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見コード1"
+    )
+    入棟時FIM_浴槽_シャワー移乗_所見1: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見1"
+    )
+    入棟時FIM_歩行_車椅子移動_所見コード1: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見コード1"
+    )
+    入棟時FIM_歩行_車椅子移動_所見1: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見1"
+    )
+    入棟時FIM_階段移動_所見コード1: str = Field(
+        "", alias="入棟時FIM/階段移動_所見コード1"
+    )
+    入棟時FIM_階段移動_所見1: str = Field("", alias="入棟時FIM/階段移動_所見1")
+    入棟時FIM_理解_所見コード1: str = Field("", alias="入棟時FIM/理解_所見コード1")
+    入棟時FIM_理解_所見1: str = Field("", alias="入棟時FIM/理解_所見1")
+    入棟時FIM_表出_所見コード1: str = Field("", alias="入棟時FIM/表出_所見コード1")
+    入棟時FIM_表出_所見1: str = Field("", alias="入棟時FIM/表出_所見1")
+    入棟時FIM_社会的交流_所見コード1: str = Field(
+        "", alias="入棟時FIM/社会的交流_所見コード1"
+    )
+    入棟時FIM_社会的交流_所見1: str = Field("", alias="入棟時FIM/社会的交流_所見1")
+    入棟時FIM_問題解決_所見コード1: str = Field(
+        "", alias="入棟時FIM/問題解決_所見コード1"
+    )
+    入棟時FIM_問題解決_所見1: str = Field("", alias="入棟時FIM/問題解決_所見1")
+    入棟時FIM_記憶_所見コード1: str = Field("", alias="入棟時FIM/記憶_所見コード1")
+    入棟時FIM_記憶_所見1: str = Field("", alias="入棟時FIM/記憶_所見1")
+    入棟時体重_Kg_1: float | None = Field(None, alias="入棟時体重(Kg)1")
+    退棟日_FIM_1: date | None = Field(None, alias="退棟日(FIM)1")
+    退棟時FIM_食事_所見コード1: str = Field("", alias="退棟時FIM/食事_所見コード1")
+    退棟時FIM_食事_所見1: str = Field("", alias="退棟時FIM/食事_所見1")
+    退棟時FIM_整容_所見コード1: str = Field("", alias="退棟時FIM/整容_所見コード1")
+    退棟時FIM_整容_所見1: str = Field("", alias="退棟時FIM/整容_所見1")
+    退棟時FIM_清拭_所見コード1: str = Field("", alias="退棟時FIM/清拭_所見コード1")
+    退棟時FIM_清拭_所見1: str = Field("", alias="退棟時FIM/清拭_所見1")
+    退棟時FIM_更衣_上半身__所見コード1: str = Field(
+        "", alias="退棟時FIM/更衣(上半身)_所見コード1"
+    )
+    退棟時FIM_更衣_上半身__所見1: str = Field("", alias="退棟時FIM/更衣(上半身)_所見1")
+    退棟時FIM_更衣_下半身__所見コード1: str = Field(
+        "", alias="退棟時FIM/更衣(下半身)_所見コード1"
+    )
+    退棟時FIM_更衣_下半身__所見1: str = Field("", alias="退棟時FIM/更衣(下半身)_所見1")
+    退棟時FIM_トイレ_所見コード1: str = Field("", alias="退棟時FIM/トイレ_所見コード1")
+    退棟時FIM_トイレ_所見1: str = Field("", alias="退棟時FIM/トイレ_所見1")
+    退棟時FIM_排尿コントロール_所見コード1: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見コード1"
+    )
+    退棟時FIM_排尿コントロール_所見1: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見1"
+    )
+    退棟時FIM_排便コントロール_所見コード1: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見コード1"
+    )
+    退棟時FIM_排便コントロール_所見1: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見1"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見コード1: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見コード1"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見1: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見1"
+    )
+    退棟時FIM_トイレ移乗_所見コード1: str = Field(
+        "", alias="退棟時FIM/トイレ移乗_所見コード1"
+    )
+    退棟時FIM_トイレ移乗_所見1: str = Field("", alias="退棟時FIM/トイレ移乗_所見1")
+    退棟時FIM_浴槽_シャワー移乗_所見コード1: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見コード1"
+    )
+    退棟時FIM_浴槽_シャワー移乗_所見1: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見1"
+    )
+    退棟時FIM_歩行_車椅子移動_所見コード1: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見コード1"
+    )
+    退棟時FIM_歩行_車椅子移動_所見1: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見1"
+    )
+    退棟時FIM_階段移動_所見コード1: str = Field(
+        "", alias="退棟時FIM/階段移動_所見コード1"
+    )
+    退棟時FIM_階段移動_所見1: str = Field("", alias="退棟時FIM/階段移動_所見1")
+    退棟時FIM_理解_所見コード1: str = Field("", alias="退棟時FIM/理解_所見コード1")
+    退棟時FIM_理解_所見1: str = Field("", alias="退棟時FIM/理解_所見1")
+    退棟時FIM_表出_所見コード1: str = Field("", alias="退棟時FIM/表出_所見コード1")
+    退棟時FIM_表出_所見1: str = Field("", alias="退棟時FIM/表出_所見1")
+    退棟時FIM_社会的交流_所見コード1: str = Field(
+        "", alias="退棟時FIM/社会的交流_所見コード1"
+    )
+    退棟時FIM_社会的交流_所見1: str = Field("", alias="退棟時FIM/社会的交流_所見1")
+    退棟時FIM_問題解決_所見コード1: str = Field(
+        "", alias="退棟時FIM/問題解決_所見コード1"
+    )
+    退棟時FIM_問題解決_所見1: str = Field("", alias="退棟時FIM/問題解決_所見1")
+    退棟時FIM_記憶_所見コード1: str = Field("", alias="退棟時FIM/記憶_所見コード1")
+    退棟時FIM_記憶_所見1: str = Field("", alias="退棟時FIM/記憶_所見1")
+    退棟時体重_Kg_1: float | None = Field(None, alias="退棟時体重(Kg)1")
+    入棟日_FIM_2: date | None = Field(None, alias="入棟日(FIM)2")
+    入棟時FIM_食事_所見コード2: str = Field("", alias="入棟時FIM/食事_所見コード2")
+    入棟時FIM_食事_所見2: str = Field("", alias="入棟時FIM/食事_所見2")
+    入棟時FIM_整容_所見コード2: str = Field("", alias="入棟時FIM/整容_所見コード2")
+    入棟時FIM_整容_所見2: str = Field("", alias="入棟時FIM/整容_所見2")
+    入棟時FIM_清拭_所見コード2: str = Field("", alias="入棟時FIM/清拭_所見コード2")
+    入棟時FIM_清拭_所見2: str = Field("", alias="入棟時FIM/清拭_所見2")
+    入棟時FIM_更衣_上半身__所見コード2: str = Field(
+        "", alias="入棟時FIM/更衣(上半身)_所見コード2"
+    )
+    入棟時FIM_更衣_上半身__所見2: str = Field("", alias="入棟時FIM/更衣(上半身)_所見2")
+    入棟時FIM_更衣_下半身__所見コード2: str = Field(
+        "", alias="入棟時FIM/更衣(下半身)_所見コード2"
+    )
+    入棟時FIM_更衣_下半身__所見2: str = Field("", alias="入棟時FIM/更衣(下半身)_所見2")
+    入棟時FIM_トイレ_所見コード2: str = Field("", alias="入棟時FIM/トイレ_所見コード2")
+    入棟時FIM_トイレ_所見2: str = Field("", alias="入棟時FIM/トイレ_所見2")
+    入棟時FIM_排尿コントロール_所見コード2: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見コード2"
+    )
+    入棟時FIM_排尿コントロール_所見2: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見2"
+    )
+    入棟時FIM_排便コントロール_所見コード2: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見コード2"
+    )
+    入棟時FIM_排便コントロール_所見2: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見2"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見コード2: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見コード2"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見2: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見2"
+    )
+    入棟時FIM_トイレ移乗_所見コード2: str = Field(
+        "", alias="入棟時FIM/トイレ移乗_所見コード2"
+    )
+    入棟時FIM_トイレ移乗_所見2: str = Field("", alias="入棟時FIM/トイレ移乗_所見2")
+    入棟時FIM_浴槽_シャワー移乗_所見コード2: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見コード2"
+    )
+    入棟時FIM_浴槽_シャワー移乗_所見2: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見2"
+    )
+    入棟時FIM_歩行_車椅子移動_所見コード2: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見コード2"
+    )
+    入棟時FIM_歩行_車椅子移動_所見2: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見2"
+    )
+    入棟時FIM_階段移動_所見コード2: str = Field(
+        "", alias="入棟時FIM/階段移動_所見コード2"
+    )
+    入棟時FIM_階段移動_所見2: str = Field("", alias="入棟時FIM/階段移動_所見2")
+    入棟時FIM_理解_所見コード2: str = Field("", alias="入棟時FIM/理解_所見コード2")
+    入棟時FIM_理解_所見2: str = Field("", alias="入棟時FIM/理解_所見2")
+    入棟時FIM_表出_所見コード2: str = Field("", alias="入棟時FIM/表出_所見コード2")
+    入棟時FIM_表出_所見2: str = Field("", alias="入棟時FIM/表出_所見2")
+    入棟時FIM_社会的交流_所見コード2: str = Field(
+        "", alias="入棟時FIM/社会的交流_所見コード2"
+    )
+    入棟時FIM_社会的交流_所見2: str = Field("", alias="入棟時FIM/社会的交流_所見2")
+    入棟時FIM_問題解決_所見コード2: str = Field(
+        "", alias="入棟時FIM/問題解決_所見コード2"
+    )
+    入棟時FIM_問題解決_所見2: str = Field("", alias="入棟時FIM/問題解決_所見2")
+    入棟時FIM_記憶_所見コード2: str = Field("", alias="入棟時FIM/記憶_所見コード2")
+    入棟時FIM_記憶_所見2: str = Field("", alias="入棟時FIM/記憶_所見2")
+    入棟時体重_Kg_2: float | None = Field(None, alias="入棟時体重(Kg)2")
+    退棟日_FIM_2: date | None = Field(None, alias="退棟日(FIM)2")
+    退棟時FIM_食事_所見コード2: str = Field("", alias="退棟時FIM/食事_所見コード2")
+    退棟時FIM_食事_所見2: str = Field("", alias="退棟時FIM/食事_所見2")
+    退棟時FIM_整容_所見コード2: str = Field("", alias="退棟時FIM/整容_所見コード2")
+    退棟時FIM_整容_所見2: str = Field("", alias="退棟時FIM/整容_所見2")
+    退棟時FIM_清拭_所見コード2: str = Field("", alias="退棟時FIM/清拭_所見コード2")
+    退棟時FIM_清拭_所見2: str = Field("", alias="退棟時FIM/清拭_所見2")
+    退棟時FIM_更衣_上半身__所見コード2: str = Field(
+        "", alias="退棟時FIM/更衣(上半身)_所見コード2"
+    )
+    退棟時FIM_更衣_上半身__所見2: str = Field("", alias="退棟時FIM/更衣(上半身)_所見2")
+    退棟時FIM_更衣_下半身__所見コード2: str = Field(
+        "", alias="退棟時FIM/更衣(下半身)_所見コード2"
+    )
+    退棟時FIM_更衣_下半身__所見2: str = Field("", alias="退棟時FIM/更衣(下半身)_所見2")
+    退棟時FIM_トイレ_所見コード2: str = Field("", alias="退棟時FIM/トイレ_所見コード2")
+    退棟時FIM_トイレ_所見2: str = Field("", alias="退棟時FIM/トイレ_所見2")
+    退棟時FIM_排尿コントロール_所見コード2: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見コード2"
+    )
+    退棟時FIM_排尿コントロール_所見2: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見2"
+    )
+    退棟時FIM_排便コントロール_所見コード2: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見コード2"
+    )
+    退棟時FIM_排便コントロール_所見2: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見2"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見コード2: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見コード2"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見2: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見2"
+    )
+    退棟時FIM_トイレ移乗_所見コード2: str = Field(
+        "", alias="退棟時FIM/トイレ移乗_所見コード2"
+    )
+    退棟時FIM_トイレ移乗_所見2: str = Field("", alias="退棟時FIM/トイレ移乗_所見2")
+    退棟時FIM_浴槽_シャワー移乗_所見コード2: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見コード2"
+    )
+    退棟時FIM_浴槽_シャワー移乗_所見2: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見2"
+    )
+    退棟時FIM_歩行_車椅子移動_所見コード2: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見コード2"
+    )
+    退棟時FIM_歩行_車椅子移動_所見2: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見2"
+    )
+    退棟時FIM_階段移動_所見コード2: str = Field(
+        "", alias="退棟時FIM/階段移動_所見コード2"
+    )
+    退棟時FIM_階段移動_所見2: str = Field("", alias="退棟時FIM/階段移動_所見2")
+    退棟時FIM_理解_所見コード2: str = Field("", alias="退棟時FIM/理解_所見コード2")
+    退棟時FIM_理解_所見2: str = Field("", alias="退棟時FIM/理解_所見2")
+    退棟時FIM_表出_所見コード2: str = Field("", alias="退棟時FIM/表出_所見コード2")
+    退棟時FIM_表出_所見2: str = Field("", alias="退棟時FIM/表出_所見2")
+    退棟時FIM_社会的交流_所見コード2: str = Field(
+        "", alias="退棟時FIM/社会的交流_所見コード2"
+    )
+    退棟時FIM_社会的交流_所見2: str = Field("", alias="退棟時FIM/社会的交流_所見2")
+    退棟時FIM_問題解決_所見コード2: str = Field(
+        "", alias="退棟時FIM/問題解決_所見コード2"
+    )
+    退棟時FIM_問題解決_所見2: str = Field("", alias="退棟時FIM/問題解決_所見2")
+    退棟時FIM_記憶_所見コード2: str = Field("", alias="退棟時FIM/記憶_所見コード2")
+    退棟時FIM_記憶_所見2: str = Field("", alias="退棟時FIM/記憶_所見2")
+    退棟時体重_Kg_2: float | None = Field(None, alias="退棟時体重(Kg)2")
+    入棟日_FIM_3: date | None = Field(None, alias="入棟日(FIM)3")
+    入棟時FIM_食事_所見コード3: str = Field("", alias="入棟時FIM/食事_所見コード3")
+    入棟時FIM_食事_所見3: str = Field("", alias="入棟時FIM/食事_所見3")
+    入棟時FIM_整容_所見コード3: str = Field("", alias="入棟時FIM/整容_所見コード3")
+    入棟時FIM_整容_所見3: str = Field("", alias="入棟時FIM/整容_所見3")
+    入棟時FIM_清拭_所見コード3: str = Field("", alias="入棟時FIM/清拭_所見コード3")
+    入棟時FIM_清拭_所見3: str = Field("", alias="入棟時FIM/清拭_所見3")
+    入棟時FIM_更衣_上半身__所見コード3: str = Field(
+        "", alias="入棟時FIM/更衣(上半身)_所見コード3"
+    )
+    入棟時FIM_更衣_上半身__所見3: str = Field("", alias="入棟時FIM/更衣(上半身)_所見3")
+    入棟時FIM_更衣_下半身__所見コード3: str = Field(
+        "", alias="入棟時FIM/更衣(下半身)_所見コード3"
+    )
+    入棟時FIM_更衣_下半身__所見3: str = Field("", alias="入棟時FIM/更衣(下半身)_所見3")
+    入棟時FIM_トイレ_所見コード3: str = Field("", alias="入棟時FIM/トイレ_所見コード3")
+    入棟時FIM_トイレ_所見3: str = Field("", alias="入棟時FIM/トイレ_所見3")
+    入棟時FIM_排尿コントロール_所見コード3: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見コード3"
+    )
+    入棟時FIM_排尿コントロール_所見3: str = Field(
+        "", alias="入棟時FIM/排尿コントロール_所見3"
+    )
+    入棟時FIM_排便コントロール_所見コード3: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見コード3"
+    )
+    入棟時FIM_排便コントロール_所見3: str = Field(
+        "", alias="入棟時FIM/排便コントロール_所見3"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見コード3: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見コード3"
+    )
+    入棟時FIM_ベッド_車椅子移乗_所見3: str = Field(
+        "", alias="入棟時FIM/ベッド・車椅子移乗_所見3"
+    )
+    入棟時FIM_トイレ移乗_所見コード3: str = Field(
+        "", alias="入棟時FIM/トイレ移乗_所見コード3"
+    )
+    入棟時FIM_トイレ移乗_所見3: str = Field("", alias="入棟時FIM/トイレ移乗_所見3")
+    入棟時FIM_浴槽_シャワー移乗_所見コード3: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見コード3"
+    )
+    入棟時FIM_浴槽_シャワー移乗_所見3: str = Field(
+        "", alias="入棟時FIM/浴槽・シャワー移乗_所見3"
+    )
+    入棟時FIM_歩行_車椅子移動_所見コード3: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見コード3"
+    )
+    入棟時FIM_歩行_車椅子移動_所見3: str = Field(
+        "", alias="入棟時FIM/歩行・車椅子移動_所見3"
+    )
+    入棟時FIM_階段移動_所見コード3: str = Field(
+        "", alias="入棟時FIM/階段移動_所見コード3"
+    )
+    入棟時FIM_階段移動_所見3: str = Field("", alias="入棟時FIM/階段移動_所見3")
+    入棟時FIM_理解_所見コード3: str = Field("", alias="入棟時FIM/理解_所見コード3")
+    入棟時FIM_理解_所見3: str = Field("", alias="入棟時FIM/理解_所見3")
+    入棟時FIM_表出_所見コード3: str = Field("", alias="入棟時FIM/表出_所見コード3")
+    入棟時FIM_表出_所見3: str = Field("", alias="入棟時FIM/表出_所見3")
+    入棟時FIM_社会的交流_所見コード3: str = Field(
+        "", alias="入棟時FIM/社会的交流_所見コード3"
+    )
+    入棟時FIM_社会的交流_所見3: str = Field("", alias="入棟時FIM/社会的交流_所見3")
+    入棟時FIM_問題解決_所見コード3: str = Field(
+        "", alias="入棟時FIM/問題解決_所見コード3"
+    )
+    入棟時FIM_問題解決_所見3: str = Field("", alias="入棟時FIM/問題解決_所見3")
+    入棟時FIM_記憶_所見コード3: str = Field("", alias="入棟時FIM/記憶_所見コード3")
+    入棟時FIM_記憶_所見3: str = Field("", alias="入棟時FIM/記憶_所見3")
+    入棟時体重_Kg_3: float | None = Field(None, alias="入棟時体重(Kg)3")
+    退棟日_FIM_3: date | None = Field(None, alias="退棟日(FIM)3")
+    退棟時FIM_食事_所見コード3: str = Field("", alias="退棟時FIM/食事_所見コード3")
+    退棟時FIM_食事_所見3: str = Field("", alias="退棟時FIM/食事_所見3")
+    退棟時FIM_整容_所見コード3: str = Field("", alias="退棟時FIM/整容_所見コード3")
+    退棟時FIM_整容_所見3: str = Field("", alias="退棟時FIM/整容_所見3")
+    退棟時FIM_清拭_所見コード3: str = Field("", alias="退棟時FIM/清拭_所見コード3")
+    退棟時FIM_清拭_所見3: str = Field("", alias="退棟時FIM/清拭_所見3")
+    退棟時FIM_更衣_上半身__所見コード3: str = Field(
+        "", alias="退棟時FIM/更衣(上半身)_所見コード3"
+    )
+    退棟時FIM_更衣_上半身__所見3: str = Field("", alias="退棟時FIM/更衣(上半身)_所見3")
+    退棟時FIM_更衣_下半身__所見コード3: str = Field(
+        "", alias="退棟時FIM/更衣(下半身)_所見コード3"
+    )
+    退棟時FIM_更衣_下半身__所見3: str = Field("", alias="退棟時FIM/更衣(下半身)_所見3")
+    退棟時FIM_トイレ_所見コード3: str = Field("", alias="退棟時FIM/トイレ_所見コード3")
+    退棟時FIM_トイレ_所見3: str = Field("", alias="退棟時FIM/トイレ_所見3")
+    退棟時FIM_排尿コントロール_所見コード3: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見コード3"
+    )
+    退棟時FIM_排尿コントロール_所見3: str = Field(
+        "", alias="退棟時FIM/排尿コントロール_所見3"
+    )
+    退棟時FIM_排便コントロール_所見コード3: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見コード3"
+    )
+    退棟時FIM_排便コントロール_所見3: str = Field(
+        "", alias="退棟時FIM/排便コントロール_所見3"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見コード3: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見コード3"
+    )
+    退棟時FIM_ベッド_車椅子移乗_所見3: str = Field(
+        "", alias="退棟時FIM/ベッド・車椅子移乗_所見3"
+    )
+    退棟時FIM_トイレ移乗_所見コード3: str = Field(
+        "", alias="退棟時FIM/トイレ移乗_所見コード3"
+    )
+    退棟時FIM_トイレ移乗_所見3: str = Field("", alias="退棟時FIM/トイレ移乗_所見3")
+    退棟時FIM_浴槽_シャワー移乗_所見コード3: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見コード3"
+    )
+    退棟時FIM_浴槽_シャワー移乗_所見3: str = Field(
+        "", alias="退棟時FIM/浴槽・シャワー移乗_所見3"
+    )
+    退棟時FIM_歩行_車椅子移動_所見コード3: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見コード3"
+    )
+    退棟時FIM_歩行_車椅子移動_所見3: str = Field(
+        "", alias="退棟時FIM/歩行・車椅子移動_所見3"
+    )
+    退棟時FIM_階段移動_所見コード3: str = Field(
+        "", alias="退棟時FIM/階段移動_所見コード3"
+    )
+    退棟時FIM_階段移動_所見3: str = Field("", alias="退棟時FIM/階段移動_所見3")
+    退棟時FIM_理解_所見コード3: str = Field("", alias="退棟時FIM/理解_所見コード3")
+    退棟時FIM_理解_所見3: str = Field("", alias="退棟時FIM/理解_所見3")
+    退棟時FIM_表出_所見コード3: str = Field("", alias="退棟時FIM/表出_所見コード3")
+    退棟時FIM_表出_所見3: str = Field("", alias="退棟時FIM/表出_所見3")
+    退棟時FIM_社会的交流_所見コード3: str = Field(
+        "", alias="退棟時FIM/社会的交流_所見コード3"
+    )
+    退棟時FIM_社会的交流_所見3: str = Field("", alias="退棟時FIM/社会的交流_所見3")
+    退棟時FIM_問題解決_所見コード3: str = Field(
+        "", alias="退棟時FIM/問題解決_所見コード3"
+    )
+    退棟時FIM_問題解決_所見3: str = Field("", alias="退棟時FIM/問題解決_所見3")
+    退棟時FIM_記憶_所見コード3: str = Field("", alias="退棟時FIM/記憶_所見コード3")
+    退棟時FIM_記憶_所見3: str = Field("", alias="退棟時FIM/記憶_所見3")
+    退棟時体重_Kg_3: float | None = Field(None, alias="退棟時体重(Kg)3")
+    FIM_入棟中測定日1: date | None = Field(None, alias="FIM/入棟中測定日1")
+    FIM_入棟中食事コード1: str = Field("", alias="FIM/入棟中食事コード1")
+    FIM_入棟中食事1: str = Field("", alias="FIM/入棟中食事1")
+    FIM_入棟中整容コード1: str = Field("", alias="FIM/入棟中整容コード1")
+    FIM_入棟中整容1: str = Field("", alias="FIM/入棟中整容1")
+    FIM_入棟中清拭コード1: str = Field("", alias="FIM/入棟中清拭コード1")
+    FIM_入棟中清拭1: str = Field("", alias="FIM/入棟中清拭1")
+    FIM_入棟中更衣_上半身_コード1: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード1"
+    )
+    FIM_入棟中更衣_上半身_1: str = Field("", alias="FIM/入棟中更衣(上半身)1")
+    FIM_入棟中更衣_下半身_コード1: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード1"
+    )
+    FIM_入棟中更衣_下半身_1: str = Field("", alias="FIM/入棟中更衣(下半身)1")
+    FIM_入棟中トイレコード1_1: str = Field("", alias="FIM/入棟中トイレコード1")
+    FIM_入棟中トイレ1_1: str = Field("", alias="FIM/入棟中トイレ1")
+    FIM_入棟中排尿コントロールコード1: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード1"
+    )
+    FIM_入棟中排尿コントロール1: str = Field("", alias="FIM/入棟中排尿コントロール1")
+    FIM_入棟中排便コントロールコード1: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード1"
+    )
+    FIM_入棟中排便コントロール1: str = Field("", alias="FIM/入棟中排便コントロール1")
+    FIM_入棟中ベッド_車椅子コード1: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード1"
+    )
+    FIM_入棟中ベッド_車椅子1: str = Field("", alias="FIM/入棟中ベッド・車椅子1")
+    FIM_入棟中トイレコード1_2: str = Field("", alias="FIM/入棟中トイレコード1")
+    FIM_入棟中トイレ1_2: str = Field("", alias="FIM/入棟中トイレ1")
+    FIM_入棟中浴槽_シャワーコード1: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード1"
+    )
+    FIM_入棟中浴槽_シャワー1: str = Field("", alias="FIM/入棟中浴槽・シャワー1")
+    FIM_入棟中歩行_車椅子コード1: str = Field("", alias="FIM/入棟中歩行・車椅子コード1")
+    FIM_入棟中歩行_車椅子1: str = Field("", alias="FIM/入棟中歩行・車椅子1")
+    FIM_入棟中階段コード1: str = Field("", alias="FIM/入棟中階段コード1")
+    FIM_入棟中階段1: str = Field("", alias="FIM/入棟中階段1")
+    FIM_入棟中理解コード1: str = Field("", alias="FIM/入棟中理解コード1")
+    FIM_入棟中理解1: str = Field("", alias="FIM/入棟中理解1")
+    FIM_入棟中表出コード1: str = Field("", alias="FIM/入棟中表出コード1")
+    FIM_入棟中表出1: str = Field("", alias="FIM/入棟中表出1")
+    FIM_入棟中社会的交流コード1: str = Field("", alias="FIM/入棟中社会的交流コード1")
+    FIM_入棟中社会的交流1: str = Field("", alias="FIM/入棟中社会的交流1")
+    FIM_入棟中問題解決コード1: str = Field("", alias="FIM/入棟中問題解決コード1")
+    FIM_入棟中問題解決1: str = Field("", alias="FIM/入棟中問題解決1")
+    FIM_入棟中記憶コード1: str = Field("", alias="FIM/入棟中記憶コード1")
+    FIM_入棟中記憶1: str = Field("", alias="FIM/入棟中記憶1")
+    FIM_入棟中測定日2: date | None = Field(None, alias="FIM/入棟中測定日2")
+    FIM_入棟中食事コード2: str = Field("", alias="FIM/入棟中食事コード2")
+    FIM_入棟中食事2: str = Field("", alias="FIM/入棟中食事2")
+    FIM_入棟中整容コード2: str = Field("", alias="FIM/入棟中整容コード2")
+    FIM_入棟中整容2: str = Field("", alias="FIM/入棟中整容2")
+    FIM_入棟中清拭コード2: str = Field("", alias="FIM/入棟中清拭コード2")
+    FIM_入棟中清拭2: str = Field("", alias="FIM/入棟中清拭2")
+    FIM_入棟中更衣_上半身_コード2: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード2"
+    )
+    FIM_入棟中更衣_上半身_2: str = Field("", alias="FIM/入棟中更衣(上半身)2")
+    FIM_入棟中更衣_下半身_コード2: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード2"
+    )
+    FIM_入棟中更衣_下半身_2: str = Field("", alias="FIM/入棟中更衣(下半身)2")
+    FIM_入棟中トイレコード2_1: str = Field("", alias="FIM/入棟中トイレコード2")
+    FIM_入棟中トイレ2_1: str = Field("", alias="FIM/入棟中トイレ2")
+    FIM_入棟中排尿コントロールコード2: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード2"
+    )
+    FIM_入棟中排尿コントロール2: str = Field("", alias="FIM/入棟中排尿コントロール2")
+    FIM_入棟中排便コントロールコード2: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード2"
+    )
+    FIM_入棟中排便コントロール2: str = Field("", alias="FIM/入棟中排便コントロール2")
+    FIM_入棟中ベッド_車椅子コード2: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード2"
+    )
+    FIM_入棟中ベッド_車椅子2: str = Field("", alias="FIM/入棟中ベッド・車椅子2")
+    FIM_入棟中トイレコード2_2: str = Field("", alias="FIM/入棟中トイレコード2")
+    FIM_入棟中トイレ2_2: str = Field("", alias="FIM/入棟中トイレ2")
+    FIM_入棟中浴槽_シャワーコード2: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード2"
+    )
+    FIM_入棟中浴槽_シャワー2: str = Field("", alias="FIM/入棟中浴槽・シャワー2")
+    FIM_入棟中歩行_車椅子コード2: str = Field("", alias="FIM/入棟中歩行・車椅子コード2")
+    FIM_入棟中歩行_車椅子2: str = Field("", alias="FIM/入棟中歩行・車椅子2")
+    FIM_入棟中階段コード2: str = Field("", alias="FIM/入棟中階段コード2")
+    FIM_入棟中階段2: str = Field("", alias="FIM/入棟中階段2")
+    FIM_入棟中理解コード2: str = Field("", alias="FIM/入棟中理解コード2")
+    FIM_入棟中理解2: str = Field("", alias="FIM/入棟中理解2")
+    FIM_入棟中表出コード2: str = Field("", alias="FIM/入棟中表出コード2")
+    FIM_入棟中表出2: str = Field("", alias="FIM/入棟中表出2")
+    FIM_入棟中社会的交流コード2: str = Field("", alias="FIM/入棟中社会的交流コード2")
+    FIM_入棟中社会的交流2: str = Field("", alias="FIM/入棟中社会的交流2")
+    FIM_入棟中問題解決コード2: str = Field("", alias="FIM/入棟中問題解決コード2")
+    FIM_入棟中問題解決2: str = Field("", alias="FIM/入棟中問題解決2")
+    FIM_入棟中記憶コード2: str = Field("", alias="FIM/入棟中記憶コード2")
+    FIM_入棟中記憶2: str = Field("", alias="FIM/入棟中記憶2")
+    FIM_入棟中測定日3: date | None = Field(None, alias="FIM/入棟中測定日3")
+    FIM_入棟中食事コード3: str = Field("", alias="FIM/入棟中食事コード3")
+    FIM_入棟中食事3: str = Field("", alias="FIM/入棟中食事3")
+    FIM_入棟中整容コード3: str = Field("", alias="FIM/入棟中整容コード3")
+    FIM_入棟中整容3: str = Field("", alias="FIM/入棟中整容3")
+    FIM_入棟中清拭コード3: str = Field("", alias="FIM/入棟中清拭コード3")
+    FIM_入棟中清拭3: str = Field("", alias="FIM/入棟中清拭3")
+    FIM_入棟中更衣_上半身_コード3: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード3"
+    )
+    FIM_入棟中更衣_上半身_3: str = Field("", alias="FIM/入棟中更衣(上半身)3")
+    FIM_入棟中更衣_下半身_コード3: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード3"
+    )
+    FIM_入棟中更衣_下半身_3: str = Field("", alias="FIM/入棟中更衣(下半身)3")
+    FIM_入棟中トイレコード3_1: str = Field("", alias="FIM/入棟中トイレコード3")
+    FIM_入棟中トイレ3_1: str = Field("", alias="FIM/入棟中トイレ3")
+    FIM_入棟中排尿コントロールコード3: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード3"
+    )
+    FIM_入棟中排尿コントロール3: str = Field("", alias="FIM/入棟中排尿コントロール3")
+    FIM_入棟中排便コントロールコード3: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード3"
+    )
+    FIM_入棟中排便コントロール3: str = Field("", alias="FIM/入棟中排便コントロール3")
+    FIM_入棟中ベッド_車椅子コード3: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード3"
+    )
+    FIM_入棟中ベッド_車椅子3: str = Field("", alias="FIM/入棟中ベッド・車椅子3")
+    FIM_入棟中トイレコード3_2: str = Field("", alias="FIM/入棟中トイレコード3")
+    FIM_入棟中トイレ3_2: str = Field("", alias="FIM/入棟中トイレ3")
+    FIM_入棟中浴槽_シャワーコード3: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード3"
+    )
+    FIM_入棟中浴槽_シャワー3: str = Field("", alias="FIM/入棟中浴槽・シャワー3")
+    FIM_入棟中歩行_車椅子コード3: str = Field("", alias="FIM/入棟中歩行・車椅子コード3")
+    FIM_入棟中歩行_車椅子3: str = Field("", alias="FIM/入棟中歩行・車椅子3")
+    FIM_入棟中階段コード3: str = Field("", alias="FIM/入棟中階段コード3")
+    FIM_入棟中階段3: str = Field("", alias="FIM/入棟中階段3")
+    FIM_入棟中理解コード3: str = Field("", alias="FIM/入棟中理解コード3")
+    FIM_入棟中理解3: str = Field("", alias="FIM/入棟中理解3")
+    FIM_入棟中表出コード3: str = Field("", alias="FIM/入棟中表出コード3")
+    FIM_入棟中表出3: str = Field("", alias="FIM/入棟中表出3")
+    FIM_入棟中社会的交流コード3: str = Field("", alias="FIM/入棟中社会的交流コード3")
+    FIM_入棟中社会的交流3: str = Field("", alias="FIM/入棟中社会的交流3")
+    FIM_入棟中問題解決コード3: str = Field("", alias="FIM/入棟中問題解決コード3")
+    FIM_入棟中問題解決3: str = Field("", alias="FIM/入棟中問題解決3")
+    FIM_入棟中記憶コード3: str = Field("", alias="FIM/入棟中記憶コード3")
+    FIM_入棟中記憶3: str = Field("", alias="FIM/入棟中記憶3")
+    FIM_入棟中測定日4: date | None = Field(None, alias="FIM/入棟中測定日4")
+    FIM_入棟中食事コード4: str = Field("", alias="FIM/入棟中食事コード4")
+    FIM_入棟中食事4: str = Field("", alias="FIM/入棟中食事4")
+    FIM_入棟中整容コード4: str = Field("", alias="FIM/入棟中整容コード4")
+    FIM_入棟中整容4: str = Field("", alias="FIM/入棟中整容4")
+    FIM_入棟中清拭コード4: str = Field("", alias="FIM/入棟中清拭コード4")
+    FIM_入棟中清拭4: str = Field("", alias="FIM/入棟中清拭4")
+    FIM_入棟中更衣_上半身_コード4: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード4"
+    )
+    FIM_入棟中更衣_上半身_4: str = Field("", alias="FIM/入棟中更衣(上半身)4")
+    FIM_入棟中更衣_下半身_コード4: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード4"
+    )
+    FIM_入棟中更衣_下半身_4: str = Field("", alias="FIM/入棟中更衣(下半身)4")
+    FIM_入棟中トイレコード4_1: str = Field("", alias="FIM/入棟中トイレコード4")
+    FIM_入棟中トイレ4_1: str = Field("", alias="FIM/入棟中トイレ4")
+    FIM_入棟中排尿コントロールコード4: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード4"
+    )
+    FIM_入棟中排尿コントロール4: str = Field("", alias="FIM/入棟中排尿コントロール4")
+    FIM_入棟中排便コントロールコード4: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード4"
+    )
+    FIM_入棟中排便コントロール4: str = Field("", alias="FIM/入棟中排便コントロール4")
+    FIM_入棟中ベッド_車椅子コード4: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード4"
+    )
+    FIM_入棟中ベッド_車椅子4: str = Field("", alias="FIM/入棟中ベッド・車椅子4")
+    FIM_入棟中トイレコード4_2: str = Field("", alias="FIM/入棟中トイレコード4")
+    FIM_入棟中トイレ4_2: str = Field("", alias="FIM/入棟中トイレ4")
+    FIM_入棟中浴槽_シャワーコード4: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード4"
+    )
+    FIM_入棟中浴槽_シャワー4: str = Field("", alias="FIM/入棟中浴槽・シャワー4")
+    FIM_入棟中歩行_車椅子コード4: str = Field("", alias="FIM/入棟中歩行・車椅子コード4")
+    FIM_入棟中歩行_車椅子4: str = Field("", alias="FIM/入棟中歩行・車椅子4")
+    FIM_入棟中階段コード4: str = Field("", alias="FIM/入棟中階段コード4")
+    FIM_入棟中階段4: str = Field("", alias="FIM/入棟中階段4")
+    FIM_入棟中理解コード4: str = Field("", alias="FIM/入棟中理解コード4")
+    FIM_入棟中理解4: str = Field("", alias="FIM/入棟中理解4")
+    FIM_入棟中表出コード4: str = Field("", alias="FIM/入棟中表出コード4")
+    FIM_入棟中表出4: str = Field("", alias="FIM/入棟中表出4")
+    FIM_入棟中社会的交流コード4: str = Field("", alias="FIM/入棟中社会的交流コード4")
+    FIM_入棟中社会的交流4: str = Field("", alias="FIM/入棟中社会的交流4")
+    FIM_入棟中問題解決コード4: str = Field("", alias="FIM/入棟中問題解決コード4")
+    FIM_入棟中問題解決4: str = Field("", alias="FIM/入棟中問題解決4")
+    FIM_入棟中記憶コード4: str = Field("", alias="FIM/入棟中記憶コード4")
+    FIM_入棟中記憶4: str = Field("", alias="FIM/入棟中記憶4")
+    FIM_入棟中測定日5: date | None = Field(None, alias="FIM/入棟中測定日5")
+    FIM_入棟中食事コード5: str = Field("", alias="FIM/入棟中食事コード5")
+    FIM_入棟中食事5: str = Field("", alias="FIM/入棟中食事5")
+    FIM_入棟中整容コード5: str = Field("", alias="FIM/入棟中整容コード5")
+    FIM_入棟中整容5: str = Field("", alias="FIM/入棟中整容5")
+    FIM_入棟中清拭コード5: str = Field("", alias="FIM/入棟中清拭コード5")
+    FIM_入棟中清拭5: str = Field("", alias="FIM/入棟中清拭5")
+    FIM_入棟中更衣_上半身_コード5: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード5"
+    )
+    FIM_入棟中更衣_上半身_5: str = Field("", alias="FIM/入棟中更衣(上半身)5")
+    FIM_入棟中更衣_下半身_コード5: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード5"
+    )
+    FIM_入棟中更衣_下半身_5: str = Field("", alias="FIM/入棟中更衣(下半身)5")
+    FIM_入棟中トイレコード5_1: str = Field("", alias="FIM/入棟中トイレコード5")
+    FIM_入棟中トイレ5_1: str = Field("", alias="FIM/入棟中トイレ5")
+    FIM_入棟中排尿コントロールコード5: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード5"
+    )
+    FIM_入棟中排尿コントロール5: str = Field("", alias="FIM/入棟中排尿コントロール5")
+    FIM_入棟中排便コントロールコード5: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード5"
+    )
+    FIM_入棟中排便コントロール5: str = Field("", alias="FIM/入棟中排便コントロール5")
+    FIM_入棟中ベッド_車椅子コード5: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード5"
+    )
+    FIM_入棟中ベッド_車椅子5: str = Field("", alias="FIM/入棟中ベッド・車椅子5")
+    FIM_入棟中トイレコード5_2: str = Field("", alias="FIM/入棟中トイレコード5")
+    FIM_入棟中トイレ5_2: str = Field("", alias="FIM/入棟中トイレ5")
+    FIM_入棟中浴槽_シャワーコード5: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード5"
+    )
+    FIM_入棟中浴槽_シャワー5: str = Field("", alias="FIM/入棟中浴槽・シャワー5")
+    FIM_入棟中歩行_車椅子コード5: str = Field("", alias="FIM/入棟中歩行・車椅子コード5")
+    FIM_入棟中歩行_車椅子5: str = Field("", alias="FIM/入棟中歩行・車椅子5")
+    FIM_入棟中階段コード5: str = Field("", alias="FIM/入棟中階段コード5")
+    FIM_入棟中階段5: str = Field("", alias="FIM/入棟中階段5")
+    FIM_入棟中理解コード5: str = Field("", alias="FIM/入棟中理解コード5")
+    FIM_入棟中理解5: str = Field("", alias="FIM/入棟中理解5")
+    FIM_入棟中表出コード5: str = Field("", alias="FIM/入棟中表出コード5")
+    FIM_入棟中表出5: str = Field("", alias="FIM/入棟中表出5")
+    FIM_入棟中社会的交流コード5: str = Field("", alias="FIM/入棟中社会的交流コード5")
+    FIM_入棟中社会的交流5: str = Field("", alias="FIM/入棟中社会的交流5")
+    FIM_入棟中問題解決コード5: str = Field("", alias="FIM/入棟中問題解決コード5")
+    FIM_入棟中問題解決5: str = Field("", alias="FIM/入棟中問題解決5")
+    FIM_入棟中記憶コード5: str = Field("", alias="FIM/入棟中記憶コード5")
+    FIM_入棟中記憶5: str = Field("", alias="FIM/入棟中記憶5")
+    FIM_入棟中測定日6: date | None = Field(None, alias="FIM/入棟中測定日6")
+    FIM_入棟中食事コード6: str = Field("", alias="FIM/入棟中食事コード6")
+    FIM_入棟中食事6: str = Field("", alias="FIM/入棟中食事6")
+    FIM_入棟中整容コード6: str = Field("", alias="FIM/入棟中整容コード6")
+    FIM_入棟中整容6: str = Field("", alias="FIM/入棟中整容6")
+    FIM_入棟中清拭コード6: str = Field("", alias="FIM/入棟中清拭コード6")
+    FIM_入棟中清拭6: str = Field("", alias="FIM/入棟中清拭6")
+    FIM_入棟中更衣_上半身_コード6: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード6"
+    )
+    FIM_入棟中更衣_上半身_6: str = Field("", alias="FIM/入棟中更衣(上半身)6")
+    FIM_入棟中更衣_下半身_コード6: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード6"
+    )
+    FIM_入棟中更衣_下半身_6: str = Field("", alias="FIM/入棟中更衣(下半身)6")
+    FIM_入棟中トイレコード6_1: str = Field("", alias="FIM/入棟中トイレコード6")
+    FIM_入棟中トイレ6_1: str = Field("", alias="FIM/入棟中トイレ6")
+    FIM_入棟中排尿コントロールコード6: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード6"
+    )
+    FIM_入棟中排尿コントロール6: str = Field("", alias="FIM/入棟中排尿コントロール6")
+    FIM_入棟中排便コントロールコード6: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード6"
+    )
+    FIM_入棟中排便コントロール6: str = Field("", alias="FIM/入棟中排便コントロール6")
+    FIM_入棟中ベッド_車椅子コード6: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード6"
+    )
+    FIM_入棟中ベッド_車椅子6: str = Field("", alias="FIM/入棟中ベッド・車椅子6")
+    FIM_入棟中トイレコード6_2: str = Field("", alias="FIM/入棟中トイレコード6")
+    FIM_入棟中トイレ6_2: str = Field("", alias="FIM/入棟中トイレ6")
+    FIM_入棟中浴槽_シャワーコード6: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード6"
+    )
+    FIM_入棟中浴槽_シャワー6: str = Field("", alias="FIM/入棟中浴槽・シャワー6")
+    FIM_入棟中歩行_車椅子コード6: str = Field("", alias="FIM/入棟中歩行・車椅子コード6")
+    FIM_入棟中歩行_車椅子6: str = Field("", alias="FIM/入棟中歩行・車椅子6")
+    FIM_入棟中階段コード6: str = Field("", alias="FIM/入棟中階段コード6")
+    FIM_入棟中階段6: str = Field("", alias="FIM/入棟中階段6")
+    FIM_入棟中理解コード6: str = Field("", alias="FIM/入棟中理解コード6")
+    FIM_入棟中理解6: str = Field("", alias="FIM/入棟中理解6")
+    FIM_入棟中表出コード6: str = Field("", alias="FIM/入棟中表出コード6")
+    FIM_入棟中表出6: str = Field("", alias="FIM/入棟中表出6")
+    FIM_入棟中社会的交流コード6: str = Field("", alias="FIM/入棟中社会的交流コード6")
+    FIM_入棟中社会的交流6: str = Field("", alias="FIM/入棟中社会的交流6")
+    FIM_入棟中問題解決コード6: str = Field("", alias="FIM/入棟中問題解決コード6")
+    FIM_入棟中問題解決6: str = Field("", alias="FIM/入棟中問題解決6")
+    FIM_入棟中記憶コード6: str = Field("", alias="FIM/入棟中記憶コード6")
+    FIM_入棟中記憶6: str = Field("", alias="FIM/入棟中記憶6")
+    FIM_入棟中測定日7: date | None = Field(None, alias="FIM/入棟中測定日7")
+    FIM_入棟中食事コード7: str = Field("", alias="FIM/入棟中食事コード7")
+    FIM_入棟中食事7: str = Field("", alias="FIM/入棟中食事7")
+    FIM_入棟中整容コード7: str = Field("", alias="FIM/入棟中整容コード7")
+    FIM_入棟中整容7: str = Field("", alias="FIM/入棟中整容7")
+    FIM_入棟中清拭コード7: str = Field("", alias="FIM/入棟中清拭コード7")
+    FIM_入棟中清拭7: str = Field("", alias="FIM/入棟中清拭7")
+    FIM_入棟中更衣_上半身_コード7: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード7"
+    )
+    FIM_入棟中更衣_上半身_7: str = Field("", alias="FIM/入棟中更衣(上半身)7")
+    FIM_入棟中更衣_下半身_コード7: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード7"
+    )
+    FIM_入棟中更衣_下半身_7: str = Field("", alias="FIM/入棟中更衣(下半身)7")
+    FIM_入棟中トイレコード7_1: str = Field("", alias="FIM/入棟中トイレコード7")
+    FIM_入棟中トイレ7_1: str = Field("", alias="FIM/入棟中トイレ7")
+    FIM_入棟中排尿コントロールコード7: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード7"
+    )
+    FIM_入棟中排尿コントロール7: str = Field("", alias="FIM/入棟中排尿コントロール7")
+    FIM_入棟中排便コントロールコード7: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード7"
+    )
+    FIM_入棟中排便コントロール7: str = Field("", alias="FIM/入棟中排便コントロール7")
+    FIM_入棟中ベッド_車椅子コード7: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード7"
+    )
+    FIM_入棟中ベッド_車椅子7: str = Field("", alias="FIM/入棟中ベッド・車椅子7")
+    FIM_入棟中トイレコード7_2: str = Field("", alias="FIM/入棟中トイレコード7")
+    FIM_入棟中トイレ7_2: str = Field("", alias="FIM/入棟中トイレ7")
+    FIM_入棟中浴槽_シャワーコード7: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード7"
+    )
+    FIM_入棟中浴槽_シャワー7: str = Field("", alias="FIM/入棟中浴槽・シャワー7")
+    FIM_入棟中歩行_車椅子コード7: str = Field("", alias="FIM/入棟中歩行・車椅子コード7")
+    FIM_入棟中歩行_車椅子7: str = Field("", alias="FIM/入棟中歩行・車椅子7")
+    FIM_入棟中階段コード7: str = Field("", alias="FIM/入棟中階段コード7")
+    FIM_入棟中階段7: str = Field("", alias="FIM/入棟中階段7")
+    FIM_入棟中理解コード7: str = Field("", alias="FIM/入棟中理解コード7")
+    FIM_入棟中理解7: str = Field("", alias="FIM/入棟中理解7")
+    FIM_入棟中表出コード7: str = Field("", alias="FIM/入棟中表出コード7")
+    FIM_入棟中表出7: str = Field("", alias="FIM/入棟中表出7")
+    FIM_入棟中社会的交流コード7: str = Field("", alias="FIM/入棟中社会的交流コード7")
+    FIM_入棟中社会的交流7: str = Field("", alias="FIM/入棟中社会的交流7")
+    FIM_入棟中問題解決コード7: str = Field("", alias="FIM/入棟中問題解決コード7")
+    FIM_入棟中問題解決7: str = Field("", alias="FIM/入棟中問題解決7")
+    FIM_入棟中記憶コード7: str = Field("", alias="FIM/入棟中記憶コード7")
+    FIM_入棟中記憶7: str = Field("", alias="FIM/入棟中記憶7")
+    FIM_入棟中測定日8: date | None = Field(None, alias="FIM/入棟中測定日8")
+    FIM_入棟中食事コード8: str = Field("", alias="FIM/入棟中食事コード8")
+    FIM_入棟中食事8: str = Field("", alias="FIM/入棟中食事8")
+    FIM_入棟中整容コード8: str = Field("", alias="FIM/入棟中整容コード8")
+    FIM_入棟中整容8: str = Field("", alias="FIM/入棟中整容8")
+    FIM_入棟中清拭コード8: str = Field("", alias="FIM/入棟中清拭コード8")
+    FIM_入棟中清拭8: str = Field("", alias="FIM/入棟中清拭8")
+    FIM_入棟中更衣_上半身_コード8: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード8"
+    )
+    FIM_入棟中更衣_上半身_8: str = Field("", alias="FIM/入棟中更衣(上半身)8")
+    FIM_入棟中更衣_下半身_コード8: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード8"
+    )
+    FIM_入棟中更衣_下半身_8: str = Field("", alias="FIM/入棟中更衣(下半身)8")
+    FIM_入棟中トイレコード8_1: str = Field("", alias="FIM/入棟中トイレコード8")
+    FIM_入棟中トイレ8_1: str = Field("", alias="FIM/入棟中トイレ8")
+    FIM_入棟中排尿コントロールコード8: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード8"
+    )
+    FIM_入棟中排尿コントロール8: str = Field("", alias="FIM/入棟中排尿コントロール8")
+    FIM_入棟中排便コントロールコード8: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード8"
+    )
+    FIM_入棟中排便コントロール8: str = Field("", alias="FIM/入棟中排便コントロール8")
+    FIM_入棟中ベッド_車椅子コード8: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード8"
+    )
+    FIM_入棟中ベッド_車椅子8: str = Field("", alias="FIM/入棟中ベッド・車椅子8")
+    FIM_入棟中トイレコード8_2: str = Field("", alias="FIM/入棟中トイレコード8")
+    FIM_入棟中トイレ8_2: str = Field("", alias="FIM/入棟中トイレ8")
+    FIM_入棟中浴槽_シャワーコード8: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード8"
+    )
+    FIM_入棟中浴槽_シャワー8: str = Field("", alias="FIM/入棟中浴槽・シャワー8")
+    FIM_入棟中歩行_車椅子コード8: str = Field("", alias="FIM/入棟中歩行・車椅子コード8")
+    FIM_入棟中歩行_車椅子8: str = Field("", alias="FIM/入棟中歩行・車椅子8")
+    FIM_入棟中階段コード8: str = Field("", alias="FIM/入棟中階段コード8")
+    FIM_入棟中階段8: str = Field("", alias="FIM/入棟中階段8")
+    FIM_入棟中理解コード8: str = Field("", alias="FIM/入棟中理解コード8")
+    FIM_入棟中理解8: str = Field("", alias="FIM/入棟中理解8")
+    FIM_入棟中表出コード8: str = Field("", alias="FIM/入棟中表出コード8")
+    FIM_入棟中表出8: str = Field("", alias="FIM/入棟中表出8")
+    FIM_入棟中社会的交流コード8: str = Field("", alias="FIM/入棟中社会的交流コード8")
+    FIM_入棟中社会的交流8: str = Field("", alias="FIM/入棟中社会的交流8")
+    FIM_入棟中問題解決コード8: str = Field("", alias="FIM/入棟中問題解決コード8")
+    FIM_入棟中問題解決8: str = Field("", alias="FIM/入棟中問題解決8")
+    FIM_入棟中記憶コード8: str = Field("", alias="FIM/入棟中記憶コード8")
+    FIM_入棟中記憶8: str = Field("", alias="FIM/入棟中記憶8")
+    FIM_入棟中測定日9: date | None = Field(None, alias="FIM/入棟中測定日9")
+    FIM_入棟中食事コード9: str = Field("", alias="FIM/入棟中食事コード9")
+    FIM_入棟中食事9: str = Field("", alias="FIM/入棟中食事9")
+    FIM_入棟中整容コード9: str = Field("", alias="FIM/入棟中整容コード9")
+    FIM_入棟中整容9: str = Field("", alias="FIM/入棟中整容9")
+    FIM_入棟中清拭コード9: str = Field("", alias="FIM/入棟中清拭コード9")
+    FIM_入棟中清拭9: str = Field("", alias="FIM/入棟中清拭9")
+    FIM_入棟中更衣_上半身_コード9: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード9"
+    )
+    FIM_入棟中更衣_上半身_9: str = Field("", alias="FIM/入棟中更衣(上半身)9")
+    FIM_入棟中更衣_下半身_コード9: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード9"
+    )
+    FIM_入棟中更衣_下半身_9: str = Field("", alias="FIM/入棟中更衣(下半身)9")
+    FIM_入棟中トイレコード9_1: str = Field("", alias="FIM/入棟中トイレコード9")
+    FIM_入棟中トイレ9_1: str = Field("", alias="FIM/入棟中トイレ9")
+    FIM_入棟中排尿コントロールコード9: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード9"
+    )
+    FIM_入棟中排尿コントロール9: str = Field("", alias="FIM/入棟中排尿コントロール9")
+    FIM_入棟中排便コントロールコード9: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード9"
+    )
+    FIM_入棟中排便コントロール9: str = Field("", alias="FIM/入棟中排便コントロール9")
+    FIM_入棟中ベッド_車椅子コード9: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード9"
+    )
+    FIM_入棟中ベッド_車椅子9: str = Field("", alias="FIM/入棟中ベッド・車椅子9")
+    FIM_入棟中トイレコード9_2: str = Field("", alias="FIM/入棟中トイレコード9")
+    FIM_入棟中トイレ9_2: str = Field("", alias="FIM/入棟中トイレ9")
+    FIM_入棟中浴槽_シャワーコード9: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード9"
+    )
+    FIM_入棟中浴槽_シャワー9: str = Field("", alias="FIM/入棟中浴槽・シャワー9")
+    FIM_入棟中歩行_車椅子コード9: str = Field("", alias="FIM/入棟中歩行・車椅子コード9")
+    FIM_入棟中歩行_車椅子9: str = Field("", alias="FIM/入棟中歩行・車椅子9")
+    FIM_入棟中階段コード9: str = Field("", alias="FIM/入棟中階段コード9")
+    FIM_入棟中階段9: str = Field("", alias="FIM/入棟中階段9")
+    FIM_入棟中理解コード9: str = Field("", alias="FIM/入棟中理解コード9")
+    FIM_入棟中理解9: str = Field("", alias="FIM/入棟中理解9")
+    FIM_入棟中表出コード9: str = Field("", alias="FIM/入棟中表出コード9")
+    FIM_入棟中表出9: str = Field("", alias="FIM/入棟中表出9")
+    FIM_入棟中社会的交流コード9: str = Field("", alias="FIM/入棟中社会的交流コード9")
+    FIM_入棟中社会的交流9: str = Field("", alias="FIM/入棟中社会的交流9")
+    FIM_入棟中問題解決コード9: str = Field("", alias="FIM/入棟中問題解決コード9")
+    FIM_入棟中問題解決9: str = Field("", alias="FIM/入棟中問題解決9")
+    FIM_入棟中記憶コード9: str = Field("", alias="FIM/入棟中記憶コード9")
+    FIM_入棟中記憶9: str = Field("", alias="FIM/入棟中記憶9")
+    FIM_入棟中測定日10: date | None = Field(None, alias="FIM/入棟中測定日10")
+    FIM_入棟中食事コード10: str = Field("", alias="FIM/入棟中食事コード10")
+    FIM_入棟中食事10: str = Field("", alias="FIM/入棟中食事10")
+    FIM_入棟中整容コード10: str = Field("", alias="FIM/入棟中整容コード10")
+    FIM_入棟中整容10: str = Field("", alias="FIM/入棟中整容10")
+    FIM_入棟中清拭コード10: str = Field("", alias="FIM/入棟中清拭コード10")
+    FIM_入棟中清拭10: str = Field("", alias="FIM/入棟中清拭10")
+    FIM_入棟中更衣_上半身_コード10: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード10"
+    )
+    FIM_入棟中更衣_上半身_10: str = Field("", alias="FIM/入棟中更衣(上半身)10")
+    FIM_入棟中更衣_下半身_コード10: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード10"
+    )
+    FIM_入棟中更衣_下半身_10: str = Field("", alias="FIM/入棟中更衣(下半身)10")
+    FIM_入棟中トイレコード10_1: str = Field("", alias="FIM/入棟中トイレコード10")
+    FIM_入棟中トイレ10_1: str = Field("", alias="FIM/入棟中トイレ10")
+    FIM_入棟中排尿コントロールコード10: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード10"
+    )
+    FIM_入棟中排尿コントロール10: str = Field("", alias="FIM/入棟中排尿コントロール10")
+    FIM_入棟中排便コントロールコード10: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード10"
+    )
+    FIM_入棟中排便コントロール10: str = Field("", alias="FIM/入棟中排便コントロール10")
+    FIM_入棟中ベッド_車椅子コード10: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード10"
+    )
+    FIM_入棟中ベッド_車椅子10: str = Field("", alias="FIM/入棟中ベッド・車椅子10")
+    FIM_入棟中トイレコード10_2: str = Field("", alias="FIM/入棟中トイレコード10")
+    FIM_入棟中トイレ10_2: str = Field("", alias="FIM/入棟中トイレ10")
+    FIM_入棟中浴槽_シャワーコード10: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード10"
+    )
+    FIM_入棟中浴槽_シャワー10: str = Field("", alias="FIM/入棟中浴槽・シャワー10")
+    FIM_入棟中歩行_車椅子コード10: str = Field(
+        "", alias="FIM/入棟中歩行・車椅子コード10"
+    )
+    FIM_入棟中歩行_車椅子10: str = Field("", alias="FIM/入棟中歩行・車椅子10")
+    FIM_入棟中階段コード10: str = Field("", alias="FIM/入棟中階段コード10")
+    FIM_入棟中階段10: str = Field("", alias="FIM/入棟中階段10")
+    FIM_入棟中理解コード10: str = Field("", alias="FIM/入棟中理解コード10")
+    FIM_入棟中理解10: str = Field("", alias="FIM/入棟中理解10")
+    FIM_入棟中表出コード10: str = Field("", alias="FIM/入棟中表出コード10")
+    FIM_入棟中表出10: str = Field("", alias="FIM/入棟中表出10")
+    FIM_入棟中社会的交流コード10: str = Field("", alias="FIM/入棟中社会的交流コード10")
+    FIM_入棟中社会的交流10: str = Field("", alias="FIM/入棟中社会的交流10")
+    FIM_入棟中問題解決コード10: str = Field("", alias="FIM/入棟中問題解決コード10")
+    FIM_入棟中問題解決10: str = Field("", alias="FIM/入棟中問題解決10")
+    FIM_入棟中記憶コード10: str = Field("", alias="FIM/入棟中記憶コード10")
+    FIM_入棟中記憶10: str = Field("", alias="FIM/入棟中記憶10")
+    FIM_入棟中測定日11: date | None = Field(None, alias="FIM/入棟中測定日11")
+    FIM_入棟中食事コード11: str = Field("", alias="FIM/入棟中食事コード11")
+    FIM_入棟中食事11: str = Field("", alias="FIM/入棟中食事11")
+    FIM_入棟中整容コード11: str = Field("", alias="FIM/入棟中整容コード11")
+    FIM_入棟中整容11: str = Field("", alias="FIM/入棟中整容11")
+    FIM_入棟中清拭コード11: str = Field("", alias="FIM/入棟中清拭コード11")
+    FIM_入棟中清拭11: str = Field("", alias="FIM/入棟中清拭11")
+    FIM_入棟中更衣_上半身_コード11: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード11"
+    )
+    FIM_入棟中更衣_上半身_11: str = Field("", alias="FIM/入棟中更衣(上半身)11")
+    FIM_入棟中更衣_下半身_コード11: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード11"
+    )
+    FIM_入棟中更衣_下半身_11: str = Field("", alias="FIM/入棟中更衣(下半身)11")
+    FIM_入棟中トイレコード11_1: str = Field("", alias="FIM/入棟中トイレコード11")
+    FIM_入棟中トイレ11_1: str = Field("", alias="FIM/入棟中トイレ11")
+    FIM_入棟中排尿コントロールコード11: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード11"
+    )
+    FIM_入棟中排尿コントロール11: str = Field("", alias="FIM/入棟中排尿コントロール11")
+    FIM_入棟中排便コントロールコード11: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード11"
+    )
+    FIM_入棟中排便コントロール11: str = Field("", alias="FIM/入棟中排便コントロール11")
+    FIM_入棟中ベッド_車椅子コード11: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード11"
+    )
+    FIM_入棟中ベッド_車椅子11: str = Field("", alias="FIM/入棟中ベッド・車椅子11")
+    FIM_入棟中トイレコード11_2: str = Field("", alias="FIM/入棟中トイレコード11")
+    FIM_入棟中トイレ11_2: str = Field("", alias="FIM/入棟中トイレ11")
+    FIM_入棟中浴槽_シャワーコード11: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード11"
+    )
+    FIM_入棟中浴槽_シャワー11: str = Field("", alias="FIM/入棟中浴槽・シャワー11")
+    FIM_入棟中歩行_車椅子コード11: str = Field(
+        "", alias="FIM/入棟中歩行・車椅子コード11"
+    )
+    FIM_入棟中歩行_車椅子11: str = Field("", alias="FIM/入棟中歩行・車椅子11")
+    FIM_入棟中階段コード11: str = Field("", alias="FIM/入棟中階段コード11")
+    FIM_入棟中階段11: str = Field("", alias="FIM/入棟中階段11")
+    FIM_入棟中理解コード11: str = Field("", alias="FIM/入棟中理解コード11")
+    FIM_入棟中理解11: str = Field("", alias="FIM/入棟中理解11")
+    FIM_入棟中表出コード11: str = Field("", alias="FIM/入棟中表出コード11")
+    FIM_入棟中表出11: str = Field("", alias="FIM/入棟中表出11")
+    FIM_入棟中社会的交流コード11: str = Field("", alias="FIM/入棟中社会的交流コード11")
+    FIM_入棟中社会的交流11: str = Field("", alias="FIM/入棟中社会的交流11")
+    FIM_入棟中問題解決コード11: str = Field("", alias="FIM/入棟中問題解決コード11")
+    FIM_入棟中問題解決11: str = Field("", alias="FIM/入棟中問題解決11")
+    FIM_入棟中記憶コード11: str = Field("", alias="FIM/入棟中記憶コード11")
+    FIM_入棟中記憶11: str = Field("", alias="FIM/入棟中記憶11")
+    FIM_入棟中測定日12: date | None = Field(None, alias="FIM/入棟中測定日12")
+    FIM_入棟中食事コード12: str = Field("", alias="FIM/入棟中食事コード12")
+    FIM_入棟中食事12: str = Field("", alias="FIM/入棟中食事12")
+    FIM_入棟中整容コード12: str = Field("", alias="FIM/入棟中整容コード12")
+    FIM_入棟中整容12: str = Field("", alias="FIM/入棟中整容12")
+    FIM_入棟中清拭コード12: str = Field("", alias="FIM/入棟中清拭コード12")
+    FIM_入棟中清拭12: str = Field("", alias="FIM/入棟中清拭12")
+    FIM_入棟中更衣_上半身_コード12: str = Field(
+        "", alias="FIM/入棟中更衣(上半身)コード12"
+    )
+    FIM_入棟中更衣_上半身_12: str = Field("", alias="FIM/入棟中更衣(上半身)12")
+    FIM_入棟中更衣_下半身_コード12: str = Field(
+        "", alias="FIM/入棟中更衣(下半身)コード12"
+    )
+    FIM_入棟中更衣_下半身_12: str = Field("", alias="FIM/入棟中更衣(下半身)12")
+    FIM_入棟中トイレコード12_1: str = Field("", alias="FIM/入棟中トイレコード12")
+    FIM_入棟中トイレ12_1: str = Field("", alias="FIM/入棟中トイレ12")
+    FIM_入棟中排尿コントロールコード12: str = Field(
+        "", alias="FIM/入棟中排尿コントロールコード12"
+    )
+    FIM_入棟中排尿コントロール12: str = Field("", alias="FIM/入棟中排尿コントロール12")
+    FIM_入棟中排便コントロールコード12: str = Field(
+        "", alias="FIM/入棟中排便コントロールコード12"
+    )
+    FIM_入棟中排便コントロール12: str = Field("", alias="FIM/入棟中排便コントロール12")
+    FIM_入棟中ベッド_車椅子コード12: str = Field(
+        "", alias="FIM/入棟中ベッド・車椅子コード12"
+    )
+    FIM_入棟中ベッド_車椅子12: str = Field("", alias="FIM/入棟中ベッド・車椅子12")
+    FIM_入棟中トイレコード12_2: str = Field("", alias="FIM/入棟中トイレコード12")
+    FIM_入棟中トイレ12_2: str = Field("", alias="FIM/入棟中トイレ12")
+    FIM_入棟中浴槽_シャワーコード12: str = Field(
+        "", alias="FIM/入棟中浴槽・シャワーコード12"
+    )
+    FIM_入棟中浴槽_シャワー12: str = Field("", alias="FIM/入棟中浴槽・シャワー12")
+    FIM_入棟中歩行_車椅子コード12: str = Field(
+        "", alias="FIM/入棟中歩行・車椅子コード12"
+    )
+    FIM_入棟中歩行_車椅子12: str = Field("", alias="FIM/入棟中歩行・車椅子12")
+    FIM_入棟中階段コード12: str = Field("", alias="FIM/入棟中階段コード12")
+    FIM_入棟中階段12: str = Field("", alias="FIM/入棟中階段12")
+    FIM_入棟中理解コード12: str = Field("", alias="FIM/入棟中理解コード12")
+    FIM_入棟中理解12: str = Field("", alias="FIM/入棟中理解12")
+    FIM_入棟中表出コード12: str = Field("", alias="FIM/入棟中表出コード12")
+    FIM_入棟中表出12: str = Field("", alias="FIM/入棟中表出12")
+    FIM_入棟中社会的交流コード12: str = Field("", alias="FIM/入棟中社会的交流コード12")
+    FIM_入棟中社会的交流12: str = Field("", alias="FIM/入棟中社会的交流12")
+    FIM_入棟中問題解決コード12: str = Field("", alias="FIM/入棟中問題解決コード12")
+    FIM_入棟中問題解決12: str = Field("", alias="FIM/入棟中問題解決12")
+    FIM_入棟中記憶コード12: str = Field("", alias="FIM/入棟中記憶コード12")
+    FIM_入棟中記憶12: str = Field("", alias="FIM/入棟中記憶12")
+    心不全_発症時期コード: str = Field("", alias="心不全/発症時期コード")
+    心不全_発症時期: str = Field("", alias="心不全/発症時期")
+    心不全_収縮期血圧コード: str = Field("", alias="心不全/収縮期血圧コード")
+    心不全_収縮期血圧: str = Field("", alias="心不全/収縮期血圧")
+    心不全_心拍数コード: str = Field("", alias="心不全/心拍数コード")
+    心不全_心拍数: str = Field("", alias="心不全/心拍数")
+    心不全_心調律コード: str = Field("", alias="心不全/心調律コード")
+    心不全_心調律: str = Field("", alias="心不全/心調律")
+    救急受診時の収縮期血圧コード: str = ""
+    救急受診時の収縮期血圧: str = ""
+    救急受診時の循環作動薬の使用コード: str = ""
+    救急受診時の循環作動薬の使用: str = ""
+    治療室又は病棟入室時時の収縮期血圧コード: str = ""
+    治療室又は病棟入室時時の収縮期血圧: str = ""
+    治療室又は病棟入室時時の循環作動薬の使用コード: str = ""
+    治療室又は病棟入室時時の循環作動薬の使用: str = ""
+    要介護度コード: str = ""
+    要介護度: str = ""
+    要介護算定開始日: date | None = None
+    要介護算定終了日: date | None = None
+    低栄養の有無_算定開始時_コード: str = Field(
+        "", alias="低栄養の有無(算定開始時)コード"
+    )
+    低栄養の有無_算定開始時_: str = Field("", alias="低栄養の有無(算定開始時)")
+    低栄養コード_様式1開始日時点_: str = Field(
+        "", alias="低栄養コード(様式1開始日時点)"
+    )
+    低栄養_様式1開始日時点_: str = Field("", alias="低栄養(様式1開始日時点)")
+    意図しない体重の減少_様式1開始日時点__1: str = Field(
+        "", alias="意図しない体重の減少(様式1開始日時点)"
+    )
+    低BMI_様式1開始日時点_: str = Field("", alias="低BMI(様式1開始日時点)")
+    筋肉量減_様式1開始日時点_: str = Field("", alias="筋肉量減(様式1開始日時点)")
+    食事摂取量減少_消化吸収能低下_様式1開始日時点_: str = Field(
+        "", alias="食事摂取量減少/消化吸収能低下(様式1開始日時点)"
+    )
+    摂食_嚥下機能障害の有無_算定開始時__コード: str = Field(
+        "", alias="摂食・嚥下機能障害の有無(算定開始時))コード"
+    )
+    摂食_嚥下機能障害の有無_算定開始時_: str = Field(
+        "", alias="摂食・嚥下機能障害の有無(算定開始時)"
+    )
+    低栄養の有無_算定終了時_コード: str = Field(
+        "", alias="低栄養の有無(算定終了時)コード"
+    )
+    低栄養の有無_算定終了時_: str = Field("", alias="低栄養の有無(算定終了時)")
+    低栄養コード_様式1終了日時点_: str = Field(
+        "", alias="低栄養コード(様式1終了日時点)"
+    )
+    低栄養_様式1終了日時点_: str = Field("", alias="低栄養(様式1終了日時点)")
+    意図しない体重の減少_様式1開始日時点__2: str = Field(
+        "", alias="意図しない体重の減少(様式1開始日時点)"
+    )
+    低BMI_様式1終了日時点_: str = Field("", alias="低BMI(様式1終了日時点)")
+    筋肉量減_様式1終了日時点_: str = Field("", alias="筋肉量減(様式1終了日時点)")
+    食事摂取量減少_消化吸収能低下_様式1終了日時点_: str = Field(
+        "", alias="食事摂取量減少/消化吸収能低下(様式1終了日時点)"
+    )
+    摂食_嚥下機能障害の有無_算定終了時__コード: str = Field(
+        "", alias="摂食・嚥下機能障害の有無(算定終了時))コード"
+    )
+    摂食_嚥下機能障害の有無_算定終了時_: str = Field(
+        "", alias="摂食・嚥下機能障害の有無(算定終了時)"
+    )
+    経管_経静脈栄養の状況_様式1開始日時点_: str = Field(
+        "", alias="経管・経静脈栄養の状況(様式1開始日時点)"
+    )
+    経鼻胃管の実施有無_様式1開始日時点_: str = Field(
+        "", alias="経鼻胃管の実施有無(様式1開始日時点)"
+    )
+    胃瘻_腸瘻の実施有無_様式1開始日時点_: str = Field(
+        "", alias="胃瘻・腸瘻の実施有無(様式1開始日時点)"
+    )
+    末梢静脈栄養の実施有無_様式1開始日時点_: str = Field(
+        "", alias="末梢静脈栄養の実施有無(様式1開始日時点)"
+    )
+    中心静脈栄養の実施有無_様式1開始日時点_: str = Field(
+        "", alias="中心静脈栄養の実施有無(様式1開始日時点)"
+    )
+    皮下注射の実施有無_様式1開始日時点_: str = Field(
+        "", alias="皮下注射の実施有無(様式1開始日時点)"
+    )
+    経管_経静脈栄養の状況_様式1終了日時点_: str = Field(
+        "", alias="経管・経静脈栄養の状況(様式1終了日時点)"
+    )
+    経鼻胃管の実施有無_様式1終了日時点_: str = Field(
+        "", alias="経鼻胃管の実施有無(様式1終了日時点)"
+    )
+    胃瘻_腸瘻の実施有無_様式1終了日時点_: str = Field(
+        "", alias="胃瘻・腸瘻の実施有無(様式1終了日時点)"
+    )
+    末梢静脈栄養の実施有無_様式1終了日時点_: str = Field(
+        "", alias="末梢静脈栄養の実施有無(様式1終了日時点)"
+    )
+    中心静脈栄養の実施有無_様式1終了日時点_: str = Field(
+        "", alias="中心静脈栄養の実施有無(様式1終了日時点)"
+    )
+    皮下注射の実施有無_様式1終了日時点_: str = Field(
+        "", alias="皮下注射の実施有無(様式1終了日時点)"
+    )
+    入院後48時間以内の栄養アセスメントの実施有無: str = ""
+    転倒_転落回数: str = Field("", alias="転倒・転落回数")
+    インシデント影響度分類レベル3b以上の転倒_転落: str = Field(
+        "", alias="インシデント影響度分類レベル3b以上の転倒・転落"
+    )
+    身体的拘束日数: str = ""
+    SOFAスコア_特定集中治療室_入室日当日測定日1: date | None = None
+    SOFAスコア_特定集中治療室_入室日翌日測定日1: date | None = None
+    SOFAスコア_特定集中治療室_退室日測定日1: date | None = None
+    SOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_血小板_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_血小板_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_1: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_血小板_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_1: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_1: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定日2: date | None = None
+    SOFAスコア_特定集中治療室_入室日翌日測定日2: date | None = None
+    SOFAスコア_特定集中治療室_退室日測定日2: date | None = None
+    SOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_血小板_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_血小板_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_2: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_血小板_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_2: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_2: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定日3: date | None = None
+    SOFAスコア_特定集中治療室_入室日翌日測定日3: date | None = None
+    SOFAスコア_特定集中治療室_退室日測定日3: date | None = None
+    SOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_3: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_血小板_3: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_3: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_3: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_3: str = " "
+    SOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_血小板_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_3: str = " "
+    SOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_血小板_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_3: str = " "
+    SOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定日1: date | None = None
+    SOFAスコア_敗血症_治療開始日翌日測定日1: date | None = None
+    SOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_血小板_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_血小板_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_1: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_1: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定日2: date | None = None
+    SOFAスコア_敗血症_治療開始日翌日測定日2: date | None = None
+    SOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_血小板_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_血小板_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_2: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_2: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定日3: date | None = None
+    SOFAスコア_敗血症_治療開始日翌日測定日3: date | None = None
+    SOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_血小板_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_3: str = " "
+    SOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_血小板_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_3: str = " "
+    SOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定日1: date | None = None
+    pSOFAスコア_特定集中治療室_入室日翌日測定日1: date | None = None
+    pSOFAスコア_特定集中治療室_退室日測定日1: date | None = None
+    pSOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_血小板_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_血小板_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_血小板_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_1: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_1: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定日2: date | None = None
+    pSOFAスコア_特定集中治療室_入室日翌日測定日2: date | None = None
+    pSOFAスコア_特定集中治療室_退室日測定日2: date | None = None
+    pSOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_血小板_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_血小板_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_血小板_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_2: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_2: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定日3: date | None = None
+    pSOFAスコア_特定集中治療室_入室日翌日測定日3: date | None = None
+    pSOFAスコア_特定集中治療室_退室日測定日3: date | None = None
+    pSOFAスコア_特定集中治療室_入室日当日測定値_PaO2_FIO2_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_血小板_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_総ビリルビン_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_平均血圧_循環作動薬_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_GlasgowComaScale_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日当日測定値_クレアチニン値_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_PaO2_FIO2_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_血小板_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_総ビリルビン_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_平均血圧_循環作動薬_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_GlasgowComaScale_3: str = " "
+    pSOFAスコア_特定集中治療室_入室日翌日測定値_クレアチニン値_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_PaO2_FIO2_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_血小板_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_総ビリルビン_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_平均血圧_循環作動薬_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_GlasgowComaScale_3: str = " "
+    pSOFAスコア_特定集中治療室_退室日測定値_クレアチニン値_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定日1: date | None = None
+    pSOFAスコア_敗血症_治療開始日翌日測定日1: date | None = None
+    pSOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_血小板_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_血小板_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_1: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_1: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定日2: date | None = None
+    pSOFAスコア_敗血症_治療開始日翌日測定日2: date | None = None
+    pSOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_血小板_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_血小板_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_2: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_2: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定日3: date | None = None
+    pSOFAスコア_敗血症_治療開始日翌日測定日3: date | None = None
+    pSOFAスコア_敗血症_治療開始日当日測定値_PaO2_FIO2_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_血小板_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_総ビリルビン_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_平均血圧_循環作動薬_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_GlasgowComaScale_3: str = " "
+    pSOFAスコア_敗血症_治療開始日当日測定値_クレアチニン値_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_PaO2_FIO2_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_血小板_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_総ビリルビン_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_平均血圧_循環作動薬_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_GlasgowComaScale_3: str = " "
+    pSOFAスコア_敗血症_治療開始日翌日測定値_クレアチニン値_3: str = " "
+    手術6: str = ""
+    手術6コメント: str = ""
+    手術6点数表コード: str = ""
+    手術6手術基幹コード: str = ""
+    手術6回数コード: str = ""
+    手術6回数: str = ""
+    手術6側数コード: str = ""
+    手術6側数: str = ""
+    手術日6: date | None = None
+    手術6麻酔コード: str = ""
+    手術6麻酔: str = ""
+    手術6予防的抗菌薬投与コード: str = ""
+    手術6予防的抗菌薬投与: str = ""
+    手術7: str = ""
+    手術7コメント: str = ""
+    手術7点数表コード: str = ""
+    手術7手術基幹コード: str = ""
+    手術7回数コード: str = ""
+    手術7回数: str = ""
+    手術7側数コード: str = ""
+    手術7側数: str = ""
+    手術日7: date | None = None
+    手術7麻酔コード: str = ""
+    手術7麻酔: str = ""
+    手術7予防的抗菌薬投与コード: str = ""
+    手術7予防的抗菌薬投与: str = ""
+    手術8: str = ""
+    手術8コメント: str = ""
+    手術8点数表コード: str = ""
+    手術8手術基幹コード: str = ""
+    手術8回数コード: str = ""
+    手術8回数: str = ""
+    手術8側数コード: str = ""
+    手術8側数: str = ""
+    手術日8: date | None = None
+    手術8麻酔コード: str = ""
+    手術8麻酔: str = ""
+    手術8予防的抗菌薬投与コード: str = ""
+    手術8予防的抗菌薬投与: str = ""
+    手術9: str = ""
+    手術9コメント: str = ""
+    手術9点数表コード: str = ""
+    手術9手術基幹コード: str = ""
+    手術9回数コード: str = ""
+    手術9回数: str = ""
+    手術9側数コード: str = ""
+    手術9側数: str = ""
+    手術日9: date | None = None
+    手術9麻酔コード: str = ""
+    手術9麻酔: str = ""
+    手術9予防的抗菌薬投与コード: str = ""
+    手術9予防的抗菌薬投与: str = ""
+    手術10: str = ""
+    手術10コメント: str = ""
+    手術10点数表コード: str = ""
+    手術10手術基幹コード: str = ""
+    手術10回数コード: str = ""
+    手術10回数: str = ""
+    手術10側数コード: str = ""
+    手術10側数: str = ""
+    手術日10: date | None = None
+    手術10麻酔コード: str = ""
+    手術10麻酔: str = ""
+    手術10予防的抗菌薬投与コード: str = ""
+    手術10予防的抗菌薬投与: str = ""
+    救急受診時のP_F_比: str = Field("", alias="救急受診時のP/F 比")
+    救急受診時の呼吸補助: str = ""
+    治療室又は病棟入室時のP_F_比: str = Field("", alias="治療室又は病棟入室時のP/F 比")
+    治療室又は病棟入室時の呼吸補助: str = ""
+    救急受診時のP_F比: str = Field("", alias="救急受診時のP/F比")
+    救急受診時の酸素投与の有無: str = ""
+    救急受診時のFiO2: str = ""
+    救急受診時の呼吸補助の有無: str = ""
+    治療室又は病棟入室時のP_F比: str = Field("", alias="治療室又は病棟入室時のP/F比")
+    治療室又は病棟入室時の酸素投与の有無: str = ""
+    治療室又は病棟入室時のFiO2: str = ""
+    治療室又は病棟入室時の呼吸補助の有無: str = ""
+    急性心筋梗塞_050030_の発症時期: str = Field(
+        "", alias="急性心筋梗塞(050030)の発症時期"
+    )
+    急性心筋梗塞_050030_の発症時期_R06: str = Field(
+        "", alias="急性心筋梗塞(050030)の発症時期_R06"
+    )
+    入院時左室駆出率: str = ""
+    Stanford_A_B_型: str = Field("", alias="Stanford A/B 型")
+    解離性大動脈瘤の発症時期: str = ""
+    入院時BNP_NT_proBNP: str = Field("", alias="入院時BNP・NT-proBNP")
+    ガンマグロブリンの追加治療の有無: str = ""
+    入棟後に初めて行われた_当該患者の退院に向けた会議の実施日: date | None = Field(
+        None, alias="入棟後に初めて行われた、当該患者の退院に向けた会議の実施日"
+    )
+    当該患者の退院に向けた会議の開催回数: str = ""
+    会議回数_医師_: str = Field("", alias="会議回数(医師)")
+    会議回数_保健師_: str = Field("", alias="会議回数(保健師)")
+    会議回数_看護師_: str = Field("", alias="会議回数(看護師)")
+    会議回数_薬剤師_: str = Field("", alias="会議回数(薬剤師)")
+    会議回数_作業療法士_: str = Field("", alias="会議回数(作業療法士)")
+    会議回数_精神保健福祉士_: str = Field("", alias="会議回数(精神保健福祉士)")
+    会議回数_公認心理師_: str = Field("", alias="会議回数(公認心理師)")
+    会議回数_患者本人_: str = Field("", alias="会議回数(患者本人)")
+    会議回数_患者の家族等_: str = Field("", alias="会議回数(患者の家族等)")
+    会議回数_入退院支援部門の職員_: str = Field(
+        "", alias="会議回数(入退院支援部門の職員)"
+    )
+    会議回数_自治体職員_: str = Field("", alias="会議回数(自治体職員)")
+    会議回数_介護サービス事業者_: str = Field("", alias="会議回数(介護サービス事業者)")
+    会議回数_障害福祉サービス事業者_: str = Field(
+        "", alias="会議回数(障害福祉サービス事業者)"
+    )
+    会議回数_その他_: str = Field("", alias="会議回数(その他)")
+    薬剤師による服薬指導の実施回数: str = ""
+    作業療法士による個別作業療法の実施回数: str = ""
+    精神保健福祉士による個別相談支援の実施回数: str = ""
+    公認心理師による個別心理支援の実施回数: str = ""
+    入院中に患者が患家等を訪問した回数: str = ""
+    訪問回数_医師_: str = Field("", alias="訪問回数(医師)")
+    訪問回数_保健師_: str = Field("", alias="訪問回数(保健師)")
+    訪問回数_看護師_: str = Field("", alias="訪問回数(看護師)")
+    訪問回数_薬剤師_: str = Field("", alias="訪問回数(薬剤師)")
+    訪問回数_作業療法士_: str = Field("", alias="訪問回数(作業療法士)")
+    訪問回数_精神保健福祉士_: str = Field("", alias="訪問回数(精神保健福祉士)")
+    訪問回数_公認心理師_: str = Field("", alias="訪問回数(公認心理師)")
+    訪問回数_入退院支援部門の職員_: str = Field(
+        "", alias="訪問回数(入退院支援部門の職員)"
+    )
+    訪問回数_その他_: str = Field("", alias="訪問回数(その他)")
+    入院中に患者が外泊を行った回数: str = ""
+    面談回数_居宅介護_: str = Field("", alias="面談回数(居宅介護)")
+    面談回数_重度訪問介護_: str = Field("", alias="面談回数(重度訪問介護)")
+    面談回数_同行援護_: str = Field("", alias="面談回数(同行援護)")
+    面談回数_行動援護_: str = Field("", alias="面談回数(行動援護)")
+    面談回数_重度障害者等包括支援_: str = Field(
+        "", alias="面談回数(重度障害者等包括支援)"
+    )
+    面談回数_短期入所_: str = Field("", alias="面談回数(短期入所)")
+    面談回数_療養介護_: str = Field("", alias="面談回数(療養介護)")
+    面談回数_生活介護_: str = Field("", alias="面談回数(生活介護)")
+    面談回数_施設入所支援_: str = Field("", alias="面談回数(施設入所支援)")
+    居宅介護の有無: str = ""
+    重度訪問介護の有無: str = ""
+    同行援護の有無: str = ""
+    行動援護の有無: str = ""
+    重度障害者等包括支援の有無: str = ""
+    短期入所の有無: str = ""
+    療養介護の有無: str = ""
+    生活介護の有無: str = ""
+    施設入所支援の有無: str = ""
+    面談回数_自立生活援助_: str = Field("", alias="面談回数(自立生活援助)")
+    面談回数_共同生活援助_: str = Field("", alias="面談回数(共同生活援助)")
+    面談回数_宿泊型自立訓練_: str = Field("", alias="面談回数(宿泊型自立訓練)")
+    面談回数_自律訓練_機能訓練__: str = Field("", alias="面談回数(自律訓練(機能訓練))")
+    面談回数_自律訓練_生活訓練__: str = Field("", alias="面談回数(自律訓練(生活訓練))")
+    面談回数_就労移行支援_: str = Field("", alias="面談回数(就労移行支援)")
+    面談回数_就労継続支援_A型__: str = Field("", alias="面談回数(就労継続支援(A型))")
+    面談回数_就労継続支援_B型__: str = Field("", alias="面談回数(就労継続支援(B型))")
+    面談回数_就労定着支援_: str = Field("", alias="面談回数(就労定着支援)")
+    自立生活援助の有無: str = ""
+    共同生活援助の有無: str = ""
+    宿泊型自立訓練の有無: str = ""
+    自律訓練_機能訓練_の有無: str = Field("", alias="自律訓練(機能訓練)の有無")
+    自律訓練_生活訓練_の有無: str = Field("", alias="自律訓練(生活訓練)の有無")
+    就労移行支援の有無: str = ""
+    就労継続支援_A型_の有無: str = Field("", alias="就労継続支援(A型)の有無")
+    就労継続支援_B型_の有無: str = Field("", alias="就労継続支援(B型)の有無")
+    就労定着支援の有無: str = ""
+    面談回数_計画相談支援_: str = Field("", alias="面談回数(計画相談支援)")
+    面談回数_地域移行支援_: str = Field("", alias="面談回数(地域移行支援)")
+    面談回数_地域定着支援_: str = Field("", alias="面談回数(地域定着支援)")
+    計画相談支援の有無: str = ""
+    地域移行支援の有無: str = ""
+    地域定着支援の有無: str = ""
+
+
+class DPC_Dファイル(DwhBaseModel):
+    """DPC_Dファイル."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC施設コード: str = ""
+    DPC症例番号: str = ""
+    算定開始日: date = date(1000, 1, 1)
+    算定終了日: date = date(1000, 1, 1)
+    算定起算日: date = date(1000, 1, 1)
+    入院日: date | None = None
+    退院日: date | None = None
+    データ区分コード: str = ""
+    データ区分: str = ""
+    順序番号: Decimal = Decimal("0")
+    病院点数マスタコード: str = ""
+    レセプト電算処理システム用コード: str = ""
+    解釈番号_基本_: str = Field("", alias="解釈番号(基本)")
+    診療明細: str = ""
+    行為点数: Decimal | None = None
+    行為薬剤料: Decimal | None = None
+    行為材料料: Decimal | None = None
+    円_点区分コード: str = Field("", alias="円・点区分コード")
+    円_点区分: str = Field("", alias="円・点区分")
+    行為回数: Decimal | None = None
+    保険者番号: str = ""
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    実施日: date | None = None
+    レセプト科区分: str = ""
+    レセプト科: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    医師ID: str = ""
+    病棟コード: str = ""
+    病棟区分コード: str = ""
+    病棟区分: str = ""
+    入外区分コード: str = ""
+    入外区分: str = ""
+    施設タイプ: str = ""
+    分類番号: str = ""
+    医療機関係数: float | None = None
+
+
+class DPC_Eファイル(DwhBaseModel):
+    """DPC_Eファイル."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC施設コード: str = ""
+    DPC症例番号: str = ""
+    入院日_外来受診日: date = Field(date(1000, 1, 1), alias="入院日・外来受診日")
+    退院日: date = date(1000, 1, 1)
+    データ区分コード: str = ""
+    データ区分: str = ""
+    順序番号: Decimal = Decimal("0")
+    病院点数マスタコード: str = ""
+    レセプト電算処理システム用コード: str = ""
+    解釈番号_基本_: str = Field("", alias="解釈番号(基本)")
+    診療行為: str = ""
+    行為点数: Decimal | None = None
+    行為薬剤料: Decimal | None = None
+    行為材料料: Decimal | None = None
+    円_点区分コード: str = Field("", alias="円・点区分コード")
+    円_点区分: str = Field("", alias="円・点区分")
+    行為回数: Decimal | None = None
+    保険者番号: str = ""
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    実施日_診療開始日: date | None = Field(None, alias="実施日・診療開始日")
+    レセプト科区分: str = ""
+    レセプト科: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    医師ID: str = ""
+    病棟コード: str = ""
+    病棟区分コード: str = ""
+    病棟区分: str = ""
+    入外区分コード: str = ""
+    入外区分: str = ""
+    施設タイプ: str = ""
+
+
+class DPC_Fファイル(DwhBaseModel):
+    """DPC_Fファイル."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC施設コード: str = ""
+    DPC症例番号: str = ""
+    入院日_外来受診日: date = Field(date(1000, 1, 1), alias="入院日・外来受診日")
+    退院日: date = date(1000, 1, 1)
+    データ区分コード: str = ""
+    データ区分: str = ""
+    順序番号: Decimal = Decimal("0")
+    行為明細番号: Decimal = Decimal("0")
+    病院点数マスタコード: str = ""
+    レセプト電算処理システム用コード: str = ""
+    解釈番号_基本_: str = Field("", alias="解釈番号(基本)")
+    診療明細: str = ""
+    使用量: float | None = None
+    基準単位コード: str = ""
+    基準単位: str = ""
+    行為明細点数: Decimal | None = None
+    行為明細薬剤料: float | None = None
+    行為明細材料料: float | None = None
+    円_点区分コード: str = Field("", alias="円・点区分コード")
+    円_点区分: str = Field("", alias="円・点区分")
+    出来高実績点数: float | None = None
+    出来高_包括区分: str = Field("", alias="出来高・包括区分")
+    退院時処方区分コード: str = ""
+    退院時処方区分: str = ""
+    入院包括項目区分コード: str = ""
+    入院包括項目区分: str = ""
+    持参薬区分コード: str = ""
+    持参薬区分: str = ""
+    持参薬処方区分コード: str = ""
+    持参薬処方区分: str = ""
+    DPC適用区分コード: str = ""
+    DPC適用区分: str = ""
+    基本的検体検査実施料及び基本的エックス線診断料包括項目区分コード: str | None = None
+    基本的検体検査実施料及び基本的エックス線診断料包括項目区分: str | None = None
+    入院用予備1コード: str = ""
+    入院用予備1: str = ""
+    入院用予備2コード: str = ""
+    入院用予備2: str = ""
+    入院用予備3コード: str = ""
+    入院用予備3: str = ""
+    入院用予備4コード: str = ""
+    入院用予備4: str = ""
+    入院用予備5コード: str = ""
+    入院用予備5: str = ""
+    入院用予備6コード: str = ""
+    入院用予備6: str = ""
+    入院用予備7コード: str = ""
+    入院用予備7: str = ""
+    院外処方区分コード: str = ""
+    院外処方区分: str = ""
+    一般名処方区分コード: str = ""
+    一般名処方区分: str = ""
+    転帰区分コード: str = ""
+    転帰区分: str = ""
+    主病名区分: str = ""
+    外来用予備1コード: str = ""
+    外来用予備1: str = ""
+    外来用予備2コード: str = ""
+    外来用予備2: str = ""
+    外来用予備3コード: str = ""
+    外来用予備3: str = ""
+    外来用予備4コード: str = ""
+    外来用予備4: str = ""
+    外来用予備5コード: str = ""
+    外来用予備5: str = ""
+    外来用予備6コード: str = ""
+    外来用予備6: str = ""
+    外来用予備7コード: str = ""
+    外来用予備7: str = ""
+    外来用予備8コード: str = ""
+    外来用予備8: str = ""
+    外来用予備9コード: str = ""
+    外来用予備9: str = ""
+    外来用予備10コード: str = ""
+    外来用予備10: str = ""
+
+
+class DPC_EF統合ファイル(DwhBaseModel):
+    """DPC_EF統合ファイル."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC施設コード: str = ""
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC症例番号: str = ""
+    入院日_外来受診日: date = Field(date(1000, 1, 1), alias="入院日・外来受診日")
+    退院日: date = date(1000, 1, 1)
+    データ区分コード: str = ""
+    データ区分: str = ""
+    順序番号: Decimal = Decimal("0")
+    行為明細番号: Decimal = Decimal("0")
+    病院点数マスタコード: str = ""
+    レセプト電算処理システム用コード: str = ""
+    解釈番号_基本_: str = Field("", alias="解釈番号(基本)")
+    診療明細名称: str = ""
+    使用量: float | None = None
+    基準単位コード: str = ""
+    基準単位: str = ""
+    明細点数: float | None = None
+    円_点区分コード: str = Field("", alias="円・点区分コード")
+    円_点区分: str = Field("", alias="円・点区分")
+    出来高実績点数: float | None = None
+    出来高_包括フラグ: str = Field("", alias="出来高・包括フラグ")
+    退院時処方区分コード: str = ""
+    退院時処方区分: str = ""
+    入院包括項目区分コード: str = ""
+    入院包括項目区分: str = ""
+    持参薬区分コード: str = ""
+    持参薬区分: str = ""
+    持参薬処方区分コード: str = ""
+    持参薬処方区分: str = ""
+    DPC適用区分コード: str = ""
+    DPC適用区分: str = ""
+    基本的検体検査実施料及び基本的エックス線診断料包括項目区分コード: str | None = None
+    基本的検体検査実施料及び基本的エックス線診断料包括項目区分: str | None = None
+    入院用予備1コード: str = ""
+    入院用予備1: str = ""
+    入院用予備2コード: str = ""
+    入院用予備2: str = ""
+    入院用予備3コード: str = ""
+    入院用予備3: str = ""
+    入院用予備4コード: str = ""
+    入院用予備4: str = ""
+    入院用予備5コード: str = ""
+    入院用予備5: str = ""
+    入院用予備6コード: str = ""
+    入院用予備6: str = ""
+    入院用予備7コード: str = ""
+    入院用予備7: str = ""
+    院外処方区分コード: str = ""
+    院外処方区分: str = ""
+    一般名処方区分コード: str = ""
+    一般名処方区分: str = ""
+    転帰区分コード: str = ""
+    転帰区分: str = ""
+    主病名区分: str = ""
+    外来用予備1コード: str = ""
+    外来用予備1: str = ""
+    外来用予備2コード: str = ""
+    外来用予備2: str = ""
+    外来用予備3コード: str = ""
+    外来用予備3: str = ""
+    外来用予備4コード: str = ""
+    外来用予備4: str = ""
+    外来用予備5コード: str = ""
+    外来用予備5: str = ""
+    外来用予備6コード: str = ""
+    外来用予備6: str = ""
+    外来用予備7コード: str = ""
+    外来用予備7: str = ""
+    外来用予備8コード: str = ""
+    外来用予備8: str = ""
+    外来用予備9コード: str = ""
+    外来用予備9: str = ""
+    外来用予備10コード: str = ""
+    外来用予備10: str = ""
+    行為点数: Decimal | None = None
+    行為薬剤料: Decimal | None = None
+    行為材料料: Decimal | None = None
+    行為回数: Decimal | None = None
+    保険者番号: str = ""
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    実施日_診療開始日: date | None = Field(None, alias="実施日・診療開始日")
+    レセプト科区分: str = ""
+    レセプト科: str = ""
+    診療科コード: str = ""
+    診療科: str = ""
+    医師ID: str = ""
+    病棟コード: str = ""
+    病棟区分コード: str = ""
+    病棟区分: str = ""
+    入外区分コード: str = ""
+    入外区分: str = ""
+    施設タイプ: str = ""
+
+
+class DPC様式1_H26改正レイアウト(DwhBaseModel):
+    """DPC様式1(H26改正レイアウト)."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    DPC対象年月: str = ""
+    DPC対象年月_日付型_: date | None = Field(None, alias="DPC対象年月(日付型)")
+    DPC施設コード: str = ""
+    DPC症例番号: str = ""
+    入院日: date | None = None
+    回数管理番号: Decimal | None = None
+    統括診療情報番号: str = ""
+    ペイロード種別コード: str = ""
+    バージョン: str = ""
+    連番: Decimal = Decimal("0")
+    ペイロード1値: str = ""
+    ペイロード2値: str = ""
+    ペイロード3値: str = ""
+    ペイロード4値: str = ""
+    ペイロード5値: str = ""
+    ペイロード6値: str = ""
+    ペイロード7値: str = ""
+    ペイロード8値: str = ""
+    ペイロード9値: str = ""
+
+
+class レセ電算レセプト共通(DwhBaseModel):
+    """レセ電算レセプト共通."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+
+
+class レセ電算保険者(DwhBaseModel):
+    """レセ電算保険者."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    保険者番号: str = ""
+    保険記号: str = ""
+    保険番号: str = ""
+    診療実日数: Decimal | None = None
+    合計点数: Decimal | None = None
+    食事療養回数: Decimal | None = None
+    食事療養合計金額: Decimal | None = None
+    職務上の事由コード: str = ""
+    職務上の事由: str = ""
+    負担金額医療保険: Decimal | None = None
+    負担金額減免区分コード: str = ""
+    負担金額減免区分: str = ""
+    負担金額減額割合: Decimal | None = None
+    負担金額減額金額: Decimal | None = None
+
+
+class レセ電算公費(DwhBaseModel):
+    """レセ電算公費."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    公費負担者番号: str = ""
+    受給者番号: str = ""
+    任意給付区分コード: str = ""
+    任意給付区分: str = ""
+    診療実日数: Decimal | None = None
+    合計点数: Decimal | None = None
+    負担金額公費: Decimal | None = None
+    負担金額外来一部負担金: Decimal | None = None
+    負担金額入院一部負担金: Decimal | None = None
+    食事療養回数: Decimal | None = None
+    食事療養合計金額: Decimal | None = None
+    食事療養DPCレセプト標準負担金額: Decimal | None = None
+
+
+class レセ電算傷病名_医科(DwhBaseModel):
+    """レセ電算傷病名(医科)."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    傷病名コード: str = ""
+    診療開始日: date = date(1000, 1, 1)
+    転帰区分コード: str = ""
+    転帰区分: str = ""
+    修飾語コード: str = ""
+    修飾語: str = ""
+    傷病名: str = ""
+    主傷病識別: str = ""
+    補足コメント: str = ""
+
+
+class レセ電算傷病名部位_歯科(DwhBaseModel):
+    """レセ電算傷病名部位(歯科)."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療開始日: date | None = None
+    転帰区分コード: str = ""
+    転帰区分: str = ""
+    歯式コード: str = ""
+    歯式: str = ""
+    傷病名コード: str = ""
+    傷病名: str = ""
+    修飾語コード: str = ""
+    修飾語: str = ""
+    併存傷病数: Decimal | None = None
+    病態移行コード: str = ""
+    病態移行: str = ""
+    主傷病識別: str = ""
+    コメントコード: str = ""
+    補足コメント: str = ""
+    補足コメント歯式コード: str = ""
+    補足コメント歯式: str = ""
+
+
+class レセ電算DPC診断群分類(DwhBaseModel):
+    """レセ電算DPC診断群分類."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診断群分類番号: str = ""
+    診断群分類: str = ""
+    今回入院日: date | None = None
+    今回退院日: date | None = None
+    DPC転帰区分コード: str = ""
+    DPC転帰区分: str = ""
+    死因: str = ""
+
+
+class レセ電算DPC傷病(DwhBaseModel):
+    """レセ電算DPC傷病."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    傷病名コード: str = ""
+    修飾語コード: str = ""
+    修飾語: str = ""
+    傷病名: str = ""
+    ICD10: str = ""
+    傷病名区分コード: str = ""
+    傷病名区分: str = ""
+    死因対象: str = ""
+    補足コメント: str = ""
+
+
+class レセ電算DPC患者基礎(DwhBaseModel):
+    """レセ電算DPC患者基礎."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    一般病棟以外の病棟移動の有無: str = ""
+    予定_緊急入院区分コード: str = Field("", alias="予定・緊急入院区分コード")
+    予定_緊急入院区分: str = Field("", alias="予定・緊急入院区分")
+    前回退院日: date | None = None
+    前回同一傷病入院の有無: str = ""
+    入院時年齢: Decimal | None = None
+    出生時体重: Decimal | None = None
+    JCS: Decimal | None = None
+    Burn_Index: float | None = Field(None, alias="Burn Index")
+    重症度等: str = ""
+    入院時月齢: Decimal | None = None
+    妊娠週数: Decimal | None = None
+
+
+class レセ電算DPC診療関連(DwhBaseModel):
+    """レセ電算DPC診療関連."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療行為コード: str = ""
+    区分番号: str = ""
+    実施_予定_日: date | None = Field(None, alias="実施(予定)日")
+    診療区分コード: str = ""
+    診療区分: str = ""
+    診療行為: str = ""
+
+
+class レセ電算DPC外泊(DwhBaseModel):
+    """レセ電算DPC外泊."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    請求調整区分コード: str = ""
+    請求調整区分: str = ""
+    外泊等コード: str = ""
+    外泊等: str = ""
+    外泊日: date | None = None
+
+
+class レセ電算DPC包括評価(DwhBaseModel):
+    """レセ電算DPC包括評価."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    請求調整区分コード: str = ""
+    請求調整区分: str = ""
+    自他保険区分コード: str = ""
+    自他保険区分: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    入院期間区分コード: str = ""
+    入院期間区分: str = ""
+    入院期間区分別点数: Decimal | None = None
+    入院期間区分別入院日数: Decimal | None = None
+    包括小計点数: Decimal | None = None
+
+
+class レセ電算DPC合計調整(DwhBaseModel):
+    """レセ電算DPC合計調整."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    請求調整区分コード: str = ""
+    請求調整区分: str = ""
+    自他保険区分コード: str = ""
+    自他保険区分: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    包括小計点数合算: Decimal | None = None
+    包括評価点数: Decimal | None = None
+    調整点数: Decimal | None = None
+    今月包括合計点数: Decimal | None = None
+    診療識別コード: str = ""
+    診療識別: str = ""
+    変更日: date | None = None
+    変更情報: str = ""
+
+
+class レセ電算診療行為_医科(DwhBaseModel):
+    """レセ電算診療行為(医科)."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療識別コード: str = ""
+    診療識別: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    診療行為コード: str = ""
+    診療行為: str = ""
+    数量: Decimal | None = None
+    点数: Decimal | None = None
+    コメント1コード: str = ""
+    コメント1: str = ""
+    コメント2コード: str = ""
+    コメント2: str = ""
+    コメント3コード: str = ""
+    コメント3: str = ""
+    算定日: date = date(1000, 1, 1)
+    算定回数: Decimal | None = None
+
+
+class レセ電算診療行為_歯科(DwhBaseModel):
+    """レセ電算診療行為(歯科)."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療識別コード: str = ""
+    診療識別: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    診療行為コード: str = ""
+    診療行為: str = ""
+    診療行為数量1: Decimal | None = None
+    診療行為数量2: Decimal | None = None
+    加算1コード: str = ""
+    加算1: str = ""
+    加算1数量: Decimal | None = None
+    加算2コード: str = ""
+    加算2: str = ""
+    加算2数量: Decimal | None = None
+    加算3コード: str = ""
+    加算3: str = ""
+    加算3数量: Decimal | None = None
+    加算4コード: str = ""
+    加算4: str = ""
+    加算4数量: Decimal | None = None
+    加算5コード: str = ""
+    加算5: str = ""
+    加算5数量: Decimal | None = None
+    加算6コード: str = ""
+    加算6: str = ""
+    加算6数量: Decimal | None = None
+    加算7コード: str = ""
+    加算7: str = ""
+    加算7数量: Decimal | None = None
+    加算8コード: str = ""
+    加算8: str = ""
+    加算8数量: Decimal | None = None
+    加算9コード: str = ""
+    加算9: str = ""
+    加算9数量: Decimal | None = None
+    加算10コード: str = ""
+    加算10: str = ""
+    加算10数量: Decimal | None = None
+    加算11コード: str = ""
+    加算11: str = ""
+    加算11数量: Decimal | None = None
+    加算12コード: str = ""
+    加算12: str = ""
+    加算12数量: Decimal | None = None
+    加算13コード: str = ""
+    加算13: str = ""
+    加算13数量: Decimal | None = None
+    加算14コード: str = ""
+    加算14: str = ""
+    加算14数量: Decimal | None = None
+    加算15コード: str = ""
+    加算15: str = ""
+    加算15数量: Decimal | None = None
+    加算16コード: str = ""
+    加算16: str = ""
+    加算16数量: Decimal | None = None
+    加算17コード: str = ""
+    加算17: str = ""
+    加算17数量: Decimal | None = None
+    加算18コード: str = ""
+    加算18: str = ""
+    加算18数量: Decimal | None = None
+    加算19コード: str = ""
+    加算19: str = ""
+    加算19数量: Decimal | None = None
+    加算20コード: str = ""
+    加算20: str = ""
+    加算20数量: Decimal | None = None
+    加算21コード: str = ""
+    加算21: str = ""
+    加算21数量: Decimal | None = None
+    加算22コード: str = ""
+    加算22: str = ""
+    加算22数量: Decimal | None = None
+    加算23コード: str = ""
+    加算23: str = ""
+    加算23数量: Decimal | None = None
+    加算24コード: str = ""
+    加算24: str = ""
+    加算24数量: Decimal | None = None
+    加算25コード: str = ""
+    加算25: str = ""
+    加算25数量: Decimal | None = None
+    加算26コード: str = ""
+    加算26: str = ""
+    加算26数量: Decimal | None = None
+    加算27コード: str = ""
+    加算27: str = ""
+    加算27数量: Decimal | None = None
+    加算28コード: str = ""
+    加算28: str = ""
+    加算28数量: Decimal | None = None
+    加算29コード: str = ""
+    加算29: str = ""
+    加算29数量: Decimal | None = None
+    加算30コード: str = ""
+    加算30: str = ""
+    加算30数量: Decimal | None = None
+    加算31コード: str = ""
+    加算31: str = ""
+    加算31数量: Decimal | None = None
+    加算32コード: str = ""
+    加算32: str = ""
+    加算32数量: Decimal | None = None
+    加算33コード: str = ""
+    加算33: str = ""
+    加算33数量: Decimal | None = None
+    加算34コード: str = ""
+    加算34: str = ""
+    加算34数量: Decimal | None = None
+    加算35コード: str = ""
+    加算35: str = ""
+    加算35数量: Decimal | None = None
+    点数: Decimal | None = None
+    算定日: date = date(1000, 1, 1)
+    算定回数: Decimal | None = None
+
+
+class レセ電算医薬品(DwhBaseModel):
+    """レセ電算医薬品."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療識別コード: str = ""
+    診療識別: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    医薬品コード: str = ""
+    医薬品: str = ""
+    使用量: float | None = None
+    点数: Decimal | None = None
+    コメント1コード: str = ""
+    コメント1: str = ""
+    コメント2コード: str = ""
+    コメント2: str = ""
+    コメント3コード: str = ""
+    コメント3: str = ""
+    算定日: date = date(1000, 1, 1)
+    算定回数: Decimal | None = None
+
+
+class レセ電算特定器材(DwhBaseModel):
+    """レセ電算特定器材."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療識別コード: str = ""
+    診療識別: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    使用量: float | None = None
+    点数: Decimal | None = None
+    単位コード: str = ""
+    単位: str = ""
+    単価: float | None = None
+    特定器材コード: str = ""
+    特定器材: str = ""
+    特定器材加算等コード1_歯科_: str = Field("", alias="特定器材加算等コード1(歯科)")
+    特定器材加算等数量1_歯科_: float | None = Field(
+        None, alias="特定器材加算等数量1(歯科)"
+    )
+    特定器材加算等コード2_歯科_: str = Field("", alias="特定器材加算等コード2(歯科)")
+    特定器材加算等数量2_歯科_: float | None = Field(
+        None, alias="特定器材加算等数量2(歯科)"
+    )
+    商品名及び規格又はサイズ: str = ""
+    コメント1コード: str = ""
+    コメント1: str = ""
+    コメント2コード: str = ""
+    コメント2: str = ""
+    コメント3コード: str = ""
+    コメント3: str = ""
+    算定日: date = date(1000, 1, 1)
+    算定回数: Decimal | None = None
+
+
+class レセ電算コメント(DwhBaseModel):
+    """レセ電算コメント."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    診療識別コード: str = ""
+    診療識別: str = ""
+    負担区分コード: str = ""
+    負担区分: str = ""
+    コメントコード: str = ""
+    コメント: str = ""
+    歯式コード: str = ""
+    歯式コメント: str = ""
+
+
+class レセ電算症状詳記(DwhBaseModel):
+    """レセ電算症状詳記."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    症状詳記区分コード: str = ""
+    症状詳記区分: str = ""
+    症状詳記: str = ""
+
+
+class レセ電算DPCコーディング(DwhBaseModel):
+    """レセ電算DPCコーディング."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分名: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分名"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    実施日: date = date(1000, 1, 1)
+    診療識別コード: str = ""
+    診療識別: str = ""
+    順序番号: Decimal = Decimal("0")
+    行為明細番号: Decimal = Decimal("0")
+    レセプト電算コード: str = ""
+    診療項目: str = ""
+    使用量: float | None = None
+    数量: Decimal | None = None
+    単位コード: str = ""
+    単位: str = ""
+    回数: Decimal | None = None
+
+
+class レセ電算包括評価対象外理由(DwhBaseModel):
+    """レセ電算包括評価対象外理由."""
+
+    ROW_ID: str = ""
+    件数: Decimal = Decimal("1")
+    SQ_ID: str = ""
+    トランザクション名: str = ""
+    ETL更新日: date = date(1000, 1, 1)
+    ETL更新時刻: time = time(0, 0, 0)
+    症例ID: str = ""
+    施設コード: str = ""
+    施設名: str = ""
+    患者ID: str = ""
+    患者番号: float = 0.0
+    レセ電算症例番号: str = ""
+    レセプトデータ種別コード: str = ""
+    レセプトデータ種別: str = ""
+    審査支払機関コード: str = ""
+    審査支払機関: str = ""
+    点数表コード: str = ""
+    点数表: str = ""
+    医療機関コード: str = ""
+    医療機関名: str = ""
+    請求年月_レセ電形式_: str = Field("", alias="請求年月(レセ電形式)")
+    請求年月: str = ""
+    レセプト番号: Decimal = Decimal("0")
+    レセプト枝番号: Decimal = Decimal("0")
+    レセプト種別コード: str = ""
+    レセプト種別: str = ""
+    診療年月_レセ電形式_: str = Field("", alias="診療年月(レセ電形式)")
+    診療年月: str = ""
+    診療年月_日付型_: date | None = Field(None, alias="診療年月(日付型)")
+    男女区分コード: str = ""
+    男女区分: str = ""
+    生年月日_レセ電形式_: str = Field("", alias="生年月日(レセ電形式)")
+    生年月日: date | None = None
+    入院日_レセ電形式_: str = Field("", alias="入院日(レセ電形式)")
+    入院日: date | None = None
+    病棟区分1コード: str = ""
+    病棟区分1: str = ""
+    病棟区分2コード: str = ""
+    病棟区分2: str = ""
+    病棟区分3コード: str = ""
+    病棟区分3: str = ""
+    病棟区分4コード: str = ""
+    病棟区分4: str = ""
+    一部負担金_食事療養費_生活療養標準負担額区分コード: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分コード"
+    )
+    一部負担金_食事療養費_生活療養標準負担額区分: str = Field(
+        "", alias="一部負担金・食事療養費・生活療養標準負担額区分"
+    )
+    レセプト特記事項1コード: str = ""
+    レセプト特記事項1: str = ""
+    レセプト特記事項2コード: str = ""
+    レセプト特記事項2: str = ""
+    レセプト特記事項3コード: str = ""
+    レセプト特記事項3: str = ""
+    レセプト特記事項4コード: str = ""
+    レセプト特記事項4: str = ""
+    レセプト特記事項5コード: str = ""
+    レセプト特記事項5: str = ""
+    カルテ番号等: str = ""
+    割引点数単価: Decimal | None = None
+    レセプト総括区分コード: str = ""
+    レセプト総括区分: str = ""
+    明細情報数: Decimal | None = None
+    検索番号: str = ""
+    請求情報: str = ""
+    診療科1コード: str = ""
+    診療科1: str = ""
+    部位等1コード: str = ""
+    部位等1: str = ""
+    性別等1コード: str = ""
+    性別等1: str = ""
+    医学的処置1コード: str = ""
+    医学的処置1: str = ""
+    特定疾病1コード: str = ""
+    特定疾病1: str = ""
+    診療科2コード: str = ""
+    診療科2: str = ""
+    部位等2コード: str = ""
+    部位等2: str = ""
+    性別等2コード: str = ""
+    性別等2: str = ""
+    医学的処置2コード: str = ""
+    医学的処置2: str = ""
+    特定疾病2コード: str = ""
+    特定疾病2: str = ""
+    診療科3コード: str = ""
+    診療科3: str = ""
+    部位等3コード: str = ""
+    部位等3: str = ""
+    性別等3コード: str = ""
+    性別等3: str = ""
+    医学的処置3コード: str = ""
+    医学的処置3: str = ""
+    特定疾病3コード: str = ""
+    特定疾病3: str = ""
+    出来高算定理由コード: str = ""
+    出来高算定理由: str = ""
+    診断群分類番号: str = ""
+    診断群分類: str = ""
