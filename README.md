@@ -46,7 +46,12 @@ src/interactive_ehr/
     mr.py                 -- カルテ記事テーブル (MR)
     nurse.py              -- 看護系テーブル (NURSE)
     other.py              -- その他テーブル (DPC等)
-  widgets/                -- UIウィジェット
+  widgets/
+    _base.py              -- WidgetSpec基底 + WidgetType enum
+    display.py            -- データ表示系 (Dataframe, Table, Metric, Json, Markdown, Text)
+    chart.py              -- チャート系 (LineChart, BarChart)
+    input.py              -- 入力系 (Selectbox, Multiselect, DateInput, TextInput等)
+    layout.py             -- レイアウト系 (Columns, Tabs, Expander)
   pages/                  -- ページコンポーネント
 
 scripts/
