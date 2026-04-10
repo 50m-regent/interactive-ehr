@@ -241,6 +241,76 @@ class TestLayoutWidgets:
         assert spec.tabs[0][0].widget_type == WidgetType.COLUMNS
 
 
+class TestValidation:
+    """バリデーションのテスト."""
+
+    def test_tabs_labels_tabs_mismatch(self) -> None:
+        with pytest.raises(ValidationError, match="labels length"):
+            TabsSpec(
+                labels=["a", "b", "c"],
+                tabs=[[TextSpec(body="x")], [TextSpec(body="y")]],
+            )
+
+    def test_tabs_empty_labels(self) -> None:
+        with pytest.raises(ValidationError):
+            TabsSpec(labels=[], tabs=[])
+
+    def test_columns_empty(self) -> None:
+        with pytest.raises(ValidationError):
+            ColumnsSpec(columns=[])
+
+    def test_columns_widths_mismatch(self) -> None:
+        with pytest.raises(ValidationError, match="widths length"):
+            ColumnsSpec(
+                columns=[[TextSpec(body="a")], [TextSpec(body="b")]],
+                widths=[1.0],
+            )
+
+    def test_slider_min_ge_max(self) -> None:
+        with pytest.raises(ValidationError, match="min_value"):
+            SliderSpec(label="x", min_value=100, max_value=0)
+
+    def test_slider_default_out_of_range(self) -> None:
+        with pytest.raises(ValidationError, match="default_value"):
+            SliderSpec(label="x", min_value=0, max_value=10, default_value=20)
+
+    def test_slider_range_default_out_of_range(self) -> None:
+        with pytest.raises(ValidationError, match="range default"):
+            SliderSpec(
+                label="x", min_value=0, max_value=10, default_value=(5, 20)
+            )
+
+    def test_date_input_min_gt_max(self) -> None:
+        with pytest.raises(ValidationError, match="min_value"):
+            DateInputSpec(
+                label="x",
+                min_value=date(2025, 12, 31),
+                max_value=date(2025, 1, 1),
+            )
+
+    def test_number_input_min_gt_max(self) -> None:
+        with pytest.raises(ValidationError, match="min_value"):
+            NumberInputSpec(label="x", min_value=100, max_value=0)
+
+    def test_selectbox_negative_index(self) -> None:
+        with pytest.raises(ValidationError):
+            SelectboxSpec(label="x", options_key="k", default_index=-1)
+
+    def test_multiselect_negative_max_selections(self) -> None:
+        with pytest.raises(ValidationError):
+            MultiselectSpec(label="x", options_key="k", max_selections=-1)
+
+    def test_negative_height_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            DataframeSpec(data_key="x", height=-100)
+
+    def test_key_field_on_all_widgets(self) -> None:
+        spec = SelectboxSpec(
+            label="x", options_key="k", key="unique_selectbox_1"
+        )
+        assert spec.key == "unique_selectbox_1"
+
+
 class TestDiscriminatedUnion:
     """discriminated unionによるパーステスト."""
 

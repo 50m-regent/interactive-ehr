@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class WidgetType(str, Enum):
@@ -49,4 +49,9 @@ class WidgetSpec(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
+    # サブクラスは必ず Literal[WidgetType.X] でオーバーライドすること
     widget_type: WidgetType
+    key: str | None = Field(
+        None,
+        description="Streamlit widget key（セッション内で一意にする必要あり）",
+    )

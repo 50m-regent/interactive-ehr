@@ -27,7 +27,7 @@ class LineChartSpec(WidgetSpec):
     )
     x_label: str | None = Field(None, description="X軸のラベル")
     y_label: str | None = Field(None, description="Y軸のラベル")
-    height: int | None = Field(None, description="チャートの高さ（px）")
+    height: int | None = Field(None, gt=0, description="チャートの高さ（px）")
 
 
 class BarChartSpec(WidgetSpec):
@@ -43,4 +43,4 @@ class BarChartSpec(WidgetSpec):
     x_label: str | None = Field(None, description="X軸のラベル")
     y_label: str | None = Field(None, description="Y軸のラベル")
     horizontal: bool = Field(False, description="横向き棒グラフにするか")
-    height: int | None = Field(None, description="チャートの高さ（px）")
+    height: int | None = Field(None, gt=0, description="チャートの高さ（px）")

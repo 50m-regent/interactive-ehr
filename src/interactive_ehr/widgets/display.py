@@ -25,7 +25,7 @@ class DataframeSpec(WidgetSpec):
         None, description="表示するカラムの順序。Noneで全カラム表示"
     )
     hide_index: bool = Field(True, description="インデックス列を非表示にするか")
-    height: int | None = Field(None, description="テーブルの高さ（px）。Noneで自動")
+    height: int | None = Field(None, gt=0, description="テーブルの高さ（px）。Noneで自動")
 
 
 class TableSpec(WidgetSpec):
@@ -72,7 +72,7 @@ class MarkdownSpec(WidgetSpec):
     """
 
     widget_type: Literal[WidgetType.MARKDOWN] = WidgetType.MARKDOWN
-    body: str = Field(description="表示するマークダウンテキスト")
+    body: str = Field(max_length=50_000, description="表示するマークダウンテキスト")
 
 
 class TextSpec(WidgetSpec):
@@ -82,4 +82,4 @@ class TextSpec(WidgetSpec):
     """
 
     widget_type: Literal[WidgetType.TEXT] = WidgetType.TEXT
-    body: str = Field(description="表示するプレインテキスト")
+    body: str = Field(max_length=50_000, description="表示するプレインテキスト")
