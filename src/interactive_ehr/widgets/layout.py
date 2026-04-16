@@ -23,9 +23,9 @@ class ColumnsSpec(WidgetSpec):
     """
 
     widget_type: Literal[WidgetType.COLUMNS] = WidgetType.COLUMNS
-    columns: list[Annotated[list["AnyWidget"], Field(description="カラム内のウィジェット")]] = (
-        Field(min_length=1, description="各カラムに配置するウィジェットのリスト")
-    )
+    columns: list[
+        Annotated[list["AnyWidget"], Field(description="カラム内のウィジェット")]
+    ] = Field(min_length=1, description="各カラムに配置するウィジェットのリスト")
     widths: list[float] | None = Field(
         None, description="各カラムの相対幅。Noneで均等分割"
     )
@@ -51,9 +51,9 @@ class TabsSpec(WidgetSpec):
 
     widget_type: Literal[WidgetType.TABS] = WidgetType.TABS
     labels: list[str] = Field(min_length=1, description="タブのラベルリスト")
-    tabs: list[Annotated[list["AnyWidget"], Field(description="タブ内のウィジェット")]] = (
-        Field(min_length=1, description="各タブに配置するウィジェットのリスト")
-    )
+    tabs: list[
+        Annotated[list["AnyWidget"], Field(description="タブ内のウィジェット")]
+    ] = Field(min_length=1, description="各タブに配置するウィジェットのリスト")
 
     @model_validator(mode="after")
     def _validate_labels_tabs_match(self) -> TabsSpec:
