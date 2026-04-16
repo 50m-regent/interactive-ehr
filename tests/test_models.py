@@ -134,3 +134,61 @@ class TestModelCount:
         ]
         # 136テーブル分のモデルが生成されていること
         assert len(model_classes) >= 130
+
+
+class TestFake:
+    """fake()メソッドのテスト."""
+
+    def test_single_instance(self) -> None:
+        """n=1 (デフォルト) で単体インスタンスを返す."""
+        p = 患者基本.fake()
+        assert isinstance(p, 患者基本)
+
+    def test_multiple_instances(self) -> None:
+        """n>1 でリストを返す."""
+        ps = 患者基本.fake(n=5)
+        assert isinstance(ps, list)
+        assert len(ps) == 5
+        assert all(isinstance(p, 患者基本) for p in ps)
+
+    def test_overrides(self) -> None:
+        """overrides で指定した値が反映される."""
+        p = 患者基本.fake(匿名ID="TEST_001", 性別="男")
+        assert p.匿名ID == "TEST_001"
+        assert p.性別 == "男"
+
+    def test_str_fields_populated(self) -> None:
+        """str型フィールドにダミー文字列が入る."""
+        p = 患者基本.fake()
+        assert isinstance(p.匿名ID, str)
+        assert len(p.匿名ID) > 0
+
+    def test_date_fields_populated(self) -> None:
+        """date型フィールドに有効な日付が入る."""
+        p = 患者基本.fake()
+        assert isinstance(p.生年月日, date)
+        assert p.生年月日.year >= 2020
+
+    def test_optional_fields_type(self) -> None:
+        """Optional型フィールドは None か正しい型."""
+        p = 患者基本.fake()
+        assert p.現在年齢 is None or isinstance(p.現在年齢, int)
+        assert p.キャンセル日 is None or isinstance(p.キャンセル日, date)
+
+    def test_all_models_can_fake(self) -> None:
+        """全モデルで fake() がエラーなく実行できる."""
+        from interactive_ehr import models
+
+        for name in models.__all__:
+            if name == "DwhBaseModel":
+                continue
+            cls = getattr(models, name)
+            instance = cls.fake()
+            assert isinstance(instance, cls), f"{name}.fake() failed"
+
+    def test_frozen_after_fake(self) -> None:
+        """fake() で生成したインスタンスも frozen のまま."""
+        p = 患者基本.fake()
+        with pytest.raises(ValidationError):
+            p.性別 = "女"  # type: ignore[misc]
+
