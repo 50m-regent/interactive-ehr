@@ -39,8 +39,14 @@ class GeminiMixin:
     他のmixinとの属性衝突を避けるため、内部状態は `_gemini_` プレフィックス。
     """
 
-    _gemini_client: Client | None = None
-    _gemini_model: str | None = None
+    _gemini_client: Client | None
+    _gemini_model: str | None
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        # mixinなので super() を呼んで多重継承チェーンを維持
+        super().__init__(*args, **kwargs)
+        self._gemini_client = None
+        self._gemini_model = None
 
     def _init_gemini(self) -> None:
         """Geminiクライアントを初期化."""
@@ -81,10 +87,7 @@ class GeminiMixin:
         if self._gemini_client is None:
             self._init_gemini()
 
-        assert self._gemini_client is not None
-        assert self._gemini_model is not None
-
-        response = self._gemini_client.models.generate_content(
+        response = self._gemini_client.models.generate_content(  # type: ignore[union-attr]
             model=self._gemini_model,
             contents=prompt,
             config={

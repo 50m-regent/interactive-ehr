@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+from collections.abc import Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -27,7 +29,7 @@ class _Client(GeminiMixin):
 
 
 @pytest.fixture
-def mock_genai_client() -> MagicMock:
+def mock_genai_client() -> Generator[MagicMock, None, None]:
     """genai.Client をモック."""
     with patch("interactive_ehr.llm.gemini.genai.Client") as mock_cls:
         instance = MagicMock()
@@ -36,7 +38,7 @@ def mock_genai_client() -> MagicMock:
 
 
 @pytest.fixture
-def mock_credentials() -> MagicMock:
+def mock_credentials() -> Generator[MagicMock, None, None]:
     """service_account.Credentials をモック."""
     with patch(
         "interactive_ehr.llm.gemini.service_account.Credentials"
@@ -183,7 +185,20 @@ class TestGenerate:
             _make_response("not json")
         )
         client = _Client()
-        with pytest.raises(ValueError):
+        with pytest.raises(json.JSONDecodeError):
+            client.generate("prompt", SampleResponse)
+
+    def test_missing_text_attribute_raises(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        mock_genai_client: MagicMock,
+        mock_credentials: MagicMock,
+    ) -> None:
+        monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/key.json")
+        response = MagicMock(spec=[])  # text属性なし
+        mock_genai_client.return_value.models.generate_content.return_value = response
+        client = _Client()
+        with pytest.raises(ValueError, match="text属性"):
             client.generate("prompt", SampleResponse)
 
     def test_schema_validation_error_raises(
