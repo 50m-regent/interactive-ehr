@@ -75,5 +75,5 @@ class ExpanderSpec(WidgetSpec):
     label: str = Field(description="セクションのラベル")
     expanded: bool = Field(False, description="初期状態で展開するか")
     children: list["AnyWidget"] = Field(
-        description="セクション内のウィジェットリスト"
+        min_length=1, description="セクション内のウィジェットリスト"
     )

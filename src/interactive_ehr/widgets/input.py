@@ -16,18 +16,23 @@ from pydantic import Field, model_validator
 from interactive_ehr.widgets._base import WidgetSpec, WidgetType
 
 
-class SelectboxSpec(WidgetSpec):
+class _SingleChoiceSpec(WidgetSpec):
+    """単一選択系ウィジェットの共通基底."""
+
+    label: str = Field(description="ラベル")
+    options_key: str = Field(description="選択肢リストのデータキー")
+    default_index: int = Field(
+        0, ge=0, description="デフォルトで選択されるインデックス"
+    )
+
+
+class SelectboxSpec(_SingleChoiceSpec):
     """st.selectbox — ドロップダウン単一選択.
 
     患者選択、テーブル選択、診療科選択などに使用。
     """
 
     widget_type: Literal[WidgetType.SELECTBOX] = WidgetType.SELECTBOX
-    label: str = Field(description="ラベル")
-    options_key: str = Field(description="選択肢リストのデータキー")
-    default_index: int = Field(
-        0, ge=0, description="デフォルトで選択されるインデックス"
-    )
     placeholder: str | None = Field(None, description="未選択時のプレースホルダー")
 
 
@@ -49,6 +54,14 @@ class MultiselectSpec(WidgetSpec):
     placeholder: str | None = Field(None, description="未選択時のプレースホルダー")
 
 
+def _assert_min_le_max(min_val: object, max_val: object) -> None:
+    """min_value <= max_value を検証する共有ヘルパー."""
+    if min_val is not None and max_val is not None and min_val > max_val:  # type: ignore[operator]
+        raise ValueError(
+            f"min_value ({min_val}) must be <= max_value ({max_val})"
+        )
+
+
 class DateInputSpec(WidgetSpec):
     """st.date_input — 日付ピッカー.
 
@@ -65,14 +78,7 @@ class DateInputSpec(WidgetSpec):
 
     @model_validator(mode="after")
     def _validate_date_range(self) -> DateInputSpec:
-        if (
-            self.min_value is not None
-            and self.max_value is not None
-            and self.min_value > self.max_value
-        ):
-            raise ValueError(
-                f"min_value ({self.min_value}) must be <= max_value ({self.max_value})"
-            )
+        _assert_min_le_max(self.min_value, self.max_value)
         return self
 
 
@@ -92,31 +98,32 @@ class TimeInputSpec(WidgetSpec):
     )
 
 
-class TextInputSpec(WidgetSpec):
+class _TextInputBase(WidgetSpec):
+    """テキスト入力系ウィジェットの共通基底."""
+
+    label: str = Field(description="ラベル")
+    default_value: str = Field("", description="デフォルト値")
+    max_chars: int | None = Field(None, gt=0, description="最大入力文字数")
+    placeholder: str | None = Field(None, description="プレースホルダー")
+
+
+class TextInputSpec(_TextInputBase):
     """st.text_input — 単一行テキスト入力.
 
     テキスト検索、患者ID入力などに使用。
     """
 
     widget_type: Literal[WidgetType.TEXT_INPUT] = WidgetType.TEXT_INPUT
-    label: str = Field(description="ラベル")
-    default_value: str = Field("", description="デフォルト値")
-    max_chars: int | None = Field(None, gt=0, description="最大入力文字数")
-    placeholder: str | None = Field(None, description="プレースホルダー")
 
 
-class TextAreaSpec(WidgetSpec):
+class TextAreaSpec(_TextInputBase):
     """st.text_area — 複数行テキスト入力.
 
     所見テキストの入力、メモ記入などに使用。
     """
 
     widget_type: Literal[WidgetType.TEXT_AREA] = WidgetType.TEXT_AREA
-    label: str = Field(description="ラベル")
-    default_value: str = Field("", description="デフォルト値")
-    max_chars: int | None = Field(None, gt=0, description="最大入力文字数")
     height: int | None = Field(None, gt=0, description="テキストエリアの高さ（px）")
-    placeholder: str | None = Field(None, description="プレースホルダー")
 
 
 class NumberInputSpec(WidgetSpec):
@@ -137,14 +144,7 @@ class NumberInputSpec(WidgetSpec):
 
     @model_validator(mode="after")
     def _validate_number_range(self) -> NumberInputSpec:
-        if (
-            self.min_value is not None
-            and self.max_value is not None
-            and self.min_value > self.max_value
-        ):
-            raise ValueError(
-                f"min_value ({self.min_value}) must be <= max_value ({self.max_value})"
-            )
+        _assert_min_le_max(self.min_value, self.max_value)
         return self
 
 
@@ -159,18 +159,13 @@ class CheckboxSpec(WidgetSpec):
     default_value: bool = Field(False, description="デフォルト値")
 
 
-class RadioSpec(WidgetSpec):
+class RadioSpec(_SingleChoiceSpec):
     """st.radio — ラジオボタン.
 
     排他的な選択肢（表示モード切替、ソート順選択など）に使用。
     """
 
     widget_type: Literal[WidgetType.RADIO] = WidgetType.RADIO
-    label: str = Field(description="ラベル")
-    options_key: str = Field(description="選択肢リストのデータキー")
-    default_index: int = Field(
-        0, ge=0, description="デフォルトで選択されるインデックス"
-    )
     horizontal: bool = Field(False, description="選択肢を横並びにするか")
 
 
