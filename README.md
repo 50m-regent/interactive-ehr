@@ -12,6 +12,20 @@
 uv sync
 ```
 
+### Gemini API (Vertex AI) の認証設定
+
+LLM機能を使う場合は、Vertex AI のサービスアカウントキーを配置し環境変数を設定:
+
+```bash
+cp .env.example .env
+# .env を編集して GOOGLE_APPLICATION_CREDENTIALS にサービスアカウントJSONへのパスを設定
+```
+
+オプション環境変数（デフォルト値あり）:
+- `GEMINI_PROJECT` (デフォルト: `gemini-api-project-464304`)
+- `GEMINI_LOCATION` (デフォルト: `asia-northeast1`)
+- `GEMINI_MODEL` (デフォルト: `gemini-2.5-pro`)
+
 ## 起動
 
 ```bash
@@ -52,6 +66,8 @@ src/interactive_ehr/
     chart.py              -- チャート系 (LineChart, BarChart)
     input.py              -- 入力系 (Selectbox, Multiselect, DateInput, TextInput等)
     layout.py             -- レイアウト系 (Columns, Tabs, Expander)
+  llm/
+    gemini.py             -- Gemini API (Vertex AI) 呼び出しmixin
   pages/                  -- ページコンポーネント
 
 scripts/
