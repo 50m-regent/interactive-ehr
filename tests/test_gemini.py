@@ -14,7 +14,9 @@ from interactive_ehr.llm.gemini import (
     DEFAULT_MODEL,
     DEFAULT_PROJECT,
     GeminiMixin,
+    _to_gemini_response_json_schema,
 )
+from interactive_ehr.scenario_graph import ScenarioGraph
 
 
 class SampleResponse(BaseModel):
@@ -223,8 +225,8 @@ class TestGenerate:
         assert call_kwargs["contents"] == "prompt"
         assert call_kwargs["config"]["response_mime_type"] == "application/json"
         assert (
-            call_kwargs["config"]["response_schema"]
-            == SampleResponse.model_json_schema()
+            call_kwargs["config"]["response_json_schema"]
+            == _to_gemini_response_json_schema(SampleResponse.model_json_schema())
         )
 
     def test_invalid_json_raises(
@@ -281,3 +283,47 @@ class TestGenerate:
         client = _Client()
         with pytest.raises(ValueError, match="空"):
             client.generate("prompt", SampleResponse)
+
+
+def test_gemini_response_json_schema_removes_unsupported_pydantic_keywords() -> None:
+    schema = _to_gemini_response_json_schema(ScenarioGraph.model_json_schema())
+
+    def collect_schema_keys(value: object) -> set[str]:
+        keys: set[str] = set()
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key in {"$defs", "properties"}:
+                    if isinstance(child, dict):
+                        for property_schema in child.values():
+                            keys.update(collect_schema_keys(property_schema))
+                else:
+                    if isinstance(key, str):
+                        keys.add(key)
+                    keys.update(collect_schema_keys(child))
+        elif isinstance(value, list):
+            for item in value:
+                keys.update(collect_schema_keys(item))
+        return keys
+
+    keys = collect_schema_keys(schema)
+    assert "discriminator" not in keys
+    assert "default" not in keys
+    assert "const" not in keys
+    assert "exclusiveMinimum" not in keys
+    assert "maxLength" not in keys
+    assert "oneOf" in keys
+    assert "enum" in keys
+
+
+def test_gemini_response_json_schema_relaxes_recursive_layout_children() -> None:
+    schema = _to_gemini_response_json_schema(ScenarioGraph.model_json_schema())
+    defs = schema["$defs"]
+
+    columns_child = defs["ColumnsSpec"]["properties"]["columns"]["items"]["items"]
+    tabs_child = defs["TabsSpec"]["properties"]["tabs"]["items"]["items"]
+    expander_child = defs["ExpanderSpec"]["properties"]["children"]["items"]
+
+    for child_schema in [columns_child, tabs_child, expander_child]:
+        assert child_schema["type"] == "object"
+        assert child_schema["additionalProperties"] is True
+        assert "oneOf" not in child_schema
