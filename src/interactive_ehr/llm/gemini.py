@@ -87,8 +87,13 @@ class GeminiMixin:
         if self._gemini_client is None:
             self._init_gemini()
 
-        response = self._gemini_client.models.generate_content(  # type: ignore[union-attr]
-            model=self._gemini_model,
+        client = self._gemini_client
+        model = self._gemini_model
+        if client is None or model is None:
+            raise RuntimeError("Geminiクライアントの初期化に失敗しました。")
+
+        response = client.models.generate_content(
+            model=model,
             contents=prompt,
             config={
                 "response_mime_type": "application/json",

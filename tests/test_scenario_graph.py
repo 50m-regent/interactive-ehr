@@ -103,14 +103,15 @@ def test_render_scenario_graph_uses_task_tabs_and_widget_renderer(
 ) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(scenario_graph, "st", fake)
-    monkeypatch.setattr(scenario_graph, "render_widget", MagicMock())
+    render_widget_mock = MagicMock()
+    monkeypatch.setattr(scenario_graph, "render_widget", render_widget_mock)
 
     graph = _minimal_graph()
     render_scenario_graph(graph, {"rows": [{"name": "A"}]})
 
     assert fake.calls[0].name == "tabs"
     assert fake.calls[0].args == (["確認"],)
-    scenario_graph.render_widget.assert_called_once_with(  # type: ignore[attr-defined]
+    render_widget_mock.assert_called_once_with(
         graph.widget_nodes[0].widget,
         {"rows": [{"name": "A"}]},
     )
@@ -121,7 +122,8 @@ def test_render_scenario_graph_warns_for_missing_references(
 ) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(scenario_graph, "st", fake)
-    monkeypatch.setattr(scenario_graph, "render_widget", MagicMock())
+    render_widget_mock = MagicMock()
+    monkeypatch.setattr(scenario_graph, "render_widget", render_widget_mock)
     graph = ScenarioGraph(
         id="sample",
         title="sample",
@@ -156,7 +158,7 @@ def test_render_scenario_graph_warns_for_missing_references(
     assert "missing_widget" in warnings[0]
     assert "missing_data" in warnings[1]
     assert "missing_context" in warnings[2]
-    scenario_graph.render_widget.assert_called_once()  # type: ignore[attr-defined]
+    render_widget_mock.assert_called_once()
 
 
 def test_chronic_disease_graph_scenario_builds_valid_graph() -> None:

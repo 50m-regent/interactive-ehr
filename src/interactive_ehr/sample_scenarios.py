@@ -452,7 +452,7 @@ def _collect_reference_keys(value: object) -> list[str]:
     keys: list[str] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            if key.endswith("_key") and isinstance(child, str):
+            if isinstance(key, str) and key.endswith("_key") and isinstance(child, str):
                 keys.append(child)
             else:
                 keys.extend(_collect_reference_keys(child))

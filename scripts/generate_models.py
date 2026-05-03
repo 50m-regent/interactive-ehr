@@ -221,12 +221,16 @@ def _format_default_value(
         return repr(val)
 
     if python_type == "int":
+        if isinstance(default_val, date | time):
+            return None
         try:
             return str(int(default_val))
         except (ValueError, TypeError):
             return None
 
     if python_type == "float":
+        if isinstance(default_val, date | time):
+            return None
         try:
             return str(float(default_val))
         except (ValueError, TypeError):

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import time, timedelta
 from typing import Any
 
 from pydantic import TypeAdapter
@@ -22,13 +23,16 @@ from interactive_ehr.widgets import (
     MarkdownSpec,
     MetricSpec,
     MultiselectSpec,
+    NumberInputSpec,
     RadioSpec,
     SelectboxSpec,
     SliderSpec,
     TableSpec,
     TabsSpec,
+    TextAreaSpec,
     TextInputSpec,
     TextSpec,
+    TimeInputSpec,
 )
 
 
@@ -90,6 +94,15 @@ class FakeStreamlit:
 
     def text_input(self, *args: Any, **kwargs: Any) -> str:
         return self._record("text_input", *args, **kwargs)
+
+    def time_input(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("time_input", *args, **kwargs)
+
+    def text_area(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("text_area", *args, **kwargs)
+
+    def number_input(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("number_input", *args, **kwargs)
 
     def checkbox(self, *args: Any, **kwargs: Any) -> str:
         return self._record("checkbox", *args, **kwargs)
@@ -165,7 +178,17 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
         SelectboxSpec(label="患者", options_key="patients"),
         MultiselectSpec(label="カテゴリ", options_key="categories", default_keys=["検査"]),
         DateInputSpec(label="基準日"),
+        TimeInputSpec(label="服薬時刻", default_value=time(9, 0), step_seconds=1800),
         TextInputSpec(label="検索", placeholder="keyword"),
+        TextAreaSpec(label="メモ", default_value="note", height=160, max_chars=200),
+        NumberInputSpec(
+            label="閾値",
+            min_value=0,
+            max_value=10,
+            default_value=3,
+            step=0.5,
+            format_str="%.1f",
+        ),
         CheckboxSpec(label="詳細", default_value=True),
         RadioSpec(label="目的", options_key="purposes", horizontal=True),
         SliderSpec(label="期間", min_value=1, max_value=12, default_value=6),
@@ -186,14 +209,20 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
         "selectbox",
         "multiselect",
         "date_input",
+        "time_input",
         "text_input",
+        "text_area",
+        "number_input",
         "checkbox",
         "radio",
         "slider",
     ]
     assert fake.calls[1].kwargs["horizontal"] is True
     assert fake.calls[3].kwargs["default"] == ["検査"]
-    assert fake.calls[7].kwargs["horizontal"] is True
+    assert fake.calls[5].kwargs["step"] == timedelta(seconds=1800)
+    assert fake.calls[7].kwargs["height"] == 160
+    assert fake.calls[8].kwargs["format"] == "%.1f"
+    assert fake.calls[10].kwargs["horizontal"] is True
 
 
 def test_render_nested_layouts(monkeypatch: Any) -> None:
