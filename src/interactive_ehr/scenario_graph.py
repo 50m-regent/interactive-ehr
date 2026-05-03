@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from typing import Literal
+from typing import Iterator, Literal
 
 import streamlit as st
 from pydantic import BaseModel, ConfigDict, Field
@@ -81,6 +81,66 @@ class ScenarioGraph(BaseModel):
     edges: list[GraphEdge] = Field(default_factory=list)
 
 
+class TaskNodeGenerationPlan(BaseModel):
+    """Planned task node identity used for incremental generation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(description="生成する task node ID")
+    title: str = Field(description="タブに表示するタスク名")
+    description: str | None = Field(None, description="タスクの説明")
+    order: int = Field(0, description="表示順")
+    widget_ids: list[str] = Field(default_factory=list, description="関連 widget node ID")
+
+
+class DataNodeGenerationPlan(BaseModel):
+    """Planned data node identity used for incremental generation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(description="生成する data node ID")
+    context_key: str = Field(description="固定サンプル context のキー")
+    data_type: str = Field(description="データ種別")
+    description: str = Field(description="データ内容の説明")
+    primary_fields: list[str] = Field(default_factory=list, description="主要フィールド")
+
+
+class WidgetNodeGenerationPlan(BaseModel):
+    """Planned widget node identity used for incremental generation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(description="生成する widget node ID")
+    task_id: str = Field(description="この widget を表示する task node ID")
+    title: str | None = Field(None, description="ウィジェットの表示上の説明")
+    widget_type: WidgetType = Field(description="生成する WidgetSpec の widget_type")
+    data_node_ids: list[str] = Field(default_factory=list, description="参照する data node ID")
+
+
+class ScenarioGraphGenerationPlan(BaseModel):
+    """Small plan that controls node-by-node ScenarioGraph generation."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(description="シナリオID")
+    title: str = Field(description="シナリオ名")
+    description: str | None = Field(None, description="シナリオ説明")
+    tasks: list[TaskNodeGenerationPlan] = Field(default_factory=list)
+    data_nodes: list[DataNodeGenerationPlan] = Field(default_factory=list)
+    widget_nodes: list[WidgetNodeGenerationPlan] = Field(default_factory=list)
+
+
+class ScenarioGraphGenerationEvent(BaseModel):
+    """Progress event emitted while incrementally generating a ScenarioGraph."""
+
+    model_config = ConfigDict(frozen=True)
+
+    status: Literal["started", "task", "data", "widget", "completed", "failed"]
+    message: str
+    graph: ScenarioGraph
+    node_id: str | None = None
+
+
 def parse_scenario_graph_json(json_text: str) -> ScenarioGraph:
     """Parse JSON text into a validated ScenarioGraph."""
 
@@ -91,6 +151,8 @@ def parse_scenario_graph_json(json_text: str) -> ScenarioGraph:
 def render_scenario_graph(
     graph: ScenarioGraph,
     context: Mapping[str, object],
+    *,
+    show_missing_reference_warnings: bool = True,
 ) -> None:
     """Render a ScenarioGraph as Streamlit task tabs.
 
@@ -114,12 +176,14 @@ def render_scenario_graph(
             for widget_id in task.widget_ids:
                 widget_node = widget_by_id.get(widget_id)
                 if widget_node is None:
-                    st.warning(
-                        f"task '{task.id}' が存在しない widget '{widget_id}' を参照しています。"
-                    )
+                    if show_missing_reference_warnings:
+                        st.warning(
+                            f"task '{task.id}' が存在しない widget '{widget_id}' を参照しています。"
+                        )
                     continue
 
-                _warn_for_data_references(widget_node, data_by_id, context)
+                if show_missing_reference_warnings:
+                    _warn_for_data_references(widget_node, data_by_id, context)
                 render_widget(widget_node.widget, context)
 
 
@@ -129,8 +193,127 @@ def generate_scenario_graph(
 ) -> ScenarioGraph:
     """Generate a ScenarioGraph using Gemini structured output."""
 
+    final_graph: ScenarioGraph | None = None
+    failed_message: str | None = None
+    for event in generate_scenario_graph_incrementally(prompt, context):
+        final_graph = event.graph
+        if event.status == "failed":
+            failed_message = event.message
+            break
+    if failed_message is not None:
+        raise RuntimeError(failed_message)
+    if final_graph is None:
+        raise RuntimeError("ScenarioGraph を生成できませんでした。")
+    return final_graph
+
+
+def generate_scenario_graph_incrementally(
+    prompt: str,
+    context: Mapping[str, object],
+) -> Iterator[ScenarioGraphGenerationEvent]:
+    """Generate a ScenarioGraph node by node, yielding partial graphs."""
+
     client = _ScenarioGraphGenerator()
-    return client.generate(_build_generation_prompt(prompt, context), ScenarioGraph)
+    try:
+        plan = client.generate(
+            _build_generation_plan_prompt(prompt, context),
+            ScenarioGraphGenerationPlan,
+        )
+    except Exception as exc:
+        empty_graph = ScenarioGraph(id="generated_scenario", title="生成中")
+        yield ScenarioGraphGenerationEvent(
+            status="failed",
+            message=f"生成計画の作成に失敗しました: {exc}",
+            graph=empty_graph,
+        )
+        return
+
+    graph = ScenarioGraph(
+        id=plan.id,
+        title=plan.title,
+        description=plan.description,
+    )
+    yield ScenarioGraphGenerationEvent(
+        status="started",
+        message="生成計画を作成しました。",
+        graph=graph,
+    )
+
+    for task_plan in plan.tasks:
+        try:
+            task = client.generate(
+                _build_task_node_prompt(prompt, context, plan, task_plan, graph),
+                TaskNode,
+            )
+            task = _normalize_task_node(task, task_plan)
+            graph = _append_task_node(graph, task)
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"task node '{task_plan.id}' の生成に失敗しました: {exc}",
+                graph=graph,
+                node_id=task_plan.id,
+            )
+            return
+        yield ScenarioGraphGenerationEvent(
+            status="task",
+            message=f"task node '{task.id}' を生成しました。",
+            graph=graph,
+            node_id=task.id,
+        )
+
+    for data_plan in plan.data_nodes:
+        try:
+            data_node = client.generate(
+                _build_data_node_prompt(prompt, context, plan, data_plan, graph),
+                DataNode,
+            )
+            data_node = _normalize_data_node(data_node, data_plan)
+            graph = _append_data_node(graph, data_node)
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"data node '{data_plan.id}' の生成に失敗しました: {exc}",
+                graph=graph,
+                node_id=data_plan.id,
+            )
+            return
+        yield ScenarioGraphGenerationEvent(
+            status="data",
+            message=f"data node '{data_node.id}' を生成しました。",
+            graph=graph,
+            node_id=data_node.id,
+        )
+
+    for widget_plan in plan.widget_nodes:
+        try:
+            widget_node = client.generate(
+                _build_widget_node_prompt(prompt, context, plan, widget_plan, graph),
+                WidgetNode,
+            )
+            widget_node = _normalize_widget_node(widget_node, widget_plan)
+            graph = _append_widget_node(graph, widget_node, plan)
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"widget node '{widget_plan.id}' の生成に失敗しました: {exc}",
+                graph=graph,
+                node_id=widget_plan.id,
+            )
+            return
+        yield ScenarioGraphGenerationEvent(
+            status="widget",
+            message=f"widget node '{widget_node.id}' を生成しました。",
+            graph=graph,
+            node_id=widget_node.id,
+        )
+
+    graph = graph.model_copy(update={"edges": _build_edges(graph)})
+    yield ScenarioGraphGenerationEvent(
+        status="completed",
+        message="タスクグラフを生成しました。",
+        graph=ScenarioGraph.model_validate(graph.model_dump(mode="json")),
+    )
 
 
 class _ScenarioGraphGenerator(GeminiMixin):
@@ -185,3 +368,262 @@ def _build_generation_prompt(
 ユーザー要望:
 {user_prompt}
 """
+
+
+def _build_generation_plan_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+) -> str:
+    context_keys = "\n".join(f"- {key}" for key in sorted(context))
+    widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
+    return f"""\
+あなたは電子カルテ UI のタスクグラフ生成計画を作るアシスタントです。
+ユーザーの要望を、ScenarioGraphGenerationPlan JSON として出力してください。
+
+制約:
+- ここでは node の中身を詳細生成せず、生成順とIDだけを計画してください。
+- tasks は表示順に並べてください。
+- 各 task.widget_ids は、その task に後で生成する widget node ID を表示順に並べてください。
+- data_nodes.context_key は下記 context key だけを使ってください。
+- widget_nodes.task_id は既存 task ID、widget_nodes.data_node_ids は既存 data node ID だけを参照してください。
+- widget_nodes.widget_type は下記 widget_type だけを使ってください。
+- ID は英数字とアンダースコアで安定した値にしてください。
+
+利用可能な context key:
+{context_keys}
+
+利用可能な widget_type:
+{widget_types}
+
+ユーザー要望:
+{user_prompt}
+"""
+
+
+def _build_task_node_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+    plan: ScenarioGraphGenerationPlan,
+    task_plan: TaskNodeGenerationPlan,
+    graph: ScenarioGraph,
+) -> str:
+    return _build_node_prompt(
+        user_prompt,
+        context,
+        plan,
+        graph,
+        "TaskNode",
+        task_plan.model_dump(mode="json"),
+    )
+
+
+def _build_data_node_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+    plan: ScenarioGraphGenerationPlan,
+    data_plan: DataNodeGenerationPlan,
+    graph: ScenarioGraph,
+) -> str:
+    return _build_node_prompt(
+        user_prompt,
+        context,
+        plan,
+        graph,
+        "DataNode",
+        data_plan.model_dump(mode="json"),
+    )
+
+
+def _build_widget_node_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+    plan: ScenarioGraphGenerationPlan,
+    widget_plan: WidgetNodeGenerationPlan,
+    graph: ScenarioGraph,
+) -> str:
+    return _build_node_prompt(
+        user_prompt,
+        context,
+        plan,
+        graph,
+        "WidgetNode",
+        widget_plan.model_dump(mode="json"),
+    )
+
+
+def _build_node_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+    plan: ScenarioGraphGenerationPlan,
+    graph: ScenarioGraph,
+    node_type: str,
+    node_plan: object,
+) -> str:
+    context_keys = "\n".join(f"- {key}" for key in sorted(context))
+    return f"""\
+あなたは電子カルテ UI のタスクグラフをノード単位で生成するアシスタントです。
+指定された計画に一致する {node_type} JSON だけを出力してください。
+
+制約:
+- node_plan の id と参照関係を変更しないでください。
+- データ本体は生成せず、context key は下記の利用可能な値だけを参照してください。
+- WidgetNode の widget.widget_type は node_plan.widget_type と一致させてください。
+- 現在の partial graph と矛盾しない node を生成してください。
+
+利用可能な context key:
+{context_keys}
+
+全体計画:
+{plan.model_dump_json(indent=2)}
+
+現在の partial graph:
+{graph.model_dump_json(indent=2)}
+
+生成する node_plan:
+{json.dumps(node_plan, ensure_ascii=False, indent=2)}
+
+ユーザー要望:
+{user_prompt}
+"""
+
+
+def _normalize_task_node(
+    task: TaskNode,
+    plan: TaskNodeGenerationPlan,
+) -> TaskNode:
+    return TaskNode(
+        id=plan.id,
+        title=task.title or plan.title,
+        description=task.description if task.description is not None else plan.description,
+        order=plan.order,
+        widget_ids=plan.widget_ids,
+    )
+
+
+def _normalize_data_node(
+    data_node: DataNode,
+    plan: DataNodeGenerationPlan,
+) -> DataNode:
+    return DataNode(
+        id=plan.id,
+        context_key=plan.context_key,
+        data_type=data_node.data_type or plan.data_type,
+        description=data_node.description or plan.description,
+        primary_fields=data_node.primary_fields or plan.primary_fields,
+    )
+
+
+def _normalize_widget_node(
+    widget_node: WidgetNode,
+    plan: WidgetNodeGenerationPlan,
+) -> WidgetNode:
+    widget_dump = widget_node.widget.model_dump(mode="json")
+    widget_dump["widget_type"] = plan.widget_type
+    return WidgetNode(
+        id=plan.id,
+        title=widget_node.title if widget_node.title is not None else plan.title,
+        widget=widget_dump,
+        data_node_ids=plan.data_node_ids,
+    )
+
+
+def _append_task_node(graph: ScenarioGraph, task: TaskNode) -> ScenarioGraph:
+    tasks = [existing for existing in graph.tasks if existing.id != task.id]
+    tasks.append(task)
+    tasks = sorted(tasks, key=lambda node: (node.order, node.id))
+    return ScenarioGraph.model_validate(
+        graph.model_copy(
+            update={
+                "tasks": tasks,
+                "edges": _build_edges_for_parts(graph.id, tasks, graph.widget_nodes),
+            }
+        ).model_dump(mode="json")
+    )
+
+
+def _append_data_node(graph: ScenarioGraph, data_node: DataNode) -> ScenarioGraph:
+    data_nodes = [existing for existing in graph.data_nodes if existing.id != data_node.id]
+    data_nodes.append(data_node)
+    return ScenarioGraph.model_validate(
+        graph.model_copy(update={"data_nodes": data_nodes}).model_dump(mode="json")
+    )
+
+
+def _append_widget_node(
+    graph: ScenarioGraph,
+    widget_node: WidgetNode,
+    plan: ScenarioGraphGenerationPlan,
+) -> ScenarioGraph:
+    widget_nodes = [existing for existing in graph.widget_nodes if existing.id != widget_node.id]
+    widget_nodes.append(widget_node)
+    tasks = _ensure_task_references_widget(graph.tasks, widget_node.id, plan)
+    return ScenarioGraph.model_validate(
+        graph.model_copy(
+            update={
+                "tasks": tasks,
+                "widget_nodes": widget_nodes,
+                "edges": _build_edges_for_parts(graph.id, tasks, widget_nodes),
+            }
+        ).model_dump(mode="json")
+    )
+
+
+def _ensure_task_references_widget(
+    tasks: list[TaskNode],
+    widget_id: str,
+    plan: ScenarioGraphGenerationPlan,
+) -> list[TaskNode]:
+    widget_plan = next(
+        (candidate for candidate in plan.widget_nodes if candidate.id == widget_id),
+        None,
+    )
+    if widget_plan is None:
+        return tasks
+    updated: list[TaskNode] = []
+    for task in tasks:
+        if task.id != widget_plan.task_id or widget_id in task.widget_ids:
+            updated.append(task)
+            continue
+        updated.append(task.model_copy(update={"widget_ids": [*task.widget_ids, widget_id]}))
+    return sorted(updated, key=lambda node: (node.order, node.id))
+
+
+def _build_edges(graph: ScenarioGraph) -> list[GraphEdge]:
+    return _build_edges_for_parts(graph.id, graph.tasks, graph.widget_nodes)
+
+
+def _build_edges_for_parts(
+    scenario_id: str,
+    tasks: list[TaskNode],
+    widget_nodes: list[WidgetNode],
+) -> list[GraphEdge]:
+    edges: list[GraphEdge] = []
+    widget_by_id = {widget.id: widget for widget in widget_nodes}
+    for task in tasks:
+        edges.append(
+            GraphEdge(
+                source_id=scenario_id,
+                target_id=task.id,
+                edge_type="scenario_to_task",
+            )
+        )
+        for widget_id in task.widget_ids:
+            widget = widget_by_id.get(widget_id)
+            if widget is None:
+                continue
+            edges.append(
+                GraphEdge(
+                    source_id=task.id,
+                    target_id=widget.id,
+                    edge_type="task_to_widget",
+                )
+            )
+            for data_node_id in widget.data_node_ids:
+                edges.append(
+                    GraphEdge(
+                        source_id=widget.id,
+                        target_id=data_node_id,
+                        edge_type="widget_to_data",
+                    )
+                )
+    return edges

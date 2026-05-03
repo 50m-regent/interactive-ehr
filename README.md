@@ -36,7 +36,7 @@ cp .env.example .env
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。
+サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。生成はタスクグラフのノード単位で進み、生成済みの部分から UI プレビューに反映されます。
 
 ## テスト
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import streamlit as st
 from pydantic import ValidationError
@@ -8,7 +9,7 @@ from pydantic import ValidationError
 from interactive_ehr.sample_scenarios import get_chronic_disease_graph_scenario
 from interactive_ehr.scenario_graph import (
     ScenarioGraph,
-    generate_scenario_graph,
+    generate_scenario_graph_incrementally,
     parse_scenario_graph_json,
     render_scenario_graph,
 )
@@ -32,8 +33,9 @@ def main() -> None:
     _inject_debug_json_styles()
 
     _initialize_state()
-    _render_sidebar()
-    _render_preview()
+    preview_container = st.empty()
+    _render_sidebar(preview_container)
+    _render_preview(preview_container)
 
 
 def _initialize_state() -> None:
@@ -46,7 +48,7 @@ def _initialize_state() -> None:
     st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(graph)
 
 
-def _render_sidebar() -> None:
+def _render_sidebar(preview_container: Any) -> None:
     st.sidebar.header("シナリオ選択")
     st.sidebar.selectbox(
         "固定サンプル",
@@ -62,7 +64,7 @@ def _render_sidebar() -> None:
         height=160,
     )
     if st.sidebar.button("タスクグラフ生成", type="primary"):
-        _generate_graph_from_prompt(prompt)
+        _generate_graph_from_prompt(prompt, preview_container)
 
     st.sidebar.divider()
     st.sidebar.header("タスクグラフ JSON")
@@ -82,28 +84,36 @@ def _render_sidebar() -> None:
     _update_graph_from_json(json_text)
 
 
-def _render_preview() -> None:
-    st.subheader("UI プレビュー")
-    render_scenario_graph(
-        st.session_state[GRAPH_STATE_KEY],
-        st.session_state[CONTEXT_STATE_KEY],
-    )
+def _render_preview(preview_container: Any) -> None:
+    _render_graph_preview(preview_container, generating=False)
 
 
-def _generate_graph_from_prompt(prompt: str) -> None:
+def _generate_graph_from_prompt(
+    prompt: str,
+    preview_container: Any,
+) -> None:
     if not prompt.strip():
         st.sidebar.warning("生成プロンプトを入力してください。")
         return
 
-    try:
-        graph = generate_scenario_graph(prompt, st.session_state[CONTEXT_STATE_KEY])
-    except Exception as exc:
-        st.sidebar.warning(f"Gemini生成に失敗しました: {exc}")
-        return
-
-    st.session_state[GRAPH_STATE_KEY] = graph
-    st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(graph)
-    st.sidebar.success("タスクグラフを生成しました。")
+    progress = st.sidebar.empty()
+    for event in generate_scenario_graph_incrementally(
+        prompt,
+        st.session_state[CONTEXT_STATE_KEY],
+    ):
+        st.session_state[GRAPH_STATE_KEY] = event.graph
+        st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(event.graph)
+        _render_graph_preview(
+            preview_container,
+            generating=event.status != "completed",
+        )
+        if event.status == "failed":
+            progress.warning(f"Gemini生成に失敗しました: {event.message}")
+            return
+        if event.status == "completed":
+            progress.success(event.message)
+        else:
+            progress.info(event.message)
 
 
 def _reset_to_sample() -> None:
@@ -136,6 +146,24 @@ def _update_graph_from_json(json_text: str) -> None:
         return
 
     st.session_state[GRAPH_STATE_KEY] = graph
+
+
+def _render_graph_preview(
+    preview_container: Any,
+    *,
+    generating: bool,
+) -> None:
+    with preview_container.container():
+        st.subheader("UI プレビュー")
+        graph = st.session_state[GRAPH_STATE_KEY]
+        if generating and not graph.tasks:
+            st.info("タスクグラフを生成しています。")
+            return
+        render_scenario_graph(
+            graph,
+            st.session_state[CONTEXT_STATE_KEY],
+            show_missing_reference_warnings=not generating,
+        )
 
 
 def _format_graph_json(graph: ScenarioGraph) -> str:
