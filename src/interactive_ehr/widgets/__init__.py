@@ -33,6 +33,7 @@ from interactive_ehr.widgets.input import (
     TimeInputSpec,
 )
 from interactive_ehr.widgets.layout import ColumnsSpec, ExpanderSpec, TabsSpec
+from interactive_ehr.widgets.renderer import render_widget, render_widgets
 
 AnyWidget = Annotated[
     Union[
@@ -102,4 +103,6 @@ __all__ = [
     "TimeInputSpec",
     "WidgetSpec",
     "WidgetType",
+    "render_widget",
+    "render_widgets",
 ]

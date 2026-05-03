@@ -6,6 +6,8 @@
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
+現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。Gemini API認証なしで、患者概要、血圧/腎機能推移、現在処方、直近検査、過去カルテ記事を確認できます。
+
 ## セットアップ
 
 ```bash
@@ -51,6 +53,7 @@ uv run python scripts/generate_models.py
 ```
 src/interactive_ehr/
   app.py                  -- Streamlitエントリポイント
+  sample_scenarios.py     -- 固定サンプルデータとWidgetSpec
   models/
     _base.py              -- 共通ベースモデル (DwhBaseModel)
     patient.py            -- 患者系テーブル (PATIENT)
@@ -66,6 +69,7 @@ src/interactive_ehr/
     chart.py              -- チャート系 (LineChart, BarChart)
     input.py              -- 入力系 (Selectbox, Multiselect, DateInput, TextInput等)
     layout.py             -- レイアウト系 (Columns, Tabs, Expander)
+    renderer.py           -- WidgetSpecをStreamlitへ描画するレンダラ
   llm/
     gemini.py             -- Gemini API (Vertex AI) 呼び出しmixin
   pages/                  -- ページコンポーネント
