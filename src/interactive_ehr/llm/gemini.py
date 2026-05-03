@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, TypeVar
 
 from google import genai
 from google.oauth2 import service_account
+from dotenv import load_dotenv
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -50,6 +51,7 @@ class GeminiMixin:
 
     def _init_gemini(self) -> None:
         """Geminiクライアントを初期化."""
+        load_dotenv()
         credentials_path = os.environ.get(_CREDENTIALS_ENV)
         if not credentials_path:
             raise RuntimeError(
