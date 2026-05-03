@@ -28,6 +28,12 @@ class _Client(GeminiMixin):
     """GeminiMixinを利用する具象クラス."""
 
 
+@pytest.fixture(autouse=True)
+def disable_dotenv_loading(monkeypatch: pytest.MonkeyPatch) -> None:
+    """各テストが実際の .env に依存しないようにする."""
+    monkeypatch.setattr("interactive_ehr.llm.gemini.load_dotenv", MagicMock())
+
+
 @pytest.fixture
 def mock_genai_client() -> Generator[MagicMock, None, None]:
     """genai.Client をモック."""
@@ -57,6 +63,53 @@ def _make_response(text: str) -> MagicMock:
 
 
 class TestInit:
+    def test_loads_dotenv_before_reading_credentials(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        mock_genai_client: MagicMock,
+        mock_credentials: MagicMock,
+    ) -> None:
+        monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
+        load_dotenv_mock = MagicMock(
+            side_effect=lambda: monkeypatch.setenv(
+                "GOOGLE_APPLICATION_CREDENTIALS",
+                "/tmp/from-dotenv.json",
+            )
+        )
+        monkeypatch.setattr("interactive_ehr.llm.gemini.load_dotenv", load_dotenv_mock)
+
+        client = _Client()
+        mock_genai_client.return_value.models.generate_content.return_value = (
+            _make_response('{"message": "hi", "count": 1}')
+        )
+        client.generate("hello", SampleResponse)
+
+        load_dotenv_mock.assert_called_once_with()
+        mock_credentials.from_service_account_file.assert_called_once_with(
+            "/tmp/from-dotenv.json"
+        )
+
+    def test_existing_env_is_preserved_when_loading_dotenv(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        mock_genai_client: MagicMock,
+        mock_credentials: MagicMock,
+    ) -> None:
+        monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "/tmp/from-env.json")
+        load_dotenv_mock = MagicMock()
+        monkeypatch.setattr("interactive_ehr.llm.gemini.load_dotenv", load_dotenv_mock)
+
+        client = _Client()
+        mock_genai_client.return_value.models.generate_content.return_value = (
+            _make_response('{"message": "hi", "count": 1}')
+        )
+        client.generate("hello", SampleResponse)
+
+        load_dotenv_mock.assert_called_once_with()
+        mock_credentials.from_service_account_file.assert_called_once_with(
+            "/tmp/from-env.json"
+        )
+
     def test_missing_credentials_env_raises(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
