@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING
+from datetime import timedelta
+from typing import TYPE_CHECKING, Any
 
 import streamlit as st
 
@@ -20,10 +21,13 @@ from interactive_ehr.widgets.input import (
     CheckboxSpec,
     DateInputSpec,
     MultiselectSpec,
+    NumberInputSpec,
     RadioSpec,
     SelectboxSpec,
     SliderSpec,
+    TextAreaSpec,
     TextInputSpec,
+    TimeInputSpec,
 )
 from interactive_ehr.widgets.layout import ColumnsSpec, ExpanderSpec, TabsSpec
 
@@ -36,10 +40,10 @@ def _missing_key(kind: str, key: str) -> None:
 
 
 def _resolve_context_value(
-    context: Mapping[str, object],
+    context: Mapping[str, Any],
     key: str,
     kind: str,
-) -> object | None:
+) -> Any | None:
     if key not in context:
         _missing_key(kind, key)
         return None
@@ -47,9 +51,9 @@ def _resolve_context_value(
 
 
 def _resolve_options(
-    context: Mapping[str, object],
+    context: Mapping[str, Any],
     key: str,
-) -> Sequence[object] | None:
+) -> Sequence[Any] | None:
     value = _resolve_context_value(context, key, "options_key")
     if value is None:
         return None
@@ -59,13 +63,13 @@ def _resolve_options(
     return None
 
 
-def _without_none(**kwargs: object) -> dict[str, object]:
+def _without_none(**kwargs: Any) -> dict[str, Any]:
     return {key: value for key, value in kwargs.items() if value is not None}
 
 
 def render_widgets(
     widgets: Sequence[AnyWidget],
-    context: Mapping[str, object],
+    context: Mapping[str, Any],
 ) -> list[object | None]:
     """Render multiple widgets and return Streamlit return values."""
 
@@ -74,7 +78,7 @@ def render_widgets(
 
 def render_widget(
     widget: AnyWidget,
-    context: Mapping[str, object],
+    context: Mapping[str, Any],
 ) -> object | None:
     """Render one widget specification with Streamlit.
 
@@ -203,6 +207,16 @@ def render_widget(
             ),
         )
 
+    if isinstance(widget, TimeInputSpec):
+        return st.time_input(
+            widget.label,
+            **_without_none(
+                value=widget.default_value,
+                step=timedelta(seconds=widget.step_seconds),
+                key=widget.key,
+            ),
+        )
+
     if isinstance(widget, TextInputSpec):
         return st.text_input(
             widget.label,
@@ -210,6 +224,31 @@ def render_widget(
                 value=widget.default_value,
                 max_chars=widget.max_chars,
                 placeholder=widget.placeholder,
+                key=widget.key,
+            ),
+        )
+
+    if isinstance(widget, TextAreaSpec):
+        return st.text_area(
+            widget.label,
+            **_without_none(
+                value=widget.default_value,
+                height=widget.height,
+                max_chars=widget.max_chars,
+                placeholder=widget.placeholder,
+                key=widget.key,
+            ),
+        )
+
+    if isinstance(widget, NumberInputSpec):
+        return st.number_input(
+            widget.label,
+            **_without_none(
+                min_value=widget.min_value,
+                max_value=widget.max_value,
+                value=widget.default_value,
+                step=widget.step,
+                format=widget.format_str,
                 key=widget.key,
             ),
         )

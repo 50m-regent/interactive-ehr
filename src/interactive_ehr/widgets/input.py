@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 from datetime import date, time
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
@@ -54,9 +54,9 @@ class MultiselectSpec(WidgetSpec):
     placeholder: str | None = Field(None, description="未選択時のプレースホルダー")
 
 
-def _assert_min_le_max(min_val: object, max_val: object) -> None:
+def _assert_min_le_max(min_val: Any, max_val: Any) -> None:
     """min_value <= max_value を検証する共有ヘルパー."""
-    if min_val is not None and max_val is not None and min_val > max_val:  # type: ignore[operator]
+    if min_val is not None and max_val is not None and min_val > max_val:
         raise ValueError(
             f"min_value ({min_val}) must be <= max_value ({max_val})"
         )

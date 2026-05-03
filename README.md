@@ -43,7 +43,10 @@ uv run streamlit run src/interactive_ehr/app.py
 ```bash
 uv run pytest tests/ -v
 uv run ruff check .
+uv run ty check src/interactive_ehr/widgets src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
 ```
+
+`ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
 ## モデル生成
 

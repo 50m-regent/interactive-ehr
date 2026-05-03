@@ -6,7 +6,7 @@ import random
 import string
 from datetime import date, time
 from decimal import Decimal
-from typing import get_args, get_origin
+from typing import Literal, Self, get_args, get_origin, overload
 
 from pydantic import BaseModel, ConfigDict
 
@@ -56,9 +56,15 @@ class DwhBaseModel(BaseModel):
     model_config = ConfigDict(frozen=True, populate_by_name=True)
 
     @classmethod
-    def fake(
-        cls, n: int = 1, **overrides: object
-    ) -> DwhBaseModel | list[DwhBaseModel]:
+    @overload
+    def fake(cls, n: Literal[1] = 1, **overrides: object) -> Self: ...
+
+    @classmethod
+    @overload
+    def fake(cls, n: int, **overrides: object) -> list[Self]: ...
+
+    @classmethod
+    def fake(cls, n: int = 1, **overrides: object) -> Self | list[Self]:
         """ランダムなダミーデータを生成する.
 
         Args:
@@ -71,7 +77,7 @@ class DwhBaseModel(BaseModel):
             n>1 のときは list[DwhBaseModel]。
         """
 
-        def _build_one() -> DwhBaseModel:
+        def _build_one() -> Self:
             data: dict[str, object] = {}
             for field_name, field_info in cls.model_fields.items():
                 if field_name in overrides:
