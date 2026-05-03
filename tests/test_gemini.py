@@ -313,3 +313,17 @@ def test_gemini_response_json_schema_removes_unsupported_pydantic_keywords() -> 
     assert "maxLength" not in keys
     assert "oneOf" in keys
     assert "enum" in keys
+
+
+def test_gemini_response_json_schema_relaxes_recursive_layout_children() -> None:
+    schema = _to_gemini_response_json_schema(ScenarioGraph.model_json_schema())
+    defs = schema["$defs"]
+
+    columns_child = defs["ColumnsSpec"]["properties"]["columns"]["items"]["items"]
+    tabs_child = defs["TabsSpec"]["properties"]["tabs"]["items"]["items"]
+    expander_child = defs["ExpanderSpec"]["properties"]["children"]["items"]
+
+    for child_schema in [columns_child, tabs_child, expander_child]:
+        assert child_schema["type"] == "object"
+        assert child_schema["additionalProperties"] is True
+        assert "oneOf" not in child_schema
