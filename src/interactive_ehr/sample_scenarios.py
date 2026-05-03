@@ -6,6 +6,13 @@ from datetime import date
 
 import pandas as pd
 
+from interactive_ehr.scenario_graph import (
+    DataNode,
+    GraphEdge,
+    ScenarioGraph,
+    TaskNode,
+    WidgetNode,
+)
 from interactive_ehr.widgets import (
     AnyWidget,
     BarChartSpec,
@@ -26,6 +33,72 @@ from interactive_ehr.widgets import (
     TabsSpec,
     TextInputSpec,
 )
+
+
+def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, object]]:
+    """Return the chronic disease outpatient sample as a task graph."""
+
+    widgets, context = get_chronic_disease_scenario()
+    data_nodes = [
+        DataNode(
+            id=f"data_{index}",
+            context_key=context_key,
+            data_type=_describe_context_type(value),
+            description=f"固定サンプル context['{context_key}']",
+            primary_fields=_primary_fields(value),
+        )
+        for index, (context_key, value) in enumerate(context.items(), start=1)
+    ]
+    widget_nodes = [
+        WidgetNode(
+            id=f"widget_{index}",
+            title=type(widget).__name__,
+            widget=widget,
+            data_node_ids=_referenced_data_node_ids(widget, data_nodes),
+        )
+        for index, widget in enumerate(widgets, start=1)
+    ]
+    graph = ScenarioGraph(
+        id="chronic_disease_outpatient",
+        title="慢性疾患を持つ高齢患者の外来診察",
+        description="複数の慢性疾患を持つ高齢患者の定期外来を想定した検証用シナリオ。",
+        tasks=[
+            TaskNode(
+                id="task_outpatient_review",
+                title="外来診察",
+                description="患者選択、主要指標、検査・処方・カルテ確認を行う。",
+                order=1,
+                widget_ids=[node.id for node in widget_nodes],
+            )
+        ],
+        data_nodes=data_nodes,
+        widget_nodes=widget_nodes,
+        edges=[
+            GraphEdge(
+                source_id="chronic_disease_outpatient",
+                target_id="task_outpatient_review",
+                edge_type="scenario_to_task",
+            ),
+            *[
+                GraphEdge(
+                    source_id="task_outpatient_review",
+                    target_id=node.id,
+                    edge_type="task_to_widget",
+                )
+                for node in widget_nodes
+            ],
+            *[
+                GraphEdge(
+                    source_id=widget_node.id,
+                    target_id=data_node_id,
+                    edge_type="widget_to_data",
+                )
+                for widget_node in widget_nodes
+                for data_node_id in widget_node.data_node_ids
+            ],
+        ],
+    )
+    return graph, context
 
 
 def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:
@@ -339,3 +412,51 @@ def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:
     ]
 
     return widgets, context
+
+
+def _describe_context_type(value: object) -> str:
+    if isinstance(value, pd.DataFrame):
+        return "dataframe"
+    if isinstance(value, list):
+        return "list"
+    if isinstance(value, dict):
+        return "dict"
+    return type(value).__name__
+
+
+def _primary_fields(value: object) -> list[str]:
+    if isinstance(value, pd.DataFrame):
+        return [str(column) for column in value.columns]
+    if isinstance(value, list) and value and isinstance(value[0], dict):
+        return [str(key) for key in value[0]]
+    if isinstance(value, dict):
+        return [str(key) for key in value]
+    return []
+
+
+def _referenced_data_node_ids(
+    widget: AnyWidget,
+    data_nodes: list[DataNode],
+) -> list[str]:
+    data_node_by_key = {node.context_key: node for node in data_nodes}
+    widget_json = widget.model_dump(mode="json")
+    keys = _collect_reference_keys(widget_json)
+    return [
+        data_node_by_key[key].id
+        for key in keys
+        if key in data_node_by_key
+    ]
+
+
+def _collect_reference_keys(value: object) -> list[str]:
+    keys: list[str] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key.endswith("_key") and isinstance(child, str):
+                keys.append(child)
+            else:
+                keys.extend(_collect_reference_keys(child))
+    elif isinstance(value, list):
+        for child in value:
+            keys.extend(_collect_reference_keys(child))
+    return list(dict.fromkeys(keys))

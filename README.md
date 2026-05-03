@@ -8,6 +8,8 @@
 
 現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。Gemini API認証なしで、患者概要、血圧/腎機能推移、現在処方、直近検査、過去カルテ記事を確認できます。
 
+UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
+
 ## セットアップ
 
 ```bash
@@ -34,10 +36,13 @@ cp .env.example .env
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
+サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。
+
 ## テスト
 
 ```bash
 uv run pytest tests/ -v
+uv run ruff check .
 ```
 
 ## モデル生成
@@ -53,7 +58,8 @@ uv run python scripts/generate_models.py
 ```
 src/interactive_ehr/
   app.py                  -- Streamlitエントリポイント
-  sample_scenarios.py     -- 固定サンプルデータとWidgetSpec
+  scenario_graph.py       -- タスクグラフモデル、JSONパース、Graphレンダラ、Gemini生成
+  sample_scenarios.py     -- 固定サンプルデータ、ScenarioGraph、WidgetSpec互換API
   models/
     _base.py              -- 共通ベースモデル (DwhBaseModel)
     patient.py            -- 患者系テーブル (PATIENT)
