@@ -374,40 +374,6 @@ def _warn_for_data_references(
             )
 
 
-def _build_generation_prompt(
-    user_prompt: str,
-    context: Mapping[str, object],
-) -> str:
-    dwh_summary = _build_dwh_model_prompt_section()
-    widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
-    return f"""\
-あなたは電子カルテ UI のタスクグラフを設計するアシスタントです。
-ユーザーの要望を、ScenarioGraph JSON として出力してください。
-
-制約:
-- 出力は ScenarioGraph スキーマに一致する JSON のみ。
-- widget は既存 WidgetSpec の discriminated union です。
-- widget.widget_type は下記の利用可能な値だけを使ってください。
-- データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
-- data_nodes.model_name は下記のDWHモデル名だけを使ってください。
-- data_nodes.context_key は必ず dwh_{{model_name}} にしてください。
-- 各 widget の data_key は生成済み data node の context_key だけを参照してください。
-- chart/table/dataframe widget の x/y/column_order は、参照先DWHモデルのフィールド名だけを使ってください。
-- scenario_to_task, task_to_widget, widget_to_data の edges を明示してください。
-- task.widget_ids はそのタスクで表示する widget node ID を表示順に並べてください。
-- 存在しない task/widget/data ID を参照しないでください。
-
-利用可能なDWHモデルと主要フィールド:
-{dwh_summary}
-
-利用可能な widget_type:
-{widget_types}
-
-ユーザー要望:
-{user_prompt}
-"""
-
-
 def _build_generation_plan_prompt(
     user_prompt: str,
     context: Mapping[str, object],
@@ -455,23 +421,6 @@ def _build_task_node_prompt(
         graph,
         "TaskNode",
         task_plan.model_dump(mode="json"),
-    )
-
-
-def _build_data_node_prompt(
-    user_prompt: str,
-    context: Mapping[str, object],
-    plan: ScenarioGraphGenerationPlan,
-    data_plan: DataNodeGenerationPlan,
-    graph: ScenarioGraph,
-) -> str:
-    return _build_node_prompt(
-        user_prompt,
-        context,
-        plan,
-        graph,
-        "DataNode",
-        data_plan.model_dump(mode="json"),
     )
 
 
@@ -610,39 +559,6 @@ def _describe_context_columns_from_fields(fields: list[str]) -> str:
     return f" (columns: {', '.join(fields)})"
 
 
-def _build_context_prompt_section(context: Mapping[str, object]) -> str:
-    return "\n".join(
-        f"- {key}{_describe_context_columns(value)}"
-        for key, value in sorted(context.items())
-    )
-
-
-def _describe_context_columns(value: object) -> str:
-    columns = _extract_context_columns(value)
-    if not columns:
-        return ""
-    return f" (columns: {', '.join(columns)})"
-
-
-def _extract_context_columns(value: object) -> list[str]:
-    dataframe_columns = getattr(value, "columns", None)
-    if dataframe_columns is not None:
-        return [str(column) for column in dataframe_columns]
-    if isinstance(value, list):
-        columns: list[str] = []
-        seen: set[str] = set()
-        for row in value:
-            if not isinstance(row, Mapping):
-                continue
-            for column in row:
-                column_name = str(column)
-                if column_name not in seen:
-                    seen.add(column_name)
-                    columns.append(column_name)
-        return columns
-    return []
-
-
 def _normalize_task_node(
     task: TaskNode,
     plan: TaskNodeGenerationPlan,
@@ -653,20 +569,6 @@ def _normalize_task_node(
         description=task.description if task.description is not None else plan.description,
         order=plan.order,
         widget_ids=plan.widget_ids,
-    )
-
-
-def _normalize_data_node(
-    data_node: DataNode,
-    plan: DataNodeGenerationPlan,
-) -> DataNode:
-    return DataNode(
-        id=plan.id,
-        context_key=plan.context_key or dwh_context_key(plan.model_name),
-        model_name=plan.model_name,
-        data_type=data_node.data_type or plan.data_type,
-        description=data_node.description or plan.description,
-        primary_fields=data_node.primary_fields or plan.primary_fields,
     )
 
 
@@ -707,22 +609,19 @@ def _append_task_node(graph: ScenarioGraph, task: TaskNode) -> ScenarioGraph:
     tasks = [existing for existing in graph.tasks if existing.id != task.id]
     tasks.append(task)
     tasks = sorted(tasks, key=lambda node: (node.order, node.id))
-    return ScenarioGraph.model_validate(
-        graph.model_copy(
-            update={
-                "tasks": tasks,
-                "edges": _build_edges_for_parts(graph.id, tasks, graph.widget_nodes),
-            }
-        ).model_dump(mode="json")
+    return _copy_validated_graph(
+        graph,
+        {
+            "tasks": tasks,
+            "edges": _build_edges_for_parts(graph.id, tasks, graph.widget_nodes),
+        },
     )
 
 
 def _append_data_node(graph: ScenarioGraph, data_node: DataNode) -> ScenarioGraph:
     data_nodes = [existing for existing in graph.data_nodes if existing.id != data_node.id]
     data_nodes.append(data_node)
-    return ScenarioGraph.model_validate(
-        graph.model_copy(update={"data_nodes": data_nodes}).model_dump(mode="json")
-    )
+    return _copy_validated_graph(graph, {"data_nodes": data_nodes})
 
 
 def _append_widget_node(
@@ -734,14 +633,22 @@ def _append_widget_node(
     widget_nodes = [existing for existing in graph.widget_nodes if existing.id != widget_node.id]
     widget_nodes.append(widget_node)
     tasks = _ensure_task_references_widget(graph.tasks, widget_node.id, plan)
+    return _copy_validated_graph(
+        graph,
+        {
+            "tasks": tasks,
+            "widget_nodes": widget_nodes,
+            "edges": _build_edges_for_parts(graph.id, tasks, widget_nodes),
+        },
+    )
+
+
+def _copy_validated_graph(
+    graph: ScenarioGraph,
+    update: Mapping[str, object],
+) -> ScenarioGraph:
     return ScenarioGraph.model_validate(
-        graph.model_copy(
-            update={
-                "tasks": tasks,
-                "widget_nodes": widget_nodes,
-                "edges": _build_edges_for_parts(graph.id, tasks, widget_nodes),
-            }
-        ).model_dump(mode="json")
+        graph.model_copy(update=update).model_dump(mode="json")
     )
 
 
