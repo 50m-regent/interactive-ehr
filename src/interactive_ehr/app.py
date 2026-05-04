@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from interactive_ehr.sample_scenarios import get_chronic_disease_graph_scenario
 from interactive_ehr.scenario_graph import (
     ScenarioGraph,
+    build_dwh_context_for_graph,
     generate_scenario_graph_incrementally,
     parse_scenario_graph_json,
     render_scenario_graph,
@@ -102,6 +103,7 @@ def _generate_graph_from_prompt(
         st.session_state[CONTEXT_STATE_KEY],
     ):
         st.session_state[GRAPH_STATE_KEY] = event.graph
+        st.session_state[CONTEXT_STATE_KEY] = event.context
         st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(event.graph)
         _render_graph_preview(
             preview_container,
@@ -132,6 +134,8 @@ def _format_current_json() -> None:
         return
 
     st.session_state[GRAPH_STATE_KEY] = graph
+    if any(data_node.model_name is not None for data_node in graph.data_nodes):
+        st.session_state[CONTEXT_STATE_KEY] = build_dwh_context_for_graph(graph)
     st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(graph)
 
 

@@ -255,6 +255,20 @@ def test_chart_missing_columns_warn_without_exception(monkeypatch: Any) -> None:
     assert fake.calls[2].kwargs["y"] == ["eGFR"]
 
 
+def test_dataframe_missing_column_order_warns_without_exception(monkeypatch: Any) -> None:
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    renderer.render_widgets(
+        [DataframeSpec(data_key="rows", column_order=["name", "missing"])],
+        {"rows": [{"name": "A"}]},
+    )
+
+    assert [call.name for call in fake.calls] == ["warning", "dataframe"]
+    assert "missing" in fake.calls[0].args[0]
+    assert fake.calls[1].kwargs["column_order"] == ["name"]
+
+
 def test_render_nested_layouts(monkeypatch: Any) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(renderer, "st", fake)
@@ -318,5 +332,5 @@ def test_chronic_disease_scenario_builds_valid_widgets() -> None:
     validated = adapter.validate_python(widgets)
 
     assert len(validated) == len(widgets)
-    assert "current_prescriptions" in context
-    assert "recent_labs" in context
+    assert "dwh_処方" in context
+    assert "dwh_検体検査結果" in context

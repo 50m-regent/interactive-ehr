@@ -121,6 +121,26 @@ def _chart_axis_kwargs(
     return chart_x, chart_y
 
 
+def _dataframe_column_order(
+    data: Any,
+    *,
+    data_key: str,
+    column_order: list[str],
+) -> list[str] | None:
+    columns = _columns_for_data(data)
+    if columns is None:
+        return column_order
+
+    valid_columns = [column for column in column_order if column in columns]
+    for column in column_order:
+        if column not in columns:
+            st.warning(
+                f"data_key '{data_key}' に dataframe の column_order "
+                f"カラム '{column}' が存在しません。"
+            )
+    return valid_columns or None
+
+
 def render_widgets(
     widgets: Sequence[AnyWidget],
     context: Mapping[str, Any],
@@ -144,9 +164,23 @@ def render_widget(
         if data is None:
             return None
         if widget.column_order is not None:
+            column_order = _dataframe_column_order(
+                data,
+                data_key=widget.data_key,
+                column_order=widget.column_order,
+            )
+            if column_order is None:
+                return st.dataframe(
+                    data,
+                    **_without_none(
+                        hide_index=widget.hide_index,
+                        height=widget.height,
+                        key=widget.key,
+                    ),
+                )
             return st.dataframe(
                 data,
-                column_order=widget.column_order,
+                column_order=column_order,
                 **_without_none(
                     hide_index=widget.hide_index,
                     height=widget.height,

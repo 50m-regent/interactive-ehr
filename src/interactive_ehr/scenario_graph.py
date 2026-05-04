@@ -10,6 +10,14 @@ import streamlit as st
 from pydantic import BaseModel, ConfigDict, Field
 
 from interactive_ehr.llm import GeminiMixin
+from interactive_ehr.models.registry import (
+    DEFAULT_FAKE_ROWS,
+    build_dwh_context_for_model_names,
+    dwh_context_key,
+    dwh_field_names,
+    has_dwh_model,
+    iter_dwh_model_info,
+)
 from interactive_ehr.widgets import AnyWidget, WidgetType
 from interactive_ehr.widgets.renderer import render_widget
 
@@ -33,6 +41,7 @@ class DataNode(BaseModel):
 
     id: str = Field(description="データノードID")
     context_key: str = Field(description="固定サンプル context のキー")
+    model_name: str | None = Field(None, description="参照するDWH Pydanticモデル名")
     data_type: str = Field(description="データ種別")
     description: str = Field(description="データ内容の説明")
     primary_fields: list[str] = Field(
@@ -99,7 +108,8 @@ class DataNodeGenerationPlan(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     id: str = Field(description="生成する data node ID")
-    context_key: str = Field(description="固定サンプル context のキー")
+    model_name: str = Field(description="参照するDWH Pydanticモデル名")
+    context_key: str | None = Field(None, description="DWH fake context のキー")
     data_type: str = Field(description="データ種別")
     description: str = Field(description="データ内容の説明")
     primary_fields: list[str] = Field(default_factory=list, description="主要フィールド")
@@ -133,12 +143,13 @@ class ScenarioGraphGenerationPlan(BaseModel):
 class ScenarioGraphGenerationEvent(BaseModel):
     """Progress event emitted while incrementally generating a ScenarioGraph."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
 
     status: Literal["started", "task", "data", "widget", "completed", "failed"]
     message: str
     graph: ScenarioGraph
     node_id: str | None = None
+    context: dict[str, object] = Field(default_factory=dict)
 
 
 def parse_scenario_graph_json(json_text: str) -> ScenarioGraph:
@@ -187,6 +198,23 @@ def render_scenario_graph(
                 render_widget(widget_node.widget, context)
 
 
+def build_dwh_context_for_graph(
+    graph: ScenarioGraph,
+    *,
+    n: int = DEFAULT_FAKE_ROWS,
+) -> dict[str, object]:
+    """Build display context from DWH fake data for data nodes in ``graph``."""
+
+    return build_dwh_context_for_model_names(
+        [
+            data_node.model_name
+            for data_node in graph.data_nodes
+            if data_node.model_name is not None
+        ],
+        n=n,
+    )
+
+
 def generate_scenario_graph(
     prompt: str,
     context: Mapping[str, object],
@@ -233,10 +261,12 @@ def generate_scenario_graph_incrementally(
         title=plan.title,
         description=plan.description,
     )
+    generated_context: dict[str, object] = {}
     yield ScenarioGraphGenerationEvent(
         status="started",
         message="生成計画を作成しました。",
         graph=graph,
+        context=generated_context,
     )
 
     for task_plan in plan.tasks:
@@ -253,6 +283,7 @@ def generate_scenario_graph_incrementally(
                 message=f"task node '{task_plan.id}' の生成に失敗しました: {exc}",
                 graph=graph,
                 node_id=task_plan.id,
+                context=generated_context,
             )
             return
         yield ScenarioGraphGenerationEvent(
@@ -260,29 +291,29 @@ def generate_scenario_graph_incrementally(
             message=f"task node '{task.id}' を生成しました。",
             graph=graph,
             node_id=task.id,
+            context=generated_context,
         )
 
     for data_plan in plan.data_nodes:
         try:
-            data_node = client.generate(
-                _build_data_node_prompt(prompt, context, plan, data_plan, graph),
-                DataNode,
-            )
-            data_node = _normalize_data_node(data_node, data_plan)
+            data_node = _build_data_node_from_plan(data_plan)
             graph = _append_data_node(graph, data_node)
+            generated_context = build_dwh_context_for_graph(graph)
         except Exception as exc:
             yield ScenarioGraphGenerationEvent(
                 status="failed",
                 message=f"data node '{data_plan.id}' の生成に失敗しました: {exc}",
                 graph=graph,
                 node_id=data_plan.id,
+                context=generated_context,
             )
             return
         yield ScenarioGraphGenerationEvent(
             status="data",
-            message=f"data node '{data_node.id}' を生成しました。",
+            message=f"data node '{data_node.id}' ({data_node.model_name}) を生成しました。",
             graph=graph,
             node_id=data_node.id,
+            context=generated_context,
         )
 
     for widget_plan in plan.widget_nodes:
@@ -299,6 +330,7 @@ def generate_scenario_graph_incrementally(
                 message=f"widget node '{widget_plan.id}' の生成に失敗しました: {exc}",
                 graph=graph,
                 node_id=widget_plan.id,
+                context=generated_context,
             )
             return
         yield ScenarioGraphGenerationEvent(
@@ -306,6 +338,7 @@ def generate_scenario_graph_incrementally(
             message=f"widget node '{widget_node.id}' を生成しました。",
             graph=graph,
             node_id=widget_node.id,
+            context=generated_context,
         )
 
     graph = graph.model_copy(update={"edges": _build_edges(graph)})
@@ -313,6 +346,7 @@ def generate_scenario_graph_incrementally(
         status="completed",
         message="タスクグラフを生成しました。",
         graph=ScenarioGraph.model_validate(graph.model_dump(mode="json")),
+        context=generated_context,
     )
 
 
@@ -344,7 +378,7 @@ def _build_generation_prompt(
     user_prompt: str,
     context: Mapping[str, object],
 ) -> str:
-    context_summary = _build_context_prompt_section(context)
+    dwh_summary = _build_dwh_model_prompt_section()
     widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
     return f"""\
 あなたは電子カルテ UI のタスクグラフを設計するアシスタントです。
@@ -354,13 +388,17 @@ def _build_generation_prompt(
 - 出力は ScenarioGraph スキーマに一致する JSON のみ。
 - widget は既存 WidgetSpec の discriminated union です。
 - widget.widget_type は下記の利用可能な値だけを使ってください。
-- データ本体は生成せず、data_nodes.context_key と各 widget の data_key/options_key/value_key/delta_key は下記 context key だけを参照してください。
+- データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
+- data_nodes.model_name は下記のDWHモデル名だけを使ってください。
+- data_nodes.context_key は必ず dwh_{{model_name}} にしてください。
+- 各 widget の data_key は生成済み data node の context_key だけを参照してください。
+- chart/table/dataframe widget の x/y/column_order は、参照先DWHモデルのフィールド名だけを使ってください。
 - scenario_to_task, task_to_widget, widget_to_data の edges を明示してください。
 - task.widget_ids はそのタスクで表示する widget node ID を表示順に並べてください。
 - 存在しない task/widget/data ID を参照しないでください。
 
-利用可能な context key と列:
-{context_summary}
+利用可能なDWHモデルと主要フィールド:
+{dwh_summary}
 
 利用可能な widget_type:
 {widget_types}
@@ -374,7 +412,7 @@ def _build_generation_plan_prompt(
     user_prompt: str,
     context: Mapping[str, object],
 ) -> str:
-    context_summary = _build_context_prompt_section(context)
+    dwh_summary = _build_dwh_model_prompt_section()
     widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
     return f"""\
 あなたは電子カルテ UI のタスクグラフ生成計画を作るアシスタントです。
@@ -384,14 +422,16 @@ def _build_generation_plan_prompt(
 - ここでは node の中身を詳細生成せず、生成順とIDだけを計画してください。
 - tasks は表示順に並べてください。
 - 各 task.widget_ids は、その task に後で生成する widget node ID を表示順に並べてください。
-- data_nodes.context_key は下記 context key だけを使ってください。
-- chart/table/dataframe widget の x/y/column_order は下記の列名だけを使ってください。
+- data_nodes.model_name は下記のDWHモデル名だけを使ってください。
+- data_nodes.context_key を出す場合は必ず dwh_{{model_name}} にしてください。省略しても構いません。
+- データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
+- chart/table/dataframe widget の x/y/column_order は参照先DWHモデルのフィールド名だけを使ってください。
 - widget_nodes.task_id は既存 task ID、widget_nodes.data_node_ids は既存 data node ID だけを参照してください。
 - widget_nodes.widget_type は下記 widget_type だけを使ってください。
 - ID は英数字とアンダースコアで安定した値にしてください。
 
-利用可能な context key と列:
-{context_summary}
+利用可能なDWHモデルと主要フィールド:
+{dwh_summary}
 
 利用可能な widget_type:
 {widget_types}
@@ -460,19 +500,21 @@ def _build_node_prompt(
     node_type: str,
     node_plan: object,
 ) -> str:
-    context_summary = _build_context_prompt_section(context)
+    context_summary = _build_context_prompt_section_from_graph(graph)
     return f"""\
 あなたは電子カルテ UI のタスクグラフをノード単位で生成するアシスタントです。
 指定された計画に一致する {node_type} JSON だけを出力してください。
 
 制約:
 - node_plan の id と参照関係を変更しないでください。
-- データ本体は生成せず、context key は下記の利用可能な値だけを参照してください。
-- chart/table/dataframe widget の x/y/column_order は下記の列名だけを使ってください。
+- データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
+- DataNode は node_plan.model_name のDWHモデルだけを参照してください。
+- WidgetNode の data_key は生成済み data node の context_key だけを使ってください。
+- chart/table/dataframe widget の x/y/column_order は参照先DWHモデルのフィールド名だけを使ってください。
 - WidgetNode の widget.widget_type は node_plan.widget_type と一致させてください。
 - 現在の partial graph と矛盾しない node を生成してください。
 
-利用可能な context key と列:
+生成済み data node の context key と列:
 {context_summary}
 
 全体計画:
@@ -487,6 +529,85 @@ def _build_node_prompt(
 ユーザー要望:
 {user_prompt}
 """
+
+
+def _build_dwh_model_prompt_section(*, max_fields_per_model: int = 12) -> str:
+    lines: list[str] = []
+    for model_info in iter_dwh_model_info():
+        field_names = _select_prompt_field_names(
+            [field.name for field in model_info.fields],
+            max_fields=max_fields_per_model,
+        )
+        suffix = ""
+        if len(model_info.fields) > len(field_names):
+            suffix = f", ... ({len(model_info.fields)} fields)"
+        description = f" - {model_info.description}" if model_info.description else ""
+        lines.append(
+            f"- {model_info.name}{description} "
+            f"(context_key: {dwh_context_key(model_info.name)}, "
+            f"fields: {', '.join(field_names)}{suffix})"
+        )
+    return "\n".join(lines)
+
+
+def _select_prompt_field_names(
+    field_names: list[str],
+    *,
+    max_fields: int,
+) -> list[str]:
+    generic_prefixes = ("キー",)
+    generic_names = {
+        "ROW_ID",
+        "親ROW_ID",
+        "件数",
+        "シーケンスID",
+        "トランザクション名",
+        "ETL更新日",
+        "ETL更新時刻",
+        "施設コード",
+        "施設名",
+        "患者ID",
+        "患者番号",
+    }
+    preferred = [
+        field_name
+        for field_name in field_names
+        if field_name not in generic_names
+        and not field_name.startswith(generic_prefixes)
+        and not field_name.endswith("コード")
+    ]
+    selected = preferred[:max_fields]
+    if len(selected) < max_fields:
+        selected.extend(
+            field_name
+            for field_name in field_names
+            if field_name not in selected
+        )
+    return selected[:max_fields]
+
+
+def _build_context_prompt_section_from_graph(graph: ScenarioGraph) -> str:
+    if not graph.data_nodes:
+        return "- まだ生成済み data node はありません。"
+    lines: list[str] = []
+    for data_node in graph.data_nodes:
+        if data_node.model_name is None:
+            lines.append(
+                f"- {data_node.context_key}{_describe_context_columns_from_fields(data_node.primary_fields)}"
+            )
+            continue
+        lines.append(
+            f"- {data_node.context_key} "
+            f"(model_name: {data_node.model_name}, "
+            f"columns: {', '.join(dwh_field_names(data_node.model_name))})"
+        )
+    return "\n".join(lines)
+
+
+def _describe_context_columns_from_fields(fields: list[str]) -> str:
+    if not fields:
+        return ""
+    return f" (columns: {', '.join(fields)})"
 
 
 def _build_context_prompt_section(context: Mapping[str, object]) -> str:
@@ -541,10 +662,30 @@ def _normalize_data_node(
 ) -> DataNode:
     return DataNode(
         id=plan.id,
-        context_key=plan.context_key,
+        context_key=plan.context_key or dwh_context_key(plan.model_name),
+        model_name=plan.model_name,
         data_type=data_node.data_type or plan.data_type,
         description=data_node.description or plan.description,
         primary_fields=data_node.primary_fields or plan.primary_fields,
+    )
+
+
+def _build_data_node_from_plan(plan: DataNodeGenerationPlan) -> DataNode:
+    if not has_dwh_model(plan.model_name):
+        raise ValueError(f"未定義のDWHモデルです: {plan.model_name}")
+    field_names = dwh_field_names(plan.model_name)
+    context_key = dwh_context_key(plan.model_name)
+    if plan.context_key is not None and plan.context_key != context_key:
+        raise ValueError(
+            f"data node '{plan.id}' の context_key は '{context_key}' である必要があります。"
+        )
+    return DataNode(
+        id=plan.id,
+        context_key=context_key,
+        model_name=plan.model_name,
+        data_type="dataframe",
+        description=plan.description,
+        primary_fields=plan.primary_fields or field_names,
     )
 
 

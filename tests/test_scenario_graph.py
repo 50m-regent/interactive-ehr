@@ -209,7 +209,8 @@ def test_chronic_disease_graph_scenario_builds_valid_graph() -> None:
 
     assert validated.id == "chronic_disease_outpatient"
     assert validated.tasks[0].widget_ids
-    assert "recent_labs" in context
+    assert "dwh_検体検査結果" in context
+    assert all(data_node.model_name is not None for data_node in validated.data_nodes)
 
 
 def test_generate_scenario_graph_passes_schema_and_context_keys(
@@ -220,10 +221,9 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
     client.generate.side_effect = [
         plan,
         TaskNode(id="changed", title="確認", widget_ids=[]),
-        DataNode(id="changed", context_key="bad", data_type="list", description="rows"),
         WidgetNode(
             id="changed",
-            widget=TableSpec(data_key="rows"),
+            widget=TableSpec(data_key="dwh_患者基本"),
             data_node_ids=[],
         ),
     ]
@@ -233,10 +233,11 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
 
     assert result.id == "generated"
     assert result.tasks[0].id == "task_1"
-    assert result.data_nodes[0].context_key == "rows"
+    assert result.data_nodes[0].context_key == "dwh_患者基本"
+    assert result.data_nodes[0].model_name == "患者基本"
     assert result.widget_nodes[0].id == "widget_1"
     call_args = client.generate.call_args.args
-    assert "rows" in call_args[0]
+    assert "dwh_患者基本" in call_args[0]
     assert call_args[1] is WidgetNode
 
 
@@ -246,7 +247,8 @@ def test_generation_plan_prompt_includes_context_columns() -> None:
         {"renal_trend": [{"検査日": "2026-04-20", "eGFR": 38.2, "Cr": 1.19}]},
     )
 
-    assert "renal_trend (columns: 検査日, eGFR, Cr)" in prompt
+    assert "検体検査結果" in prompt
+    assert "dwh_検体検査結果" in prompt
     assert "x/y/column_order" in prompt
 
 
@@ -258,10 +260,9 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     client.generate.side_effect = [
         plan,
         TaskNode(id="changed", title="確認", widget_ids=[]),
-        DataNode(id="changed", context_key="bad", data_type="list", description="rows"),
         WidgetNode(
             id="changed",
-            widget=TableSpec(data_key="rows"),
+            widget=TableSpec(data_key="dwh_患者基本"),
             data_node_ids=[],
         ),
     ]
@@ -278,6 +279,7 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     ]
     assert events[1].graph.tasks[0].id == "task_1"
     assert events[2].graph.data_nodes[0].id == "data_1"
+    assert "dwh_患者基本" in events[2].context
     assert events[3].graph.widget_nodes[0].id == "widget_1"
     final_graph = events[-1].graph
     assert final_graph.edges == [
@@ -297,10 +299,10 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
             edge_type="widget_to_data",
         ),
     ]
-    assert client.generate.call_count == 4
+    assert client.generate.call_count == 3
 
 
-def test_generate_scenario_graph_incrementally_keeps_partial_graph_on_failure(
+def test_generate_scenario_graph_incrementally_builds_context_from_dwh_fake(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     plan = _minimal_generation_plan()
@@ -308,11 +310,43 @@ def test_generate_scenario_graph_incrementally_keeps_partial_graph_on_failure(
     client.generate.side_effect = [
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
-        RuntimeError("boom"),
+        WidgetNode(
+            id="widget_1",
+            widget=TableSpec(data_key="dwh_患者基本"),
+            data_node_ids=[],
+        ),
     ]
     monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
+
+    assert [event.status for event in events] == ["started", "task", "data", "widget", "completed"]
+    assert events[-1].context["dwh_患者基本"] is not None
+
+
+def test_generate_scenario_graph_incrementally_fails_unknown_dwh_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = _minimal_generation_plan().model_copy(
+        update={
+            "data_nodes": [
+                DataNodeGenerationPlan(
+                    id="data_1",
+                    model_name="存在しないモデル",
+                    data_type="dataframe",
+                    description="missing",
+                )
+            ]
+        }
+    )
+    client = MagicMock()
+    client.generate.side_effect = [
+        plan,
+        TaskNode(id="task_1", title="確認", widget_ids=[]),
+    ]
+    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+
+    events = list(generate_scenario_graph_incrementally("検査を見たい", {}))
 
     assert [event.status for event in events] == ["started", "task", "failed"]
     assert events[-1].graph.tasks[0].id == "task_1"
@@ -339,10 +373,9 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
     client.generate.side_effect = [
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
-        DataNode(id="data_1", context_key="rows", data_type="list", description="rows"),
         WidgetNode(
             id="widget_1",
-            widget=TableSpec(data_key="rows"),
+            widget=TableSpec(data_key="dwh_患者基本"),
             data_node_ids=[],
         ),
     ]
@@ -379,10 +412,10 @@ def _minimal_generation_plan() -> ScenarioGraphGenerationPlan:
         data_nodes=[
             DataNodeGenerationPlan(
                 id="data_1",
-                context_key="rows",
-                data_type="list",
-                description="rows",
-                primary_fields=["name"],
+                model_name="患者基本",
+                data_type="dataframe",
+                description="患者基本",
+                primary_fields=["匿名ID"],
             )
         ],
         widget_nodes=[
