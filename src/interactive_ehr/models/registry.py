@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, cast, get_args, get_origin
 
 import pandas as pd
@@ -13,6 +14,7 @@ from interactive_ehr.models import DwhBaseModel
 
 
 DEFAULT_FAKE_ROWS = 5
+DEFAULT_DWH_CSV_DIR = Path(__file__).resolve().parents[3] / "data" / "dwh"
 
 
 @dataclass(frozen=True)
@@ -108,15 +110,30 @@ def fake_dwh_dataframe(model_name: str, *, n: int = DEFAULT_FAKE_ROWS) -> pd.Dat
     return pd.DataFrame([row.model_dump(mode="python", by_alias=True) for row in rows])
 
 
+def load_dwh_dataframe(
+    model_name: str,
+    *,
+    n: int = DEFAULT_FAKE_ROWS,
+    csv_dir: str | Path = DEFAULT_DWH_CSV_DIR,
+) -> pd.DataFrame:
+    """Load DWH rows from CSV when available, otherwise generate fake rows."""
+
+    csv_path = Path(csv_dir) / f"{model_name}.csv"
+    if csv_path.exists():
+        return pd.read_csv(csv_path, encoding="utf-8-sig")
+    return fake_dwh_dataframe(model_name, n=n)
+
+
 def build_dwh_context_for_model_names(
     model_names: Iterable[str],
     *,
     n: int = DEFAULT_FAKE_ROWS,
+    csv_dir: str | Path = DEFAULT_DWH_CSV_DIR,
 ) -> dict[str, object]:
     """Build Streamlit context entries for DWH models."""
 
     return {
-        dwh_context_key(model_name): fake_dwh_dataframe(model_name, n=n)
+        dwh_context_key(model_name): load_dwh_dataframe(model_name, n=n, csv_dir=csv_dir)
         for model_name in dict.fromkeys(model_names)
     }
 
