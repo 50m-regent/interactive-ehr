@@ -10,12 +10,14 @@ dependencies = [
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.2",
     "streamlit>=1.56.0",
+    "watchdog>=6.0.0",
 ]
 
 [dependency-groups]
 dev = [
     "mypy>=1.20.0",
     "openpyxl>=3.1.5",
+    "playwright>=1.59.0",
     "pytest>=9.0.2",
     "ruff>=0.15.9",
     "ty>=0.0.34",

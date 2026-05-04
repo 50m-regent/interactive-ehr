@@ -36,7 +36,7 @@ cp .env.example .env
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。
+サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。生成はタスクグラフのノード単位で進み、生成済みの部分から UI プレビューに反映されます。
 
 ## テスト
 
@@ -55,6 +55,16 @@ DWHテーブル設計書（`data/dwh_table_design_2025-11-01.xlsx`）からPydan
 ```bash
 uv run python scripts/generate_models.py
 ```
+
+## DWHサンプルCSV生成
+
+全DWHモデルの fake データを `data/dwh/{model_name}.csv` に生成:
+
+```bash
+uv run python scripts/generate_fake_csvs.py
+```
+
+既存CSVはデフォルトでは上書きしません。再生成する場合は `--overwrite` を指定します。アプリのDWH contextは `data/dwh` のCSVを優先して読み込み、CSVが無いモデルだけ fake データへフォールバックします。
 
 ## 構成
 
@@ -85,4 +95,5 @@ src/interactive_ehr/
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
+  generate_fake_csvs.py   -- DWHモデルごとのfake CSVを生成
 ```

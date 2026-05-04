@@ -3,11 +3,21 @@
 from __future__ import annotations
 
 from datetime import date, time
+from pathlib import Path
 
+import pandas as pd
 import pytest
 from pydantic import ValidationError
 
 from interactive_ehr.models import DwhBaseModel
+from interactive_ehr.models.registry import (
+    build_dwh_context_for_model_names,
+    dwh_context_key,
+    dwh_field_names,
+    get_dwh_model_info,
+    list_dwh_model_names,
+    load_dwh_dataframe,
+)
 from interactive_ehr.models.patient import 患者基本, 患者プロフィール, 身体測定情報
 from interactive_ehr.models.order_exam import 検体検査, 検体検査結果
 from interactive_ehr.models.order_treatment import 処方, 手術実施
@@ -136,6 +146,70 @@ class TestModelCount:
         assert len(model_classes) >= 130
 
 
+class TestDwhRegistry:
+    """DWHモデルレジストリのテスト."""
+
+    def test_lists_concrete_models_without_base(self) -> None:
+        model_names = list_dwh_model_names()
+
+        assert "DwhBaseModel" not in model_names
+        assert "患者基本" in model_names
+        assert "検体検査結果" in model_names
+
+    def test_model_info_uses_dwh_field_names(self) -> None:
+        info = get_dwh_model_info("検体検査結果")
+
+        field_names = [field.name for field in info.fields]
+        assert info.name == "検体検査結果"
+        assert "検索日(採取日)" in field_names
+        assert "結果(数値)" in field_names
+
+    def test_fake_context_uses_stable_dwh_context_key(self) -> None:
+        context = build_dwh_context_for_model_names(["患者基本"], n=5)
+
+        dataframe = context[dwh_context_key("患者基本")]
+        assert isinstance(dataframe, pd.DataFrame)
+        assert list(dataframe.columns) == dwh_field_names("患者基本")
+        assert len(dataframe) == 5
+
+    def test_load_dwh_dataframe_prefers_csv(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        pd.DataFrame(
+            [
+                {
+                    "匿名ID": "CSV_001",
+                    "性別": "男",
+                    "生年月日": "1980-01-02",
+                },
+            ],
+        ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
+
+        dataframe = load_dwh_dataframe("患者基本", csv_dir=csv_dir)
+
+        assert dataframe.loc[0, "匿名ID"] == "CSV_001"
+        assert list(dataframe.columns) == ["匿名ID", "性別", "生年月日"]
+
+    def test_load_dwh_dataframe_falls_back_to_fake(self, tmp_path: Path) -> None:
+        dataframe = load_dwh_dataframe("患者基本", n=2, csv_dir=tmp_path)
+
+        assert list(dataframe.columns) == dwh_field_names("患者基本")
+        assert len(dataframe) == 2
+
+    def test_context_builder_uses_csv_loader(self, tmp_path: Path) -> None:
+        pd.DataFrame([{"匿名ID": "CSV_002"}]).to_csv(
+            tmp_path / "患者基本.csv",
+            index=False,
+            encoding="utf-8-sig",
+        )
+
+        context = build_dwh_context_for_model_names(["患者基本"], csv_dir=tmp_path)
+
+        dataframe = context[dwh_context_key("患者基本")]
+        assert isinstance(dataframe, pd.DataFrame)
+        assert dataframe.loc[0, "匿名ID"] == "CSV_002"
+
+
 class TestFake:
     """fake()メソッドのテスト."""
 
@@ -191,4 +265,3 @@ class TestFake:
         p = 患者基本.fake()
         with pytest.raises(ValidationError):
             p.性別 = "女"  # type: ignore[misc]
-
