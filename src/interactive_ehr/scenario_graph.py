@@ -344,7 +344,7 @@ def _build_generation_prompt(
     user_prompt: str,
     context: Mapping[str, object],
 ) -> str:
-    context_keys = "\n".join(f"- {key}" for key in sorted(context))
+    context_summary = _build_context_prompt_section(context)
     widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
     return f"""\
 あなたは電子カルテ UI のタスクグラフを設計するアシスタントです。
@@ -359,8 +359,8 @@ def _build_generation_prompt(
 - task.widget_ids はそのタスクで表示する widget node ID を表示順に並べてください。
 - 存在しない task/widget/data ID を参照しないでください。
 
-利用可能な context key:
-{context_keys}
+利用可能な context key と列:
+{context_summary}
 
 利用可能な widget_type:
 {widget_types}
@@ -374,7 +374,7 @@ def _build_generation_plan_prompt(
     user_prompt: str,
     context: Mapping[str, object],
 ) -> str:
-    context_keys = "\n".join(f"- {key}" for key in sorted(context))
+    context_summary = _build_context_prompt_section(context)
     widget_types = "\n".join(f"- {widget_type.value}" for widget_type in WidgetType)
     return f"""\
 あなたは電子カルテ UI のタスクグラフ生成計画を作るアシスタントです。
@@ -385,12 +385,13 @@ def _build_generation_plan_prompt(
 - tasks は表示順に並べてください。
 - 各 task.widget_ids は、その task に後で生成する widget node ID を表示順に並べてください。
 - data_nodes.context_key は下記 context key だけを使ってください。
+- chart/table/dataframe widget の x/y/column_order は下記の列名だけを使ってください。
 - widget_nodes.task_id は既存 task ID、widget_nodes.data_node_ids は既存 data node ID だけを参照してください。
 - widget_nodes.widget_type は下記 widget_type だけを使ってください。
 - ID は英数字とアンダースコアで安定した値にしてください。
 
-利用可能な context key:
-{context_keys}
+利用可能な context key と列:
+{context_summary}
 
 利用可能な widget_type:
 {widget_types}
@@ -459,7 +460,7 @@ def _build_node_prompt(
     node_type: str,
     node_plan: object,
 ) -> str:
-    context_keys = "\n".join(f"- {key}" for key in sorted(context))
+    context_summary = _build_context_prompt_section(context)
     return f"""\
 あなたは電子カルテ UI のタスクグラフをノード単位で生成するアシスタントです。
 指定された計画に一致する {node_type} JSON だけを出力してください。
@@ -467,11 +468,12 @@ def _build_node_prompt(
 制約:
 - node_plan の id と参照関係を変更しないでください。
 - データ本体は生成せず、context key は下記の利用可能な値だけを参照してください。
+- chart/table/dataframe widget の x/y/column_order は下記の列名だけを使ってください。
 - WidgetNode の widget.widget_type は node_plan.widget_type と一致させてください。
 - 現在の partial graph と矛盾しない node を生成してください。
 
-利用可能な context key:
-{context_keys}
+利用可能な context key と列:
+{context_summary}
 
 全体計画:
 {plan.model_dump_json(indent=2)}
@@ -485,6 +487,39 @@ def _build_node_prompt(
 ユーザー要望:
 {user_prompt}
 """
+
+
+def _build_context_prompt_section(context: Mapping[str, object]) -> str:
+    return "\n".join(
+        f"- {key}{_describe_context_columns(value)}"
+        for key, value in sorted(context.items())
+    )
+
+
+def _describe_context_columns(value: object) -> str:
+    columns = _extract_context_columns(value)
+    if not columns:
+        return ""
+    return f" (columns: {', '.join(columns)})"
+
+
+def _extract_context_columns(value: object) -> list[str]:
+    dataframe_columns = getattr(value, "columns", None)
+    if dataframe_columns is not None:
+        return [str(column) for column in dataframe_columns]
+    if isinstance(value, list):
+        columns: list[str] = []
+        seen: set[str] = set()
+        for row in value:
+            if not isinstance(row, Mapping):
+                continue
+            for column in row:
+                column_name = str(column)
+                if column_name not in seen:
+                    seen.add(column_name)
+                    columns.append(column_name)
+        return columns
+    return []
 
 
 def _normalize_task_node(
@@ -554,6 +589,7 @@ def _append_widget_node(
     widget_node: WidgetNode,
     plan: ScenarioGraphGenerationPlan,
 ) -> ScenarioGraph:
+    widget_node = _drop_unknown_data_references(widget_node, graph)
     widget_nodes = [existing for existing in graph.widget_nodes if existing.id != widget_node.id]
     widget_nodes.append(widget_node)
     tasks = _ensure_task_references_widget(graph.tasks, widget_node.id, plan)
@@ -586,6 +622,22 @@ def _ensure_task_references_widget(
             continue
         updated.append(task.model_copy(update={"widget_ids": [*task.widget_ids, widget_id]}))
     return sorted(updated, key=lambda node: (node.order, node.id))
+
+
+def _drop_unknown_data_references(
+    widget_node: WidgetNode,
+    graph: ScenarioGraph,
+) -> WidgetNode:
+    data_node_ids = {data_node.id for data_node in graph.data_nodes}
+    return widget_node.model_copy(
+        update={
+            "data_node_ids": [
+                data_node_id
+                for data_node_id in widget_node.data_node_ids
+                if data_node_id in data_node_ids
+            ]
+        }
+    )
 
 
 def _build_edges(graph: ScenarioGraph) -> list[GraphEdge]:

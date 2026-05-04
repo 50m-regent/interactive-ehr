@@ -240,6 +240,16 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
     assert call_args[1] is WidgetNode
 
 
+def test_generation_plan_prompt_includes_context_columns() -> None:
+    prompt = scenario_graph._build_generation_plan_prompt(
+        "腎機能を確認したい",
+        {"renal_trend": [{"検査日": "2026-04-20", "eGFR": 38.2, "Cr": 1.19}]},
+    )
+
+    assert "renal_trend (columns: 検査日, eGFR, Cr)" in prompt
+    assert "x/y/column_order" in prompt
+
+
 def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -308,6 +318,45 @@ def test_generate_scenario_graph_incrementally_keeps_partial_graph_on_failure(
     assert events[-1].graph.tasks[0].id == "task_1"
     assert events[-1].graph.data_nodes == []
     assert "data node 'data_1'" in events[-1].message
+
+
+def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = _minimal_generation_plan().model_copy(
+        update={
+            "widget_nodes": [
+                WidgetNodeGenerationPlan(
+                    id="widget_1",
+                    task_id="task_1",
+                    widget_type=WidgetType.TABLE,
+                    data_node_ids=["data_1", "missing_data"],
+                )
+            ]
+        }
+    )
+    client = MagicMock()
+    client.generate.side_effect = [
+        plan,
+        TaskNode(id="task_1", title="確認", widget_ids=[]),
+        DataNode(id="data_1", context_key="rows", data_type="list", description="rows"),
+        WidgetNode(
+            id="widget_1",
+            widget=TableSpec(data_key="rows"),
+            data_node_ids=[],
+        ),
+    ]
+    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+
+    events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
+
+    final_graph = events[-1].graph
+    assert final_graph.widget_nodes[0].data_node_ids == ["data_1"]
+    assert final_graph.edges[-1] == GraphEdge(
+        source_id="widget_1",
+        target_id="data_1",
+        edge_type="widget_to_data",
+    )
 
 
 class _MiniStreamlit(FakeStreamlit):

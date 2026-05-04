@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
 import streamlit as st
 
 from interactive_ehr.widgets.chart import BarChartSpec, LineChartSpec
@@ -65,6 +66,59 @@ def _resolve_options(
 
 def _without_none(**kwargs: Any) -> dict[str, Any]:
     return {key: value for key, value in kwargs.items() if value is not None}
+
+
+def _columns_for_data(data: Any) -> set[str] | None:
+    if isinstance(data, pd.DataFrame):
+        return {str(column) for column in data.columns}
+    if isinstance(data, Sequence) and not isinstance(data, str | bytes):
+        columns: set[str] = set()
+        for row in data:
+            if isinstance(row, Mapping):
+                columns.update(str(column) for column in row)
+        return columns or None
+    return None
+
+
+def _chart_axis_kwargs(
+    data: Any,
+    *,
+    data_key: str,
+    x: str | None,
+    y: str | list[str] | None,
+) -> tuple[str | None, str | list[str] | None]:
+    columns = _columns_for_data(data)
+    if columns is None:
+        return x, y
+
+    chart_x: str | None = None
+    chart_y: str | list[str] | None = None
+    if x is not None:
+        if x in columns:
+            chart_x = x
+        else:
+            st.warning(
+                f"data_key '{data_key}' に chart の x カラム '{x}' が存在しません。"
+            )
+
+    if isinstance(y, list):
+        valid_y = [column for column in y if column in columns]
+        missing_y = [column for column in y if column not in columns]
+        for column in missing_y:
+            st.warning(
+                f"data_key '{data_key}' に chart の y カラム '{column}' が存在しません。"
+            )
+        if valid_y:
+            chart_y = valid_y
+    elif isinstance(y, str):
+        if y in columns:
+            chart_y = y
+        else:
+            st.warning(
+                f"data_key '{data_key}' に chart の y カラム '{y}' が存在しません。"
+            )
+
+    return chart_x, chart_y
 
 
 def render_widgets(
@@ -140,11 +194,17 @@ def render_widget(
         data = _resolve_context_value(context, widget.data_key, "data_key")
         if data is None:
             return None
+        chart_x, chart_y = _chart_axis_kwargs(
+            data,
+            data_key=widget.data_key,
+            x=widget.x,
+            y=widget.y,
+        )
         return st.line_chart(
             data,
+            x=chart_x,
+            y=chart_y,
             **_without_none(
-                x=widget.x,
-                y=widget.y,
                 x_label=widget.x_label,
                 y_label=widget.y_label,
                 height=widget.height,
@@ -155,11 +215,17 @@ def render_widget(
         data = _resolve_context_value(context, widget.data_key, "data_key")
         if data is None:
             return None
+        chart_x, chart_y = _chart_axis_kwargs(
+            data,
+            data_key=widget.data_key,
+            x=widget.x,
+            y=widget.y,
+        )
         return st.bar_chart(
             data,
+            x=chart_x,
+            y=chart_y,
             **_without_none(
-                x=widget.x,
-                y=widget.y,
                 x_label=widget.x_label,
                 y_label=widget.y_label,
                 height=widget.height,

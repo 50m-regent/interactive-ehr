@@ -225,6 +225,36 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
     assert fake.calls[10].kwargs["horizontal"] is True
 
 
+def test_chart_missing_columns_warn_without_exception(monkeypatch: Any) -> None:
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    renderer.render_widgets(
+        [
+            LineChartSpec(
+                data_key="renal_trend",
+                x="date",
+                y=["eGFR", "missing_value"],
+            )
+        ],
+        {
+            "renal_trend": [
+                {"検査日": "2026-04-20", "eGFR": 38.2, "Cr": 1.19},
+            ]
+        },
+    )
+
+    assert [call.name for call in fake.calls] == [
+        "warning",
+        "warning",
+        "line_chart",
+    ]
+    assert "date" in fake.calls[0].args[0]
+    assert "missing_value" in fake.calls[1].args[0]
+    assert fake.calls[2].kwargs["x"] is None
+    assert fake.calls[2].kwargs["y"] == ["eGFR"]
+
+
 def test_render_nested_layouts(monkeypatch: Any) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(renderer, "st", fake)
