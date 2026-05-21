@@ -6,7 +6,7 @@
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
-現在は初回のUI実行経路として、固定の糖尿病外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と糖尿病外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
+現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
 
 UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
 
@@ -69,7 +69,7 @@ uv run python scripts/generate_fake_csvs.py
 
 ## DWH SQLite DB生成
 
-`data/dwh/*.csv` と糖尿病外来用の合成サンプルを `data/dwh.sqlite` に読み込みます。アプリの表示データはこのDBへのSELECT SQLから取得します。
+`data/dwh/*.csv` と慢性疾患外来用の合成サンプルを `data/dwh.sqlite` に読み込みます。アプリの表示データはこのDBへのSELECT SQLから取得します。
 
 ```bash
 uv run python scripts/build_dwh_database.py --overwrite

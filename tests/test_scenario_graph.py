@@ -217,16 +217,16 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
 
     validated = ScenarioGraph.model_validate(graph.model_dump(mode="json"))
 
-    assert validated.id == "diabetes_outpatient"
+    assert validated.id == "chronic_disease_outpatient"
     assert [task.title for task in validated.tasks] == [
-        "診察前サマリ",
-        "血糖・合併症",
-        "治療・生活",
-        "本日の診察メモ",
+        "血圧・腎機能評価",
+        "副作用・服薬確認",
+        "検査に基づく処方調整",
+        "生活習慣指導",
     ]
-    assert "chart_a1c_trend" in context
+    assert "chart_bp_trend" in context
     assert "metric_latest_egfr" in context
-    assert "metric_eye_exam" in context
+    assert "metric_patient_material" in context
 
 
 def test_generate_scenario_graph_passes_schema_and_context_keys(

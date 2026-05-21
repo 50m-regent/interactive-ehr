@@ -58,7 +58,7 @@ def _render_sidebar(preview_container: Any) -> None:
     st.sidebar.header("シナリオ選択")
     st.sidebar.selectbox(
         "固定サンプル",
-        ["糖尿病患者の外来診察"],
+        ["複数の慢性疾患を持つ高齢患者の外来診察"],
     )
     st.sidebar.caption("API認証なしで表示できる検証用ダミーデータです。")
 

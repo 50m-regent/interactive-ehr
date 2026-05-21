@@ -339,9 +339,9 @@ def test_chronic_disease_scenario_builds_valid_widgets(monkeypatch: Any) -> None
     validated = adapter.validate_python(widgets)
 
     assert len(validated) == len(widgets)
-    assert "chart_a1c_trend" in context
+    assert "chart_bp_trend" in context
     assert "metric_latest_egfr" in context
-    assert "metric_eye_exam" in context
+    assert "metric_patient_material" in context
     flattened = _flatten_widgets(validated)
     assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
 
@@ -364,22 +364,22 @@ def _flatten_widgets(widgets: list[AnyWidget]) -> list[AnyWidget]:
 def _sample_sql_result(sql: str) -> Any:
     import pandas as pd
 
-    if "糖尿病外来_検査推移" in sql:
+    if "慢性疾患外来_検査推移" in sql:
         return pd.DataFrame(
             [
-                {"検査日": "2026-01-16", "HbA1c": 7.5, "eGFR": 60, "UACR": 43},
-                {"検査日": "2026-04-18", "HbA1c": 7.4, "eGFR": 58, "UACR": 46},
+                {"検査日": "2026-01-20", "HbA1c": 7.3, "eGFR": 48, "UACR": 88},
+                {"検査日": "2026-04-21", "HbA1c": 7.2, "eGFR": 45, "UACR": 96},
             ]
         )
-    if "糖尿病外来_バイタル推移" in sql:
+    if "慢性疾患外来_血圧推移" in sql:
         return pd.DataFrame(
             [
-                {"測定日": "2026-01-16", "収縮期血圧": 136, "拡張期血圧": 80, "BMI": 27.8},
-                {"測定日": "2026-04-18", "収縮期血圧": 138, "拡張期血圧": 82, "BMI": 27.8},
+                {"測定日": "2026-01-20", "外来収縮期": 146, "外来拡張期": 82, "家庭収縮期": 140},
+                {"測定日": "2026-04-21", "外来収縮期": 148, "外来拡張期": 84, "家庭収縮期": 142},
             ]
         )
-    if "糖尿病外来_治療" in sql:
-        return pd.DataFrame([{"カテゴリ": "血糖", "薬剤数": 3}])
-    if "糖尿病外来_生活" in sql:
-        return pd.DataFrame([{"項目": "服薬遵守", "達成率": 90}])
+    if "慢性疾患外来_処方" in sql:
+        return pd.DataFrame([{"カテゴリ": "降圧・腎保護", "薬剤数": 2}])
+    if "慢性疾患外来_生活指導" in sql:
+        return pd.DataFrame([{"項目": "家庭血圧記録", "達成率": 70}])
     return pd.DataFrame([{"value": "sample"}])
