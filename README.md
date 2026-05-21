@@ -6,7 +6,7 @@
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
-現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。Gemini API認証なしで、患者概要、血圧/腎機能推移、現在処方、直近検査、過去カルテ記事を確認できます。
+現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
 
 UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
 
@@ -14,6 +14,7 @@ UIは `ScenarioGraph` JSON から描画されます。画面右側の「タス�
 
 ```bash
 uv sync
+uv run python scripts/build_dwh_database.py --overwrite
 ```
 
 ### Gemini API (Vertex AI) の認証設定
@@ -36,7 +37,7 @@ cp .env.example .env
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini 生成は固定サンプルの `context` key を参照する UI/タスクグラフ構造だけを生成し、電子カルテデータ本体は生成しません。生成はタスクグラフのノード単位で進み、生成済みの部分から UI プレビューに反映されます。
+サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
 
 ## テスト
 
@@ -64,7 +65,17 @@ uv run python scripts/generate_models.py
 uv run python scripts/generate_fake_csvs.py
 ```
 
-既存CSVはデフォルトでは上書きしません。再生成する場合は `--overwrite` を指定します。アプリのDWH contextは `data/dwh` のCSVを優先して読み込み、CSVが無いモデルだけ fake データへフォールバックします。
+既存CSVはデフォルトでは上書きしません。再生成する場合は `--overwrite` を指定します。
+
+## DWH SQLite DB生成
+
+`data/dwh/*.csv` と慢性疾患外来用の合成サンプルを `data/dwh.sqlite` に読み込みます。アプリの表示データはこのDBへのSELECT SQLから取得します。
+
+```bash
+uv run python scripts/build_dwh_database.py --overwrite
+```
+
+DBファイルは生成物です。CSVを更新した場合は、上記コマンドでDBを再生成してください。
 
 ## 構成
 
@@ -96,4 +107,5 @@ src/interactive_ehr/
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
   generate_fake_csvs.py   -- DWHモデルごとのfake CSVを生成
+  build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
 ```

@@ -325,12 +325,61 @@ def test_missing_context_keys_warn_without_exception(monkeypatch: Any) -> None:
     assert "missing_options" in fake.calls[2].args[0]
 
 
-def test_chronic_disease_scenario_builds_valid_widgets() -> None:
+def test_chronic_disease_scenario_builds_valid_widgets(monkeypatch: Any) -> None:
+    import interactive_ehr.scenario_graph as scenario_graph
+
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        lambda sql: _sample_sql_result(sql),
+    )
     widgets, context = get_chronic_disease_scenario()
     adapter = TypeAdapter(list[AnyWidget])
 
     validated = adapter.validate_python(widgets)
 
     assert len(validated) == len(widgets)
-    assert "dwh_処方" in context
-    assert "dwh_検体検査結果" in context
+    assert "chart_bp_trend" in context
+    assert "metric_latest_egfr" in context
+    assert "metric_patient_material" in context
+    flattened = _flatten_widgets(validated)
+    assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
+
+
+def _flatten_widgets(widgets: list[AnyWidget]) -> list[AnyWidget]:
+    flattened: list[AnyWidget] = []
+    for widget in widgets:
+        flattened.append(widget)
+        if isinstance(widget, ColumnsSpec):
+            for column in widget.columns:
+                flattened.extend(_flatten_widgets(column))
+        if isinstance(widget, TabsSpec):
+            for tab in widget.tabs:
+                flattened.extend(_flatten_widgets(tab))
+        if isinstance(widget, ExpanderSpec):
+            flattened.extend(_flatten_widgets(widget.children))
+    return flattened
+
+
+def _sample_sql_result(sql: str) -> Any:
+    import pandas as pd
+
+    if "慢性疾患外来_検査推移" in sql:
+        return pd.DataFrame(
+            [
+                {"検査日": "2026-01-20", "HbA1c": 7.3, "eGFR": 48, "UACR": 88},
+                {"検査日": "2026-04-21", "HbA1c": 7.2, "eGFR": 45, "UACR": 96},
+            ]
+        )
+    if "慢性疾患外来_血圧推移" in sql:
+        return pd.DataFrame(
+            [
+                {"測定日": "2026-01-20", "外来収縮期": 146, "外来拡張期": 82, "家庭収縮期": 140},
+                {"測定日": "2026-04-21", "外来収縮期": 148, "外来拡張期": 84, "家庭収縮期": 142},
+            ]
+        )
+    if "慢性疾患外来_処方" in sql:
+        return pd.DataFrame([{"カテゴリ": "降圧・腎保護", "薬剤数": 2}])
+    if "慢性疾患外来_生活指導" in sql:
+        return pd.DataFrame([{"項目": "家庭血圧記録", "達成率": 70}])
+    return pd.DataFrame([{"value": "sample"}])

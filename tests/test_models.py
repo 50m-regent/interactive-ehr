@@ -10,6 +10,12 @@ import pytest
 from pydantic import ValidationError
 
 from interactive_ehr.models import DwhBaseModel
+from interactive_ehr.models.database import (
+    build_dwh_database_from_csvs,
+    execute_read_sql,
+    list_database_tables,
+    list_table_columns,
+)
 from interactive_ehr.models.registry import (
     build_dwh_context_for_model_names,
     dwh_context_key,
@@ -208,6 +214,78 @@ class TestDwhRegistry:
         dataframe = context[dwh_context_key("患者基本")]
         assert isinstance(dataframe, pd.DataFrame)
         assert dataframe.loc[0, "匿名ID"] == "CSV_002"
+
+
+class TestDwhDatabase:
+    """DWH SQLite database tests."""
+
+    def test_builds_sqlite_database_from_csvs(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        pd.DataFrame(
+            [{"匿名ID": "CSV_001", "性別": "男"}],
+        ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
+        db_path = tmp_path / "dwh.sqlite"
+
+        loaded, skipped = build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+            include_diabetes_sample=False,
+        )
+
+        assert (loaded, skipped) == (1, 0)
+        assert list_database_tables(db_path=db_path) == ["患者基本"]
+        assert list_table_columns("患者基本", db_path=db_path) == ["匿名ID", "性別"]
+
+    def test_builds_chronic_disease_sample_tables(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        db_path = tmp_path / "dwh.sqlite"
+
+        loaded, skipped = build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+        )
+
+        assert (loaded, skipped) == (7, 0)
+        assert "慢性疾患外来_患者サマリ" in list_database_tables(db_path=db_path)
+        dataframe = execute_read_sql(
+            'SELECT "HbA1c", "eGFR", "UACR" FROM "慢性疾患外来_患者サマリ"',
+            db_path=db_path,
+        )
+        assert dataframe.to_dict(orient="records") == [
+            {"HbA1c": 7.2, "eGFR": 45, "UACR": 96}
+        ]
+
+    def test_execute_read_sql_returns_dataframe(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        pd.DataFrame(
+            [{"匿名ID": "CSV_001", "性別": "男"}],
+        ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
+        db_path = tmp_path / "dwh.sqlite"
+        build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+            include_diabetes_sample=False,
+        )
+
+        dataframe = execute_read_sql(
+            'SELECT "匿名ID" FROM "患者基本"',
+            db_path=db_path,
+        )
+
+        assert dataframe.to_dict(orient="records") == [{"匿名ID": "CSV_001"}]
+
+    def test_execute_read_sql_rejects_non_select(self, tmp_path: Path) -> None:
+        db_path = tmp_path / "dwh.sqlite"
+        db_path.touch()
+
+        with pytest.raises(ValueError, match="SELECT"):
+            execute_read_sql('DROP TABLE "患者基本"', db_path=db_path)
 
 
 class TestFake:
