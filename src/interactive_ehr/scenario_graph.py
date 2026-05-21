@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from typing import Iterator, Literal
+from typing import Iterator, Literal, cast
 
 import streamlit as st
 from pydantic import BaseModel, ConfigDict, Field
 
 from interactive_ehr.llm import GeminiMixin
+from interactive_ehr.models.database import execute_read_sql
 from interactive_ehr.models.registry import (
     DEFAULT_FAKE_ROWS,
     build_dwh_context_for_model_names,
@@ -48,6 +49,7 @@ class DataNode(BaseModel):
         default_factory=list,
         description="表形式データなどの主要フィールド",
     )
+    sql: str | None = Field(None, description="このデータを取得するSELECT SQL")
 
 
 class WidgetNode(BaseModel):
@@ -125,6 +127,15 @@ class WidgetNodeGenerationPlan(BaseModel):
     title: str | None = Field(None, description="ウィジェットの表示上の説明")
     widget_type: WidgetType = Field(description="生成する WidgetSpec の widget_type")
     data_node_ids: list[str] = Field(default_factory=list, description="参照する data node ID")
+
+
+class WidgetNodeSqlGeneration(BaseModel):
+    """Generated widget node and the SELECT SQL that feeds it."""
+
+    model_config = ConfigDict(frozen=True)
+
+    widget_node: WidgetNode = Field(description="生成した widget node")
+    sql: str = Field(description="widget 専用 data node に保存するSELECT SQL")
 
 
 class ScenarioGraphGenerationPlan(BaseModel):
@@ -215,6 +226,17 @@ def build_dwh_context_for_graph(
     )
 
 
+def build_sql_context_for_graph(graph: ScenarioGraph) -> dict[str, object]:
+    """Build display context by executing SQL stored in graph data nodes."""
+
+    context: dict[str, object] = {}
+    for data_node in graph.data_nodes:
+        if data_node.sql is None:
+            continue
+        context[data_node.context_key] = execute_read_sql(data_node.sql)
+    return context
+
+
 def generate_scenario_graph(
     prompt: str,
     context: Mapping[str, object],
@@ -298,7 +320,6 @@ def generate_scenario_graph_incrementally(
         try:
             data_node = _build_data_node_from_plan(data_plan)
             graph = _append_data_node(graph, data_node)
-            generated_context = build_dwh_context_for_graph(graph)
         except Exception as exc:
             yield ScenarioGraphGenerationEvent(
                 status="failed",
@@ -310,7 +331,7 @@ def generate_scenario_graph_incrementally(
             return
         yield ScenarioGraphGenerationEvent(
             status="data",
-            message=f"data node '{data_node.id}' ({data_node.model_name}) を生成しました。",
+            message=f"data node '{data_node.id}' ({data_node.model_name}) を準備しました。",
             graph=graph,
             node_id=data_node.id,
             context=generated_context,
@@ -318,12 +339,22 @@ def generate_scenario_graph_incrementally(
 
     for widget_plan in plan.widget_nodes:
         try:
-            widget_node = client.generate(
+            widget_sql = client.generate(
                 _build_widget_node_prompt(prompt, context, plan, widget_plan, graph),
-                WidgetNode,
+                WidgetNodeSqlGeneration,
             )
+            widget_node = widget_sql.widget_node
             widget_node = _normalize_widget_node(widget_node, widget_plan)
+            context_key = _context_key_for_widget_plan(graph, widget_plan)
+            if context_key is not None:
+                widget_node = _bind_widget_to_data_context(widget_node, context_key)
             graph = _append_widget_node(graph, widget_node, plan)
+            graph, generated_context = _attach_widget_sql_result(
+                graph,
+                widget_node,
+                widget_sql.sql,
+                generated_context,
+            )
         except Exception as exc:
             yield ScenarioGraphGenerationEvent(
                 status="failed",
@@ -335,7 +366,7 @@ def generate_scenario_graph_incrementally(
             return
         yield ScenarioGraphGenerationEvent(
             status="widget",
-            message=f"widget node '{widget_node.id}' を生成しました。",
+            message=f"widget node '{widget_node.id}' とSQLを生成しました。",
             graph=graph,
             node_id=widget_node.id,
             context=generated_context,
@@ -423,10 +454,11 @@ def _build_generation_plan_prompt(
 - tasks は表示順に並べてください。
 - 各 task.widget_ids は、その task に後で生成する widget node ID を表示順に並べてください。
 - data_nodes.model_name は下記のDWHモデル名だけを使ってください。
-- data_nodes.context_key を出す場合は必ず dwh_{{model_name}} にしてください。省略しても構いません。
+- widget node ごとに専用 data node を1つ計画してください。
+- data_nodes.context_key は省略してください。アプリが sql_{{data_node_id}} を割り当てます。
 - データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
-- chart/table/dataframe widget の x/y/column_order は参照先DWHモデルのフィールド名だけを使ってください。
-- widget_nodes.task_id は既存 task ID、widget_nodes.data_node_ids は既存 data node ID だけを参照してください。
+- chart/table/dataframe widget の x/y/column_order はSQLで取得する列名だけを使ってください。
+- widget_nodes.task_id は既存 task ID、widget_nodes.data_node_ids は専用 data node ID だけを1つ参照してください。
 - widget_nodes.widget_type は下記 widget_type だけを使ってください。
 - ID は英数字とアンダースコアで安定した値にしてください。
 
@@ -501,14 +533,24 @@ def _build_node_prompt(
     node_plan: object,
 ) -> str:
     context_summary = _build_context_prompt_section_from_graph(graph)
+    output_contract = (
+        "- WidgetNode 生成では WidgetNodeSqlGeneration JSON を出力してください。\n"
+        "- WidgetNodeSqlGeneration.sql は widget 専用 data node のための単一SELECT文にしてください。\n"
+        "- SQLではテーブル名と列名をダブルクォートしてください。例: SELECT \"匿名ID\" FROM \"患者基本\" LIMIT 20\n"
+        "- SQLは読み取り専用のSELECTだけにしてください。INSERT/UPDATE/DELETE/DDLは使わないでください。"
+        if node_type == "WidgetNode"
+        else "- 指定された node type のJSONだけを出力してください。"
+    )
+    output_type = "WidgetNodeSqlGeneration" if node_type == "WidgetNode" else node_type
     return f"""\
 あなたは電子カルテ UI のタスクグラフをノード単位で生成するアシスタントです。
-指定された計画に一致する {node_type} JSON だけを出力してください。
+指定された計画に一致する {output_type} JSON だけを出力してください。
 
 制約:
 - node_plan の id と参照関係を変更しないでください。
 - データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
-- DataNode は node_plan.model_name のDWHモデルだけを参照してください。
+- DataNode は node_plan.model_name のDWHモデルだけを参照してください。SQLやデータ本体は入れないでください。
+{output_contract}
 - WidgetNode の data_key は生成済み data node の context_key だけを使ってください。
 - chart/table/dataframe widget の x/y/column_order は参照先DWHモデルのフィールド名だけを使ってください。
 - WidgetNode の widget.widget_type は node_plan.widget_type と一致させてください。
@@ -662,7 +704,7 @@ def _normalize_data_node(
 ) -> DataNode:
     return DataNode(
         id=plan.id,
-        context_key=plan.context_key or dwh_context_key(plan.model_name),
+        context_key=plan.context_key or f"sql_{plan.id}",
         model_name=plan.model_name,
         data_type=data_node.data_type or plan.data_type,
         description=data_node.description or plan.description,
@@ -674,11 +716,7 @@ def _build_data_node_from_plan(plan: DataNodeGenerationPlan) -> DataNode:
     if not has_dwh_model(plan.model_name):
         raise ValueError(f"未定義のDWHモデルです: {plan.model_name}")
     field_names = dwh_field_names(plan.model_name)
-    context_key = dwh_context_key(plan.model_name)
-    if plan.context_key is not None and plan.context_key != context_key:
-        raise ValueError(
-            f"data node '{plan.id}' の context_key は '{context_key}' である必要があります。"
-        )
+    context_key = plan.context_key or f"sql_{plan.id}"
     return DataNode(
         id=plan.id,
         context_key=context_key,
@@ -686,6 +724,86 @@ def _build_data_node_from_plan(plan: DataNodeGenerationPlan) -> DataNode:
         data_type="dataframe",
         description=plan.description,
         primary_fields=plan.primary_fields or field_names,
+    )
+
+
+def _context_key_for_widget_plan(
+    graph: ScenarioGraph,
+    plan: WidgetNodeGenerationPlan,
+) -> str | None:
+    if not plan.data_node_ids:
+        return None
+    data_by_id = {data_node.id: data_node for data_node in graph.data_nodes}
+    data_node = data_by_id.get(plan.data_node_ids[0])
+    if data_node is None:
+        return None
+    return data_node.context_key
+
+
+def _bind_widget_to_data_context(widget_node: WidgetNode, context_key: str) -> WidgetNode:
+    widget_dump = widget_node.widget.model_dump(mode="json")
+    _replace_data_keys(widget_dump, context_key)
+    return WidgetNode.model_validate(
+        {
+            "id": widget_node.id,
+            "title": widget_node.title,
+            "widget": widget_dump,
+            "data_node_ids": widget_node.data_node_ids,
+        }
+    )
+
+
+def _replace_data_keys(value: object, context_key: str) -> None:
+    if isinstance(value, dict):
+        value_dict = cast(dict[object, object], value)
+        for key, child in value_dict.items():
+            if key == "data_key":
+                value_dict[key] = context_key
+            else:
+                _replace_data_keys(child, context_key)
+    elif isinstance(value, list):
+        for child in value:
+            _replace_data_keys(child, context_key)
+
+
+def _attach_widget_sql_result(
+    graph: ScenarioGraph,
+    widget_node: WidgetNode,
+    sql: str,
+    context: dict[str, object],
+) -> tuple[ScenarioGraph, dict[str, object]]:
+    if not widget_node.data_node_ids:
+        raise ValueError(f"widget node '{widget_node.id}' に data node 参照がありません。")
+    data_node_id = widget_node.data_node_ids[0]
+    data_nodes: list[DataNode] = []
+    target_node: DataNode | None = None
+    for data_node in graph.data_nodes:
+        if data_node.id == data_node_id:
+            target_node = data_node
+            continue
+        data_nodes.append(data_node)
+    if target_node is None:
+        raise ValueError(
+            f"widget node '{widget_node.id}' が存在しない data node "
+            f"'{data_node_id}' を参照しています。"
+        )
+
+    dataframe = execute_read_sql(sql)
+    updated_node = target_node.model_copy(
+        update={
+            "sql": sql,
+            "primary_fields": [str(column) for column in dataframe.columns],
+        }
+    )
+    data_nodes.append(updated_node)
+    data_nodes = sorted(data_nodes, key=lambda node: node.id)
+    next_context = dict(context)
+    next_context[updated_node.context_key] = dataframe
+    return (
+        ScenarioGraph.model_validate(
+            graph.model_copy(update={"data_nodes": data_nodes}).model_dump(mode="json")
+        ),
+        next_context,
     )
 
 

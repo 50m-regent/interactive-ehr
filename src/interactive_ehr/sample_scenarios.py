@@ -5,8 +5,6 @@ from __future__ import annotations
 import pandas as pd
 
 from interactive_ehr.models.registry import (
-    build_dwh_context_for_model_names,
-    dwh_context_key,
     dwh_field_names,
     get_dwh_model_info,
 )
@@ -26,6 +24,7 @@ from interactive_ehr.widgets import (
     TableSpec,
     TabsSpec,
 )
+from interactive_ehr.scenario_graph import build_sql_context_for_graph
 
 
 DEFAULT_SAMPLE_DWH_MODELS = [
@@ -36,15 +35,35 @@ DEFAULT_SAMPLE_DWH_MODELS = [
     "バイタル",
 ]
 
+SAMPLE_SQL_BY_MODEL = {
+    "患者基本": 'SELECT "匿名ID", "性別", "生年月日", "現在年齢" FROM "患者基本" LIMIT 5',
+    "検体検査結果": (
+        'SELECT "匿名ID", "検索日(採取日)", "検査項目", "結果(数値)", '
+        '"結果値単位" FROM "検体検査結果" LIMIT 20'
+    ),
+    "処方": (
+        'SELECT "匿名ID", "服薬開始日", "薬剤名", "用法", "処方日数" '
+        'FROM "処方" LIMIT 20'
+    ),
+    "カルテ記事DR": (
+        'SELECT "匿名ID", "記載日", "診療科", "記事種別", "記事" '
+        'FROM "カルテ記事DR" LIMIT 20'
+    ),
+    "バイタル": (
+        'SELECT "測定日", "体温", "脈拍", "血圧(最高)", "血圧(最低)" '
+        'FROM "バイタル" LIMIT 20'
+    ),
+}
+
 
 def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, object]]:
     """Return a DWH fake-data based task graph sample."""
 
-    widgets, context = get_chronic_disease_scenario()
     data_nodes = [
         _data_node_for_model(model_name, index)
         for index, model_name in enumerate(DEFAULT_SAMPLE_DWH_MODELS, start=1)
     ]
+    widgets = _chronic_disease_widgets()
     widget_nodes = [
         WidgetNode(
             id=f"widget_{index}",
@@ -85,19 +104,24 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
         widget_nodes=widget_nodes,
         edges=_build_edges("chronic_disease_outpatient", widget_nodes),
     )
+    context = build_sql_context_for_graph(graph)
     return graph, context
 
 
 def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:
-    """Return widgets and context generated only from DWH model fake data."""
+    """Return widgets and context generated from DWH SQLite SQL."""
 
-    context = build_dwh_context_for_model_names(DEFAULT_SAMPLE_DWH_MODELS)
-    patient_key = dwh_context_key("患者基本")
-    lab_key = dwh_context_key("検体検査結果")
-    prescription_key = dwh_context_key("処方")
-    record_key = dwh_context_key("カルテ記事DR")
-    vital_key = dwh_context_key("バイタル")
-    widgets: list[AnyWidget] = [
+    graph, context = get_chronic_disease_graph_scenario()
+    return [widget_node.widget for widget_node in graph.widget_nodes], context
+
+
+def _chronic_disease_widgets() -> list[AnyWidget]:
+    patient_key = _sql_context_key("患者基本")
+    lab_key = _sql_context_key("検体検査結果")
+    prescription_key = _sql_context_key("処方")
+    record_key = _sql_context_key("カルテ記事DR")
+    vital_key = _sql_context_key("バイタル")
+    return [
         MarkdownSpec(body="### DWH fake データサンプル"),
         ColumnsSpec(
             widths=[1, 1],
@@ -151,19 +175,34 @@ def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:
             height=320,
         ),
     ]
-    return widgets, context
 
 
 def _data_node_for_model(model_name: str, index: int) -> DataNode:
     model_info = get_dwh_model_info(model_name)
     return DataNode(
         id=f"data_{index}",
-        context_key=dwh_context_key(model_name),
+        context_key=_sql_context_key(model_name),
         model_name=model_name,
         data_type="dataframe",
-        description=model_info.description or f"DWH model {model_name} fake data",
-        primary_fields=dwh_field_names(model_name),
+        description=model_info.description or f"DWH model {model_name} SQL result",
+        primary_fields=_sql_result_fields(model_name),
+        sql=SAMPLE_SQL_BY_MODEL[model_name],
     )
+
+
+def _sql_context_key(model_name: str) -> str:
+    return f"sql_{model_name}"
+
+
+def _sql_result_fields(model_name: str) -> list[str]:
+    preferred = {
+        "患者基本": ["匿名ID", "性別", "生年月日", "現在年齢"],
+        "検体検査結果": ["匿名ID", "検索日(採取日)", "検査項目", "結果(数値)", "結果値単位"],
+        "処方": ["匿名ID", "服薬開始日", "薬剤名", "用法", "処方日数"],
+        "カルテ記事DR": ["匿名ID", "記載日", "診療科", "記事種別", "記事"],
+        "バイタル": ["測定日", "体温", "脈拍", "血圧(最高)", "血圧(最低)"],
+    }
+    return preferred.get(model_name, dwh_field_names(model_name))
 
 
 def _build_edges(scenario_id: str, widget_nodes: list[WidgetNode]) -> list[GraphEdge]:

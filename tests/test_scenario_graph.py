@@ -20,7 +20,9 @@ from interactive_ehr.scenario_graph import (
     TaskNodeGenerationPlan,
     TaskNode,
     WidgetNodeGenerationPlan,
+    WidgetNodeSqlGeneration,
     WidgetNode,
+    build_sql_context_for_graph,
     generate_scenario_graph_incrementally,
     generate_scenario_graph,
     parse_scenario_graph_json,
@@ -202,14 +204,22 @@ def test_render_scenario_graph_can_suppress_missing_reference_warnings(
     render_widget_mock.assert_called_once()
 
 
-def test_chronic_disease_graph_scenario_builds_valid_graph() -> None:
+def test_chronic_disease_graph_scenario_builds_valid_graph(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"匿名ID": ["P001"]})),
+    )
+
     graph, context = get_chronic_disease_graph_scenario()
 
     validated = ScenarioGraph.model_validate(graph.model_dump(mode="json"))
 
     assert validated.id == "chronic_disease_outpatient"
     assert validated.tasks[0].widget_ids
-    assert "dwh_検体検査結果" in context
+    assert "sql_検体検査結果" in context
     assert all(data_node.model_name is not None for data_node in validated.data_nodes)
 
 
@@ -221,24 +231,34 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
     client.generate.side_effect = [
         plan,
         TaskNode(id="changed", title="確認", widget_ids=[]),
-        WidgetNode(
-            id="changed",
-            widget=TableSpec(data_key="dwh_患者基本"),
-            data_node_ids=[],
+        WidgetNodeSqlGeneration(
+            widget_node=WidgetNode(
+                id="changed",
+                widget=TableSpec(data_key="ignored"),
+                data_node_ids=[],
+            ),
+            sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
     monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"匿名ID": ["P001"]})),
+    )
 
     result = generate_scenario_graph("検査を見たい", {"rows": []})
 
     assert result.id == "generated"
     assert result.tasks[0].id == "task_1"
-    assert result.data_nodes[0].context_key == "dwh_患者基本"
+    assert result.data_nodes[0].context_key == "sql_data_1"
     assert result.data_nodes[0].model_name == "患者基本"
+    assert result.data_nodes[0].sql == 'SELECT "匿名ID" FROM "患者基本"'
     assert result.widget_nodes[0].id == "widget_1"
+    assert result.widget_nodes[0].widget.data_key == "sql_data_1"
     call_args = client.generate.call_args.args
-    assert "dwh_患者基本" in call_args[0]
-    assert call_args[1] is WidgetNode
+    assert "sql_data_1" in call_args[0]
+    assert call_args[1] is WidgetNodeSqlGeneration
 
 
 def test_generation_plan_prompt_includes_context_columns() -> None:
@@ -248,7 +268,6 @@ def test_generation_plan_prompt_includes_context_columns() -> None:
     )
 
     assert "検体検査結果" in prompt
-    assert "dwh_検体検査結果" in prompt
     assert "x/y/column_order" in prompt
 
 
@@ -260,13 +279,21 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     client.generate.side_effect = [
         plan,
         TaskNode(id="changed", title="確認", widget_ids=[]),
-        WidgetNode(
-            id="changed",
-            widget=TableSpec(data_key="dwh_患者基本"),
-            data_node_ids=[],
+        WidgetNodeSqlGeneration(
+            widget_node=WidgetNode(
+                id="changed",
+                widget=TableSpec(data_key="ignored"),
+                data_node_ids=[],
+            ),
+            sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
     monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"匿名ID": ["P001"]})),
+    )
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
@@ -279,8 +306,9 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     ]
     assert events[1].graph.tasks[0].id == "task_1"
     assert events[2].graph.data_nodes[0].id == "data_1"
-    assert "dwh_患者基本" in events[2].context
+    assert events[2].context == {}
     assert events[3].graph.widget_nodes[0].id == "widget_1"
+    assert "sql_data_1" in events[3].context
     final_graph = events[-1].graph
     assert final_graph.edges == [
         GraphEdge(
@@ -302,7 +330,7 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
     assert client.generate.call_count == 3
 
 
-def test_generate_scenario_graph_incrementally_builds_context_from_dwh_fake(
+def test_generate_scenario_graph_incrementally_builds_context_from_widget_sql(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     plan = _minimal_generation_plan()
@@ -310,18 +338,26 @@ def test_generate_scenario_graph_incrementally_builds_context_from_dwh_fake(
     client.generate.side_effect = [
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
-        WidgetNode(
-            id="widget_1",
-            widget=TableSpec(data_key="dwh_患者基本"),
-            data_node_ids=[],
+        WidgetNodeSqlGeneration(
+            widget_node=WidgetNode(
+                id="widget_1",
+                widget=TableSpec(data_key="ignored"),
+                data_node_ids=[],
+            ),
+            sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
     monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"匿名ID": ["P001"]})),
+    )
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
     assert [event.status for event in events] == ["started", "task", "data", "widget", "completed"]
-    assert events[-1].context["dwh_患者基本"] is not None
+    assert events[-1].context["sql_data_1"] is not None
 
 
 def test_generate_scenario_graph_incrementally_fails_unknown_dwh_model(
@@ -373,13 +409,21 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
     client.generate.side_effect = [
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
-        WidgetNode(
-            id="widget_1",
-            widget=TableSpec(data_key="dwh_患者基本"),
-            data_node_ids=[],
+        WidgetNodeSqlGeneration(
+            widget_node=WidgetNode(
+                id="widget_1",
+                widget=TableSpec(data_key="ignored"),
+                data_node_ids=[],
+            ),
+            sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
     monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"匿名ID": ["P001"]})),
+    )
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
@@ -390,6 +434,31 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
         target_id="data_1",
         edge_type="widget_to_data",
     )
+
+
+def test_build_sql_context_for_graph_executes_data_node_sql(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    execute_mock = MagicMock(return_value=_dataframe({"匿名ID": ["P001"]}))
+    monkeypatch.setattr(scenario_graph, "execute_read_sql", execute_mock)
+    graph = _minimal_graph().model_copy(
+        update={
+            "data_nodes": [
+                DataNode(
+                    id="data_1",
+                    context_key="sql_data_1",
+                    data_type="dataframe",
+                    description="sql",
+                    sql='SELECT "匿名ID" FROM "患者基本"',
+                )
+            ]
+        }
+    )
+
+    context = build_sql_context_for_graph(graph)
+
+    assert "sql_data_1" in context
+    execute_mock.assert_called_once_with('SELECT "匿名ID" FROM "患者基本"')
 
 
 class _MiniStreamlit(FakeStreamlit):
@@ -427,3 +496,9 @@ def _minimal_generation_plan() -> ScenarioGraphGenerationPlan:
             )
         ],
     )
+
+
+def _dataframe(data: dict[str, list[object]]) -> Any:
+    import pandas as pd
+
+    return pd.DataFrame(data)

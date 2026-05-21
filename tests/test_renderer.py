@@ -332,5 +332,5 @@ def test_chronic_disease_scenario_builds_valid_widgets() -> None:
     validated = adapter.validate_python(widgets)
 
     assert len(validated) == len(widgets)
-    assert "dwh_処方" in context
-    assert "dwh_検体検査結果" in context
+    assert "sql_処方" in context
+    assert "sql_検体検査結果" in context
