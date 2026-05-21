@@ -2,13 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 import pandas as pd
 
-from interactive_ehr.models.registry import (
-    get_dwh_model_info,
-)
 from interactive_ehr.scenario_graph import (
     DataNode,
     GraphEdge,
@@ -32,150 +27,182 @@ SAMPLE_DATA_NODE_SPECS = [
     {
         "id": "data_patient_age",
         "context_key": "metric_patient_age",
-        "model_name": "患者基本",
+        "model_name": None,
         "data_type": "scalar",
         "description": "患者の現在年齢",
-        "primary_fields": ["現在年齢"],
-        "sql": (
-            'SELECT COALESCE((SELECT "現在年齢" FROM "患者基本" '
-            "WHERE \"現在年齢\" IS NOT NULL LIMIT 1), '未記録') AS \"現在年齢\""
-        ),
+        "primary_fields": ["年齢"],
+        "sql": 'SELECT "年齢" FROM "糖尿病外来_患者サマリ"',
     },
     {
-        "id": "data_latest_sbp",
-        "context_key": "metric_latest_sbp",
-        "model_name": "バイタル",
+        "id": "data_diabetes_duration",
+        "context_key": "metric_diabetes_duration",
+        "model_name": None,
         "data_type": "scalar",
-        "description": "直近の収縮期血圧",
-        "primary_fields": ["血圧(最高)"],
-        "sql": (
-            'SELECT COALESCE((SELECT "血圧(最高)" FROM "バイタル" '
-            'WHERE "血圧(最高)" IS NOT NULL ORDER BY "測定日" DESC LIMIT 1), '
-            "'未記録') AS \"血圧(最高)\""
-        ),
+        "description": "糖尿病罹病年数",
+        "primary_fields": ["糖尿病罹病年数"],
+        "sql": 'SELECT "糖尿病罹病年数" FROM "糖尿病外来_患者サマリ"',
     },
     {
-        "id": "data_latest_dbp",
-        "context_key": "metric_latest_dbp",
-        "model_name": "バイタル",
+        "id": "data_latest_a1c",
+        "context_key": "metric_latest_a1c",
+        "model_name": None,
         "data_type": "scalar",
-        "description": "直近の拡張期血圧",
-        "primary_fields": ["血圧(最低)"],
+        "description": "最新HbA1c",
+        "primary_fields": ["最新HbA1c"],
+        "sql": 'SELECT "最新HbA1c" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_latest_bp",
+        "context_key": "metric_latest_bp",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "最新外来血圧",
+        "primary_fields": ["血圧"],
         "sql": (
-            'SELECT COALESCE((SELECT "血圧(最低)" FROM "バイタル" '
-            'WHERE "血圧(最低)" IS NOT NULL ORDER BY "測定日" DESC LIMIT 1), '
-            "'未記録') AS \"血圧(最低)\""
+            'SELECT CAST("収縮期血圧" AS TEXT) || "/" || CAST("拡張期血圧" AS TEXT) '
+            '|| " mmHg" AS "血圧" FROM "糖尿病外来_患者サマリ"'
         ),
     },
     {
-        "id": "data_vital_trend",
-        "context_key": "chart_vital_trend",
-        "model_name": "バイタル",
+        "id": "data_latest_bmi",
+        "context_key": "metric_latest_bmi",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "最新BMI",
+        "primary_fields": ["BMI"],
+        "sql": 'SELECT "BMI" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_hypoglycemia",
+        "context_key": "metric_hypoglycemia",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "低血糖エピソード",
+        "primary_fields": ["低血糖"],
+        "sql": 'SELECT "低血糖" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_a1c_trend",
+        "context_key": "chart_a1c_trend",
+        "model_name": None,
         "data_type": "dataframe",
-        "description": "バイタル推移",
-        "primary_fields": ["測定日", "体温", "脈拍", "血圧(最高)", "血圧(最低)"],
-        "sql": (
-            'SELECT "測定日", "体温", "脈拍", "血圧(最高)", "血圧(最低)" '
-            'FROM "バイタル" ORDER BY "測定日" LIMIT 20'
-        ),
+        "description": "HbA1c推移",
+        "primary_fields": ["検査日", "HbA1c"],
+        "sql": 'SELECT "検査日", "HbA1c" FROM "糖尿病外来_検査推移" ORDER BY "検査日"',
     },
     {
-        "id": "data_latest_lab_value",
-        "context_key": "metric_latest_lab_value",
-        "model_name": "検体検査結果",
-        "data_type": "scalar",
-        "description": "直近の数値検査結果",
-        "primary_fields": ["結果(数値)"],
-        "sql": (
-            'SELECT COALESCE((SELECT "結果(数値)" FROM "検体検査結果" '
-            'WHERE "結果(数値)" IS NOT NULL ORDER BY "検索日(採取日)" DESC LIMIT 1), '
-            "'未記録') AS \"結果(数値)\""
-        ),
-    },
-    {
-        "id": "data_prescription_count",
-        "context_key": "metric_prescription_count",
-        "model_name": "処方",
-        "data_type": "scalar",
-        "description": "処方件数",
-        "primary_fields": ["処方件数"],
-        "sql": 'SELECT COUNT(*) AS "処方件数" FROM "処方"',
-    },
-    {
-        "id": "data_average_prescription_days",
-        "context_key": "metric_average_prescription_days",
-        "model_name": "処方",
-        "data_type": "scalar",
-        "description": "平均処方日数",
-        "primary_fields": ["平均処方日数"],
-        "sql": (
-            "SELECT COALESCE(ROUND(AVG(\"処方日数\"), 1), '未記録') AS \"平均処方日数\" "
-            'FROM "処方" WHERE "処方日数" IS NOT NULL'
-        ),
-    },
-    {
-        "id": "data_lab_trend",
-        "context_key": "chart_lab_trend",
-        "model_name": "検体検査結果",
+        "id": "data_bp_weight_trend",
+        "context_key": "chart_bp_weight_trend",
+        "model_name": None,
         "data_type": "dataframe",
-        "description": "検査値推移",
-        "primary_fields": ["検索日(採取日)", "結果(数値)"],
+        "description": "血圧とBMIの推移",
+        "primary_fields": ["測定日", "収縮期血圧", "拡張期血圧", "BMI"],
         "sql": (
-            'SELECT "検索日(採取日)", "結果(数値)" FROM "検体検査結果" '
-            'WHERE "結果(数値)" IS NOT NULL ORDER BY "検索日(採取日)" LIMIT 20'
+            'SELECT "測定日", "収縮期血圧", "拡張期血圧", "BMI" '
+            'FROM "糖尿病外来_バイタル推移" ORDER BY "測定日"'
         ),
     },
     {
-        "id": "data_prescription_days",
-        "context_key": "chart_prescription_days",
-        "model_name": "処方",
-        "data_type": "dataframe",
-        "description": "薬剤別処方日数",
-        "primary_fields": ["薬剤名", "処方日数"],
-        "sql": (
-            'SELECT "薬剤名", "処方日数" FROM "処方" '
-            'WHERE "処方日数" IS NOT NULL ORDER BY "服薬開始日" DESC LIMIT 10'
-        ),
-    },
-    {
-        "id": "data_record_count",
-        "context_key": "metric_record_count",
-        "model_name": "カルテ記事DR",
+        "id": "data_latest_egfr",
+        "context_key": "metric_latest_egfr",
+        "model_name": None,
         "data_type": "scalar",
-        "description": "医師カルテ記事数",
-        "primary_fields": ["記事数"],
-        "sql": 'SELECT COUNT(*) AS "記事数" FROM "カルテ記事DR"',
+        "description": "最新eGFR",
+        "primary_fields": ["eGFR"],
+        "sql": 'SELECT "eGFR" FROM "糖尿病外来_患者サマリ"',
     },
     {
-        "id": "data_latest_record_date",
-        "context_key": "metric_latest_record_date",
-        "model_name": "カルテ記事DR",
+        "id": "data_latest_uacr",
+        "context_key": "metric_latest_uacr",
+        "model_name": None,
         "data_type": "scalar",
-        "description": "直近カルテ記載日",
-        "primary_fields": ["記載日"],
+        "description": "最新UACR",
+        "primary_fields": ["UACR"],
+        "sql": 'SELECT "UACR" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_latest_ldl",
+        "context_key": "metric_latest_ldl",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "最新LDL",
+        "primary_fields": ["LDL"],
+        "sql": 'SELECT "LDL" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_eye_exam",
+        "context_key": "metric_eye_exam",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "最終眼科受診",
+        "primary_fields": ["最終眼科受診"],
+        "sql": 'SELECT "最終眼科受診" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_foot_check",
+        "context_key": "metric_foot_check",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "最終足チェック",
+        "primary_fields": ["最終足チェック"],
+        "sql": 'SELECT "最終足チェック" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_kidney_trend",
+        "context_key": "chart_kidney_trend",
+        "model_name": None,
+        "data_type": "dataframe",
+        "description": "腎機能推移",
+        "primary_fields": ["検査日", "eGFR", "UACR"],
         "sql": (
-            'SELECT COALESCE((SELECT "記載日" FROM "カルテ記事DR" '
-            'WHERE "記載日" IS NOT NULL ORDER BY "記載日" DESC LIMIT 1), '
-            "'未記録') AS \"記載日\""
+            'SELECT "検査日", "eGFR", "UACR" '
+            'FROM "糖尿病外来_検査推移" ORDER BY "検査日"'
         ),
     },
     {
-        "id": "data_record_type_counts",
-        "context_key": "chart_record_type_counts",
-        "model_name": "カルテ記事DR",
+        "id": "data_medication_categories",
+        "context_key": "chart_medication_categories",
+        "model_name": None,
         "data_type": "dataframe",
-        "description": "記事種別件数",
-        "primary_fields": ["記事種別", "件数"],
+        "description": "薬剤カテゴリ別件数",
+        "primary_fields": ["カテゴリ", "薬剤数"],
         "sql": (
-            'SELECT "記事種別", COUNT(*) AS "件数" FROM "カルテ記事DR" '
-            'GROUP BY "記事種別" ORDER BY "件数" DESC LIMIT 10'
+            'SELECT "カテゴリ", COUNT(*) AS "薬剤数" FROM "糖尿病外来_治療" '
+            'GROUP BY "カテゴリ" ORDER BY "薬剤数" DESC'
         ),
+    },
+    {
+        "id": "data_lifestyle_adherence",
+        "context_key": "chart_lifestyle_adherence",
+        "model_name": None,
+        "data_type": "dataframe",
+        "description": "生活習慣達成率",
+        "primary_fields": ["項目", "達成率"],
+        "sql": 'SELECT "項目", "達成率" FROM "糖尿病外来_生活" ORDER BY "達成率"',
+    },
+    {
+        "id": "data_visit_issue",
+        "context_key": "metric_visit_issue",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "本日の論点",
+        "primary_fields": ["本日の論点"],
+        "sql": 'SELECT "本日の論点" FROM "糖尿病外来_患者サマリ"',
+    },
+    {
+        "id": "data_next_todo",
+        "context_key": "metric_next_todo",
+        "model_name": None,
+        "data_type": "scalar",
+        "description": "次回までのToDo",
+        "primary_fields": ["次回ToDo"],
+        "sql": 'SELECT "次回ToDo" FROM "糖尿病外来_患者サマリ"',
     },
 ]
 
 
 def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, object]]:
-    """Return a DWH fake-data based task graph sample."""
+    """Return the default diabetes outpatient task graph sample."""
 
     data_nodes = [_data_node_from_spec(spec) for spec in SAMPLE_DATA_NODE_SPECS]
     widgets = _chronic_disease_widgets()
@@ -190,35 +217,42 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
     ]
     tasks = [
         TaskNode(
-            id="task_patient_overview",
-            title="患者・バイタル",
-            description="患者背景とバイタルの要点を確認する。",
+            id="task_visit_summary",
+            title="診察前サマリ",
+            description="血糖、血圧、体重、低血糖の要点を診察前に確認する。",
             order=1,
-            widget_ids=["widget_1", "widget_2", "widget_3"],
+            widget_ids=["widget_1", "widget_2", "widget_3", "widget_4"],
         ),
         TaskNode(
-            id="task_labs_orders",
-            title="検査・処方",
-            description="検査値と処方継続の確認ポイントを見る。",
+            id="task_complications",
+            title="血糖・合併症",
+            description="血糖推移、腎症、脂質、眼科/足チェックを確認する。",
             order=2,
-            widget_ids=["widget_4", "widget_5", "widget_6"],
+            widget_ids=["widget_5", "widget_6", "widget_7", "widget_8"],
         ),
         TaskNode(
-            id="task_records",
-            title="カルテ",
-            description="直近記録と記事種別の偏りを確認する。",
+            id="task_treatment_lifestyle",
+            title="治療・生活",
+            description="薬物療法と生活習慣の継続状況を確認する。",
             order=3,
-            widget_ids=["widget_7", "widget_8", "widget_9"],
+            widget_ids=["widget_9", "widget_10", "widget_11"],
+        ),
+        TaskNode(
+            id="task_today_plan",
+            title="本日の診察メモ",
+            description="今日の確認事項と次回までのToDoを整理する。",
+            order=4,
+            widget_ids=["widget_12", "widget_13", "widget_14"],
         ),
     ]
     graph = ScenarioGraph(
-        id="chronic_disease_outpatient",
-        title="慢性疾患外来レビュー",
-        description="SQLで抽出した要点を使う診療タスク別サンプル。",
+        id="diabetes_outpatient",
+        title="糖尿病患者の外来診察",
+        description="糖尿病外来で確認する血糖、合併症、治療、生活指導のサンプル。",
         tasks=tasks,
         data_nodes=data_nodes,
         widget_nodes=widget_nodes,
-        edges=_build_edges("chronic_disease_outpatient", tasks, widget_nodes),
+        edges=_build_edges("diabetes_outpatient", tasks, widget_nodes),
     )
     context = build_sql_context_for_graph(graph)
     return graph, context
@@ -235,102 +269,115 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
     return [
         MarkdownSpec(
             body=(
-                "### 慢性疾患外来レビュー\n"
-                "診察前に患者背景、バイタル推移、検査値、処方継続、直近記録を確認します。"
+                "### 糖尿病外来レビュー\n"
+                "A1C、血圧、体重、低血糖、腎症・網膜症・足病変の確認漏れを防ぐための診察前サマリです。"
             )
         ),
         ColumnsSpec(
-            widths=[1, 1, 1],
+            widths=[1, 1, 1, 1],
             columns=[
-                [MetricSpec(label="現在年齢", value_key="metric_patient_age")],
-                [MetricSpec(label="直近 収縮期血圧", value_key="metric_latest_sbp")],
-                [MetricSpec(label="直近 拡張期血圧", value_key="metric_latest_dbp")],
+                [MetricSpec(label="年齢", value_key="metric_patient_age")],
+                [MetricSpec(label="糖尿病罹病年数", value_key="metric_diabetes_duration")],
+                [MetricSpec(label="最新HbA1c", value_key="metric_latest_a1c")],
+                [MetricSpec(label="低血糖", value_key="metric_hypoglycemia")],
             ],
-        ),
-        LineChartSpec(
-            data_key="chart_vital_trend",
-            x="測定日",
-            y=["体温", "脈拍", "血圧(最高)", "血圧(最低)"],
-            height=280,
-        ),
-        MarkdownSpec(
-            body=(
-                "### 検査・処方確認\n"
-                "検査値の変化と処方日数を見て、追加確認が必要な項目を絞り込みます。"
-            )
-        ),
-        ColumnsSpec(
-            widths=[1, 1, 1],
-            columns=[
-                [MetricSpec(label="直近 数値検査結果", value_key="metric_latest_lab_value")],
-                [MetricSpec(label="処方件数", value_key="metric_prescription_count")],
-                [
-                    MetricSpec(
-                        label="平均処方日数",
-                        value_key="metric_average_prescription_days",
-                    )
-                ],
-            ],
-        ),
-        TabsSpec(
-            labels=["検査値推移", "処方日数"],
-            tabs=[
-                [
-                    LineChartSpec(
-                        data_key="chart_lab_trend",
-                        x="検索日(採取日)",
-                        y="結果(数値)",
-                        height=280,
-                    )
-                ],
-                [
-                    BarChartSpec(
-                        data_key="chart_prescription_days",
-                        x="薬剤名",
-                        y="処方日数",
-                        height=280,
-                    )
-                ],
-            ],
-        ),
-        MarkdownSpec(
-            body=(
-                "### カルテ確認\n"
-                "直近記載日と記事種別を確認し、診察前に読むべき記録の優先度を決めます。"
-            )
         ),
         ColumnsSpec(
             widths=[1, 1],
             columns=[
-                [MetricSpec(label="医師記事数", value_key="metric_record_count")],
-                [MetricSpec(label="直近記載日", value_key="metric_latest_record_date")],
+                [MetricSpec(label="外来血圧", value_key="metric_latest_bp")],
+                [MetricSpec(label="BMI", value_key="metric_latest_bmi")],
             ],
         ),
+        LineChartSpec(
+            data_key="chart_bp_weight_trend",
+            x="測定日",
+            y=["収縮期血圧", "拡張期血圧", "BMI"],
+            height=300,
+        ),
+        MarkdownSpec(
+            body=(
+                "### 血糖・合併症チェック\n"
+                "A1Cは多くの成人で7%未満を目安にしつつ、腎機能・尿アルブミン・眼科/足チェックを合わせて確認します。"
+            )
+        ),
+        ColumnsSpec(
+            widths=[1, 1, 1, 1],
+            columns=[
+                [MetricSpec(label="eGFR", value_key="metric_latest_egfr")],
+                [MetricSpec(label="UACR", value_key="metric_latest_uacr")],
+                [MetricSpec(label="LDL-C", value_key="metric_latest_ldl")],
+                [MetricSpec(label="最終眼科受診", value_key="metric_eye_exam")],
+            ],
+        ),
+        TabsSpec(
+            labels=["HbA1c推移", "腎機能推移"],
+            tabs=[
+                [
+                    LineChartSpec(
+                        data_key="chart_a1c_trend",
+                        x="検査日",
+                        y="HbA1c",
+                        height=300,
+                    )
+                ],
+                [
+                    LineChartSpec(
+                        data_key="chart_kidney_trend",
+                        x="検査日",
+                        y=["eGFR", "UACR"],
+                        height=300,
+                    )
+                ],
+            ],
+        ),
+        MetricSpec(label="最終足チェック", value_key="metric_foot_check"),
+        MarkdownSpec(
+            body=(
+                "### 治療・生活\n"
+                "薬物療法の役割を確認し、服薬継続、食事、運動、家庭血圧、足セルフチェックを診察で聞き取ります。"
+            )
+        ),
         BarChartSpec(
-            data_key="chart_record_type_counts",
-            x="記事種別",
-            y="件数",
-            height=280,
+            data_key="chart_medication_categories",
+            x="カテゴリ",
+            y="薬剤数",
+            height=300,
+        ),
+        BarChartSpec(
+            data_key="chart_lifestyle_adherence",
+            x="項目",
+            y="達成率",
+            height=300,
+        ),
+        MarkdownSpec(
+            body=(
+                "### 本日の診察メモ\n"
+                "検査値だけでなく、低血糖、服薬負担、感染症状、眼科/足チェックの予定を確認します。"
+            )
+        ),
+        MetricSpec(label="本日の論点", value_key="metric_visit_issue"),
+        MetricSpec(label="次回までのToDo", value_key="metric_next_todo"),
+        MarkdownSpec(
+            body=(
+                "#### 参考にした確認観点\n"
+                "- A1Cと血圧・体重を外来ごとに確認\n"
+                "- eGFR/UACR、脂質、眼科、足チェックを定期確認\n"
+                "- 薬剤の心腎保護、服薬継続、食事・運動・セルフケアを合わせて確認"
+            )
         ),
     ]
 
 
 def _data_node_from_spec(spec: dict[str, object]) -> DataNode:
-    model_name = str(spec["model_name"])
-    description = str(spec["description"])
-    model_description = (get_dwh_model_info(model_name).description or "").strip()
-    primary_fields = spec["primary_fields"]
-    if not isinstance(primary_fields, Sequence) or isinstance(
-        primary_fields, str | bytes
-    ):
-        primary_fields = []
+    model_name = spec["model_name"]
     return DataNode(
         id=str(spec["id"]),
         context_key=str(spec["context_key"]),
-        model_name=model_name,
+        model_name=str(model_name) if model_name is not None else None,
         data_type=str(spec["data_type"]),
-        description=description or model_description,
-        primary_fields=[str(field) for field in primary_fields],
+        description=str(spec["description"]),
+        primary_fields=[str(field) for field in spec["primary_fields"]],
         sql=str(spec["sql"]),
     )
 

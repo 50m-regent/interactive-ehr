@@ -231,11 +231,33 @@ class TestDwhDatabase:
             csv_dir=csv_dir,
             db_path=db_path,
             overwrite=True,
+            include_diabetes_sample=False,
         )
 
         assert (loaded, skipped) == (1, 0)
         assert list_database_tables(db_path=db_path) == ["患者基本"]
         assert list_table_columns("患者基本", db_path=db_path) == ["匿名ID", "性別"]
+
+    def test_builds_diabetes_sample_tables(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        db_path = tmp_path / "dwh.sqlite"
+
+        loaded, skipped = build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+        )
+
+        assert (loaded, skipped) == (6, 0)
+        assert "糖尿病外来_患者サマリ" in list_database_tables(db_path=db_path)
+        dataframe = execute_read_sql(
+            'SELECT "最新HbA1c", "eGFR", "UACR" FROM "糖尿病外来_患者サマリ"',
+            db_path=db_path,
+        )
+        assert dataframe.to_dict(orient="records") == [
+            {"最新HbA1c": 7.4, "eGFR": 58, "UACR": 46}
+        ]
 
     def test_execute_read_sql_returns_dataframe(self, tmp_path: Path) -> None:
         csv_dir = tmp_path / "dwh"
@@ -244,7 +266,12 @@ class TestDwhDatabase:
             [{"匿名ID": "CSV_001", "性別": "男"}],
         ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
         db_path = tmp_path / "dwh.sqlite"
-        build_dwh_database_from_csvs(csv_dir=csv_dir, db_path=db_path, overwrite=True)
+        build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+            include_diabetes_sample=False,
+        )
 
         dataframe = execute_read_sql(
             'SELECT "匿名ID" FROM "患者基本"',
