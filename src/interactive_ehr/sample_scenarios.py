@@ -18,7 +18,6 @@ from interactive_ehr.scenario_graph import (
 from interactive_ehr.widgets import (
     AnyWidget,
     ColumnsSpec,
-    DataframeSpec,
     LineChartSpec,
     MarkdownSpec,
     TableSpec,
@@ -142,37 +141,19 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
             labels=["検体検査結果", "処方"],
             tabs=[
                 [
-                    DataframeSpec(
+                    TableSpec(
                         data_key=lab_key,
-                        column_order=[
-                            "匿名ID",
-                            "検索日(採取日)",
-                            "検査項目",
-                            "結果(数値)",
-                            "結果値単位",
-                        ],
-                        height=320,
                     )
                 ],
                 [
-                    DataframeSpec(
+                    TableSpec(
                         data_key=prescription_key,
-                        column_order=[
-                            "匿名ID",
-                            "服薬開始日",
-                            "薬剤名",
-                            "用法",
-                            "処方日数",
-                        ],
-                        height=320,
                     )
                 ],
             ],
         ),
-        DataframeSpec(
+        TableSpec(
             data_key=record_key,
-            column_order=["匿名ID", "記載日", "診療科", "記事種別", "記事"],
-            height=320,
         ),
     ]
 

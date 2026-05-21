@@ -334,3 +334,4 @@ def test_chronic_disease_scenario_builds_valid_widgets() -> None:
     assert len(validated) == len(widgets)
     assert "sql_処方" in context
     assert "sql_検体検査結果" in context
+    assert all(not isinstance(widget, DataframeSpec) for widget in validated)
