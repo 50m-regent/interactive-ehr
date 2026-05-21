@@ -332,6 +332,23 @@ def test_chronic_disease_scenario_builds_valid_widgets() -> None:
     validated = adapter.validate_python(widgets)
 
     assert len(validated) == len(widgets)
-    assert "sql_処方" in context
-    assert "sql_検体検査結果" in context
-    assert all(not isinstance(widget, DataframeSpec) for widget in validated)
+    assert "chart_prescription_days" in context
+    assert "chart_lab_trend" in context
+    assert "metric_prescription_count" in context
+    flattened = _flatten_widgets(validated)
+    assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
+
+
+def _flatten_widgets(widgets: list[AnyWidget]) -> list[AnyWidget]:
+    flattened: list[AnyWidget] = []
+    for widget in widgets:
+        flattened.append(widget)
+        if isinstance(widget, ColumnsSpec):
+            for column in widget.columns:
+                flattened.extend(_flatten_widgets(column))
+        if isinstance(widget, TabsSpec):
+            for tab in widget.tabs:
+                flattened.extend(_flatten_widgets(tab))
+        if isinstance(widget, ExpanderSpec):
+            flattened.extend(_flatten_widgets(widget.children))
+    return flattened

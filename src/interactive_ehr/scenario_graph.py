@@ -6,6 +6,7 @@ import json
 from collections.abc import Mapping
 from typing import Iterator, Literal, cast
 
+import pandas as pd
 import streamlit as st
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -233,8 +234,18 @@ def build_sql_context_for_graph(graph: ScenarioGraph) -> dict[str, object]:
     for data_node in graph.data_nodes:
         if data_node.sql is None:
             continue
-        context[data_node.context_key] = execute_read_sql(data_node.sql)
+        dataframe = execute_read_sql(data_node.sql)
+        if data_node.data_type == "scalar":
+            context[data_node.context_key] = _scalar_from_dataframe(dataframe)
+        else:
+            context[data_node.context_key] = dataframe
     return context
+
+
+def _scalar_from_dataframe(dataframe: pd.DataFrame) -> object | None:
+    if dataframe.empty:
+        return None
+    return dataframe.iat[0, 0]
 
 
 def generate_scenario_graph(

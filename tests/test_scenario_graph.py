@@ -219,7 +219,8 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
 
     assert validated.id == "chronic_disease_outpatient"
     assert validated.tasks[0].widget_ids
-    assert "sql_検体検査結果" in context
+    assert "chart_lab_trend" in context
+    assert "metric_prescription_count" in context
     assert all(data_node.model_name is not None for data_node in validated.data_nodes)
 
 
