@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 
 import pandas as pd
-from pandas.errors import EmptyDataError
+from pandas.errors import DatabaseError, EmptyDataError
 
 from interactive_ehr.models.registry import DEFAULT_DWH_CSV_DIR
 
@@ -63,7 +63,7 @@ def execute_read_sql(
     *,
     db_path: str | Path = DEFAULT_DWH_DB_PATH,
 ) -> pd.DataFrame:
-    """Execute a read-only SELECT SQL statement against the DWH SQLite DB."""
+    """Execute a read-only SQL query against the DWH SQLite DB."""
 
     _validate_read_sql(sql)
     sqlite_path = Path(db_path)
@@ -75,7 +75,13 @@ def execute_read_sql(
 
     uri = f"file:{sqlite_path.resolve()}?mode=ro"
     with sqlite3.connect(uri, uri=True) as connection:
-        return pd.read_sql_query(sql, connection)
+        connection.set_authorizer(_read_only_authorizer)
+        try:
+            return pd.read_sql_query(sql, connection)
+        except DatabaseError as exc:
+            if "not authorized" in str(exc).lower():
+                raise ValueError("SQLは読み取りクエリだけを指定してください。") from exc
+            raise
 
 
 def list_database_tables(
@@ -205,10 +211,52 @@ def _validate_read_sql(sql: str) -> None:
     if not stripped:
         raise ValueError("SQLが空です。")
     if ";" in stripped.rstrip(";"):
-        raise ValueError("SQLは単一のSELECT文だけを指定してください。")
+        raise ValueError("SQLは単一の読み取りクエリだけを指定してください。")
     first_token = stripped.lstrip(" \n\t(").split(None, 1)[0].lower()
-    if first_token != "select":
-        raise ValueError("SQLはSELECT文だけを指定してください。")
+    if first_token not in {"select", "with", "values"}:
+        raise ValueError("SQLは読み取りクエリだけを指定してください。")
+
+
+_DENIED_SQLITE_ACTIONS = {
+    sqlite3.SQLITE_ALTER_TABLE,
+    sqlite3.SQLITE_ATTACH,
+    sqlite3.SQLITE_CREATE_INDEX,
+    sqlite3.SQLITE_CREATE_TABLE,
+    sqlite3.SQLITE_CREATE_TEMP_INDEX,
+    sqlite3.SQLITE_CREATE_TEMP_TABLE,
+    sqlite3.SQLITE_CREATE_TEMP_TRIGGER,
+    sqlite3.SQLITE_CREATE_TEMP_VIEW,
+    sqlite3.SQLITE_CREATE_TRIGGER,
+    sqlite3.SQLITE_CREATE_VIEW,
+    sqlite3.SQLITE_CREATE_VTABLE,
+    sqlite3.SQLITE_DELETE,
+    sqlite3.SQLITE_DETACH,
+    sqlite3.SQLITE_DROP_INDEX,
+    sqlite3.SQLITE_DROP_TABLE,
+    sqlite3.SQLITE_DROP_TEMP_INDEX,
+    sqlite3.SQLITE_DROP_TEMP_TABLE,
+    sqlite3.SQLITE_DROP_TEMP_TRIGGER,
+    sqlite3.SQLITE_DROP_TEMP_VIEW,
+    sqlite3.SQLITE_DROP_TRIGGER,
+    sqlite3.SQLITE_DROP_VIEW,
+    sqlite3.SQLITE_DROP_VTABLE,
+    sqlite3.SQLITE_INSERT,
+    sqlite3.SQLITE_REINDEX,
+    sqlite3.SQLITE_TRANSACTION,
+    sqlite3.SQLITE_UPDATE,
+}
+
+
+def _read_only_authorizer(
+    action_code: int,
+    _arg1: str | None,
+    _arg2: str | None,
+    _database_name: str | None,
+    _trigger_or_view: str | None,
+) -> int:
+    if action_code in _DENIED_SQLITE_ACTIONS:
+        return sqlite3.SQLITE_DENY
+    return sqlite3.SQLITE_OK
 
 
 def _escape_identifier(identifier: str) -> str:
