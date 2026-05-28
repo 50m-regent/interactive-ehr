@@ -1,0 +1,13 @@
+services:
+  interactive-ehr:
+    build: .
+    image: interactive-ehr:latest
+    container_name: interactive-ehr
+    ports:
+      - "8501:8501"
+    # Bind-mount source so host edits reflect live (Streamlit reruns on save).
+    # Dependencies live in /opt/venv inside the image and are unaffected.
+    volumes:
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+    restart: unless-stopped

@@ -1,0 +1,26 @@
+# Virtual env / caches (re-created inside the image)
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+**/__pycache__/
+*.pyc
+*.egg-info/
+
+# VCS
+.git/
+.gitignore
+
+# Generated DB (rebuilt during image build)
+data/*.sqlite
+data/*.sqlite-*
+
+# Secrets (Gemini is not needed for offline run)
+.env
+key.json
+
+# Large research artifacts not needed at runtime
+Research.pdf
+
+# Docker artifacts
+*.tar
