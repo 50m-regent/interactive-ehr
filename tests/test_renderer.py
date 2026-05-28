@@ -344,6 +344,7 @@ def test_chronic_disease_scenario_builds_valid_widgets(monkeypatch: Any) -> None
     assert "metric_patient_material" in context
     flattened = _flatten_widgets(validated)
     assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
+    assert all(not isinstance(widget, MarkdownSpec) for widget in flattened)
 
 
 def _flatten_widgets(widgets: list[AnyWidget]) -> list[AnyWidget]:

@@ -17,7 +17,6 @@ from interactive_ehr.widgets import (
     BarChartSpec,
     ColumnsSpec,
     LineChartSpec,
-    MarkdownSpec,
     MetricSpec,
     TabsSpec,
 )
@@ -251,28 +250,28 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
             title="血圧・腎機能評価",
             description="最近の血圧コントロール状況と腎機能の経時的変化を評価する。",
             order=1,
-            widget_ids=["widget_1", "widget_2", "widget_3", "widget_4"],
+            widget_ids=["widget_1", "widget_2", "widget_3"],
         ),
         TaskNode(
             id="task_side_effect_adherence",
             title="副作用・服薬確認",
             description="現在の処方内容、過去のカルテ記載から副作用と服薬状況を確認する。",
             order=2,
-            widget_ids=["widget_5", "widget_6", "widget_7", "widget_8"],
+            widget_ids=["widget_4", "widget_5", "widget_6"],
         ),
         TaskNode(
             id="task_prescription_adjustment",
             title="検査に基づく処方調整",
             description="直近の検査結果、現在処方、過去記載を合わせて処方調整を検討する。",
             order=3,
-            widget_ids=["widget_9", "widget_10", "widget_11"],
+            widget_ids=["widget_7", "widget_8"],
         ),
         TaskNode(
             id="task_lifestyle_guidance",
             title="生活習慣指導",
             description="患者向け資料を使い、生活習慣の重要性を再度指導する。",
             order=4,
-            widget_ids=["widget_12", "widget_13", "widget_14"],
+            widget_ids=["widget_9", "widget_10"],
         ),
     ]
     graph = ScenarioGraph(
@@ -297,12 +296,6 @@ def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:
 
 def _chronic_disease_widgets() -> list[AnyWidget]:
     return [
-        MarkdownSpec(
-            body=(
-                "### 血圧・腎機能の評価\n"
-                "血圧推移とeGFR/UACRの推移を同時に見て、降圧目標と腎保護の観点で確認します。"
-            )
-        ),
         ColumnsSpec(
             widths=[1, 1, 1, 1],
             columns=[
@@ -340,12 +333,6 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
                 [MetricSpec(label="K", value_key="metric_latest_potassium")],
             ],
         ),
-        MarkdownSpec(
-            body=(
-                "### 副作用・服薬コンプライアンス確認\n"
-                "現在処方を疾患横断で確認し、ふらつき、電解質異常、低血糖、飲み忘れを聞き取ります。"
-            )
-        ),
         ColumnsSpec(
             widths=[1, 1, 1],
             columns=[
@@ -367,12 +354,6 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
                 [MetricSpec(label="服薬状況", value_key="metric_adherence_note")],
             ],
         ),
-        MarkdownSpec(
-            body=(
-                "### 検査結果に基づく処方調整\n"
-                "直近検査、現在処方、過去記載を合わせ、増量・減量・継続の判断材料をまとめます。"
-            )
-        ),
         ColumnsSpec(
             widths=[1, 1, 1, 1],
             columns=[
@@ -388,12 +369,6 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
                 [MetricSpec(label="本日の論点", value_key="metric_latest_exam_summary")],
                 [MetricSpec(label="処方調整メモ", value_key="metric_adjustment_note")],
             ],
-        ),
-        MarkdownSpec(
-            body=(
-                "### 生活習慣指導\n"
-                "患者に見せる前提で、減塩、運動、家庭血圧、服薬、体重管理の要点を短く提示します。"
-            )
         ),
         BarChartSpec(
             data_key="chart_lifestyle_status",
