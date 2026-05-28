@@ -41,8 +41,8 @@
     },
     {
       "id": "task_5",
-      "title": "チラーヂン補充量の変更",
-      "description": "甲状腺機能と直近補充量から不足・過剰を判断する。",
+      "title": "チラーヂン補充量変更のための情報確認",
+      "description": "直近の甲状腺機能と最新のチラーヂン補充量を確認する。",
       "order": 5,
       "widget_ids": [
         "widget_5"
@@ -100,14 +100,14 @@
     },
     {
       "id": "data_5",
-      "context_key": "md_dose_adjust",
+      "context_key": "md_latest_levothyroxine_status",
       "model_name": null,
       "data_type": "scalar",
-      "description": "甲状腺機能と補充量に基づく投与調整判断",
+      "description": "直近の甲状腺機能と最新チラーヂン補充量",
       "primary_fields": [
-        "dose_adjust_markdown"
+        "latest_levothyroxine_status_markdown"
       ],
-      "sql": "WITH latest_labs AS (SELECT MAX(CASE WHEN \"検査項目\"='TSH' THEN \"結果(数値)\" END) AS tsh, MAX(CASE WHEN \"検査項目\"='fT4' THEN \"結果(数値)\" END) AS ft4, MAX(CASE WHEN \"検査項目\"='fT3' THEN \"結果(数値)\" END) AS ft3, \"報告日\" FROM \"検体検査結果\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"検査項目\" IN ('TSH','fT4','fT3') GROUP BY \"報告日\" ORDER BY \"報告日\" DESC LIMIT 1), latest_dose AS (SELECT CAST(\"一日量\" AS REAL) AS dose, \"服薬開始日\" FROM \"処方\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"薬剤名\" LIKE '%チラーヂン%' ORDER BY \"服薬開始日\" DESC LIMIT 1) SELECT '### チラーヂン補充量変更の検討' || char(10) || '- 検査日: ' || COALESCE((SELECT \"報告日\" FROM latest_labs), '-') || char(10) || '- TSH: ' || COALESCE(CAST((SELECT tsh FROM latest_labs) AS TEXT), '-') || ', fT4: ' || COALESCE(CAST((SELECT ft4 FROM latest_labs) AS TEXT), '-') || ', fT3: ' || COALESCE(CAST((SELECT ft3 FROM latest_labs) AS TEXT), '-') || char(10) || '- 現在投与量: ' || COALESCE(CAST((SELECT dose FROM latest_dose) AS TEXT), '-') || ' μg/日' || char(10) || '- 判断: ' || CASE WHEN (SELECT tsh FROM latest_labs) > 4.5 THEN '補充不足の可能性。増量を検討。' WHEN (SELECT tsh FROM latest_labs) < 0.3 THEN '補充過剰の可能性。減量を検討。' ELSE '概ね目標範囲。現行量継続を基本に症状で微調整。' END AS \"dose_adjust_markdown\""
+      "sql": "WITH latest_labs AS (SELECT MAX(CASE WHEN \"検査項目\"='TSH' THEN \"結果(数値)\" END) AS tsh, MAX(CASE WHEN \"検査項目\"='fT4' THEN \"結果(数値)\" END) AS ft4, MAX(CASE WHEN \"検査項目\"='fT3' THEN \"結果(数値)\" END) AS ft3, \"報告日\" FROM \"検体検査結果\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"検査項目\" IN ('TSH','fT4','fT3') GROUP BY \"報告日\" ORDER BY \"報告日\" DESC LIMIT 1), latest_dose AS (SELECT CAST(\"一日量\" AS REAL) AS dose, \"一日量単位\", \"服薬開始日\" FROM \"処方\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"薬剤名\" LIKE '%チラーヂン%' ORDER BY \"服薬開始日\" DESC LIMIT 1) SELECT '### 最新の甲状腺機能とチラーヂン補充量' || char(10) || '- 検査日: ' || COALESCE((SELECT \"報告日\" FROM latest_labs), '-') || char(10) || '- TSH: ' || COALESCE(CAST((SELECT tsh FROM latest_labs) AS TEXT), '-') || ', fT4: ' || COALESCE(CAST((SELECT ft4 FROM latest_labs) AS TEXT), '-') || ', fT3: ' || COALESCE(CAST((SELECT ft3 FROM latest_labs) AS TEXT), '-') || char(10) || '- 最新処方日: ' || COALESCE((SELECT \"服薬開始日\" FROM latest_dose), '-') || char(10) || '- チラーヂン補充量: ' || COALESCE(CAST((SELECT dose FROM latest_dose) AS TEXT), '-') || ' ' || COALESCE((SELECT \"一日量単位\" FROM latest_dose), 'μg/日') AS \"latest_levothyroxine_status_markdown\""
     }
   ],
   "widget_nodes": [
@@ -169,10 +169,10 @@
     },
     {
       "id": "widget_5",
-      "title": "補充量変更判断",
+      "title": "最新甲状腺機能と補充量",
       "widget": {
         "widget_type": "markdown",
-        "data_key": "md_dose_adjust"
+        "data_key": "md_latest_levothyroxine_status"
       },
       "data_node_ids": [
         "data_5"
