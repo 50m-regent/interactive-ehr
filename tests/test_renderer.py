@@ -168,6 +168,20 @@ def test_render_display_widgets(monkeypatch: Any) -> None:
     assert fake.calls[3].kwargs["expanded"] is False
 
 
+def test_markdown_data_key_renders_context_value(monkeypatch: Any) -> None:
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    result = renderer.render_widget(
+        MarkdownSpec(data_key="summary"),
+        {"summary": "### 患者サマリ\n- 72歳男性"},
+    )
+
+    assert result == "markdown-result"
+    assert [call.name for call in fake.calls] == ["markdown"]
+    assert fake.calls[0].args[0].startswith("### 患者サマリ")
+
+
 def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(renderer, "st", fake)

@@ -219,6 +219,12 @@ def render_widget(
         return None if data is None else st.json(data, expanded=widget.expanded)
 
     if isinstance(widget, MarkdownSpec):
+        if widget.data_key is not None:
+            data = _resolve_context_value(context, widget.data_key, "data_key")
+            return None if data is None else st.markdown(str(data))
+        if widget.body is None:
+            st.warning("markdown widget に body または data_key を設定してください。")
+            return None
         return st.markdown(widget.body)
 
     if isinstance(widget, TextSpec):
