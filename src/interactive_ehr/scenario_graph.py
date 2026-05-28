@@ -26,18 +26,6 @@ from interactive_ehr.widgets import AnyWidget, WidgetType
 from interactive_ehr.widgets.renderer import render_widget
 
 
-class TaskNode(BaseModel):
-    """A clinical task that owns an ordered set of widgets."""
-
-    model_config = ConfigDict(frozen=True)
-
-    id: str = Field(description="タスクID")
-    title: str = Field(description="タブに表示するタスク名")
-    description: str | None = Field(None, description="タスクの説明")
-    order: int = Field(0, description="表示順")
-    widget_ids: list[str] = Field(default_factory=list, description="関連ウィジェットID")
-
-
 class DataNode(BaseModel):
     """A context data item referenced by widgets."""
 
@@ -63,21 +51,24 @@ class WidgetNode(BaseModel):
     id: str = Field(description="ウィジェットノードID")
     title: str | None = Field(None, description="ウィジェットの表示上の説明")
     widget: AnyWidget = Field(description="既存 WidgetSpec")
-    data_node_ids: list[str] = Field(
+    data_nodes: list[DataNode] = Field(
         default_factory=list,
-        description="参照するデータノードID",
+        description="このウィジェットが参照するデータノード",
     )
 
 
-class GraphEdge(BaseModel):
-    """An explicit graph relation."""
+class TaskNode(BaseModel):
+    """A clinical task that owns an ordered set of widgets."""
 
     model_config = ConfigDict(frozen=True)
 
-    source_id: str = Field(description="始点ノードID")
-    target_id: str = Field(description="終点ノードID")
-    edge_type: Literal["scenario_to_task", "task_to_widget", "widget_to_data"] = (
-        Field(description="関係種別")
+    id: str = Field(description="タスクID")
+    title: str = Field(description="タブに表示するタスク名")
+    description: str | None = Field(None, description="タスクの説明")
+    order: int = Field(0, description="表示順")
+    widgets: list[WidgetNode] = Field(
+        default_factory=list,
+        description="このタスクで表示するウィジェット",
     )
 
 
@@ -90,9 +81,14 @@ class ScenarioGraph(BaseModel):
     title: str = Field(description="シナリオ名")
     description: str | None = Field(None, description="シナリオ説明")
     tasks: list[TaskNode] = Field(default_factory=list)
-    data_nodes: list[DataNode] = Field(default_factory=list)
-    widget_nodes: list[WidgetNode] = Field(default_factory=list)
-    edges: list[GraphEdge] = Field(default_factory=list)
+
+    @property
+    def widget_nodes(self) -> list[WidgetNode]:
+        return [widget for task in self.tasks for widget in task.widgets]
+
+    @property
+    def data_nodes(self) -> list[DataNode]:
+        return [data_node for widget in self.widget_nodes for data_node in widget.data_nodes]
 
 
 class TaskNodeGenerationPlan(BaseModel):
@@ -200,8 +196,6 @@ def render_scenario_graph(
     inspectable while editing or generating JSON.
     """
 
-    data_by_id = {node.id: node for node in graph.data_nodes}
-    widget_by_id = {node.id: node for node in graph.widget_nodes}
     tasks = sorted(graph.tasks, key=lambda task: (task.order, task.id))
 
     if not tasks:
@@ -211,17 +205,10 @@ def render_scenario_graph(
     tab_handles = st.tabs([task.title for task in tasks])
     for tab, task in zip(tab_handles, tasks, strict=True):
         with tab:
-            for widget_id in task.widget_ids:
-                widget_node = widget_by_id.get(widget_id)
-                if widget_node is None:
-                    if show_missing_reference_warnings:
-                        st.warning(
-                            f"task '{task.id}' が存在しない widget '{widget_id}' を参照しています。"
-                        )
-                    continue
-
+            for widget_node in task.widgets:
                 if show_missing_reference_warnings:
-                    _warn_for_data_references(widget_node, data_by_id, context)
+                    _warn_for_data_references(widget_node, context)
+                _render_widget_title(widget_node)
                 render_widget(widget_node.widget, context)
 
 
@@ -342,10 +329,11 @@ def generate_scenario_graph_incrementally(
             context=generated_context,
         )
 
+    generated_data_nodes: dict[str, DataNode] = {}
     for data_plan in plan.data_nodes:
         try:
             data_node = _build_data_node_from_plan(data_plan)
-            graph = _append_data_node(graph, data_node)
+            generated_data_nodes[data_node.id] = data_node
         except Exception as exc:
             yield ScenarioGraphGenerationEvent(
                 status="failed",
@@ -383,14 +371,18 @@ def generate_scenario_graph_incrementally(
                 try:
                     widget_sql = future.result()
                     widget_node = widget_sql.widget_node
-                    widget_node = _normalize_widget_node(widget_node, widget_plan)
-                    context_key = _context_key_for_widget_plan(graph, widget_plan)
+                    widget_node = _normalize_widget_node(
+                        widget_node,
+                        widget_plan,
+                        generated_data_nodes,
+                    )
+                    context_key = _context_key_for_widget_node(widget_node)
                     if context_key is not None:
                         widget_node = _bind_widget_to_data_context(widget_node, context_key)
                     graph = _append_widget_node(graph, widget_node, plan)
                     graph, generated_context = _attach_widget_sql_result(
                         graph,
-                        widget_node,
+                        widget_node.id,
                         widget_sql.sql,
                         generated_context,
                     )
@@ -413,7 +405,6 @@ def generate_scenario_graph_incrementally(
                     context=generated_context,
                 )
 
-    graph = graph.model_copy(update={"edges": _build_edges(graph)})
     yield ScenarioGraphGenerationEvent(
         status="completed",
         message="タスクグラフを生成しました。",
@@ -492,22 +483,22 @@ def _generate_widget_sql(
 
 def _warn_for_data_references(
     widget_node: WidgetNode,
-    data_by_id: Mapping[str, DataNode],
     context: Mapping[str, object],
 ) -> None:
-    for data_node_id in widget_node.data_node_ids:
-        data_node = data_by_id.get(data_node_id)
-        if data_node is None:
-            st.warning(
-                f"widget '{widget_node.id}' が存在しない data node "
-                f"'{data_node_id}' を参照しています。"
-            )
-            continue
+    for data_node in widget_node.data_nodes:
         if data_node.context_key not in context:
             st.warning(
                 f"data node '{data_node.id}' の context_key "
                 f"'{data_node.context_key}' が表示コンテキストに存在しません。"
             )
+
+
+def _render_widget_title(widget_node: WidgetNode) -> None:
+    if widget_node.title is None:
+        return
+    if widget_node.widget.widget_type not in {WidgetType.LINE_CHART, WidgetType.BAR_CHART}:
+        return
+    st.markdown(f"#### {widget_node.title}")
 
 
 def _decide_update_scope(
@@ -564,20 +555,11 @@ def _update_task_subtrees(
             )
             return
 
-        old_widget_ids = set(task.widget_ids)
-        old_data_ids = {
-            data_node_id
-            for w in working_graph.widget_nodes
-            if w.id in old_widget_ids
-            for data_node_id in w.data_node_ids
+        old_context_keys = {
+            data_node.context_key for widget in task.widgets for data_node in widget.data_nodes
         }
-        working_graph = _remove_nodes(working_graph, old_widget_ids, old_data_ids)
         working_context = {
-            k: v for k, v in working_context.items()
-            if not any(
-                dn.context_key == k and dn.id in old_data_ids
-                for dn in graph.data_nodes
-            )
+            k: v for k, v in working_context.items() if k not in old_context_keys
         }
 
         new_task = _normalize_task_node(
@@ -586,7 +568,6 @@ def _update_task_subtrees(
                 title=task_plan.title,
                 description=task_plan.description,
                 order=task_plan.order,
-                widget_ids=task_plan.widget_ids,
             ),
             TaskNodeGenerationPlan(
                 id=task_plan.id,
@@ -598,10 +579,11 @@ def _update_task_subtrees(
         )
         working_graph = _replace_task_node(working_graph, new_task)
 
+        generated_data_nodes: dict[str, DataNode] = {}
         for data_plan in task_plan.data_nodes:
             try:
                 data_node = _build_data_node_from_plan(data_plan)
-                working_graph = _append_data_node(working_graph, data_node)
+                generated_data_nodes[data_node.id] = data_node
             except Exception as exc:
                 yield ScenarioGraphGenerationEvent(
                     status="failed",
@@ -637,13 +619,17 @@ def _update_task_subtrees(
                     try:
                         widget_sql = future.result()
                         widget_node = widget_sql.widget_node
-                        widget_node = _normalize_widget_node(widget_node, widget_plan)
-                        context_key = _context_key_for_widget_plan(working_graph, widget_plan)
+                        widget_node = _normalize_widget_node(
+                            widget_node,
+                            widget_plan,
+                            generated_data_nodes,
+                        )
+                        context_key = _context_key_for_widget_node(widget_node)
                         if context_key is not None:
                             widget_node = _bind_widget_to_data_context(widget_node, context_key)
                         working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
                         working_graph, working_context = _attach_widget_sql_result(
-                            working_graph, widget_node, widget_sql.sql, working_context
+                            working_graph, widget_node.id, widget_sql.sql, working_context
                         )
                     except Exception as exc:
                         for pending in future_to_plan:
@@ -664,7 +650,6 @@ def _update_task_subtrees(
                         context=working_context,
                     )
 
-    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
     yield ScenarioGraphGenerationEvent(
         status="completed",
         message="task subtree の再生成が完了しました。",
@@ -703,12 +688,12 @@ def _update_widgets(
         WidgetNodeGenerationPlan(
             id=w.id,
             task_id=next(
-                (t.id for t in graph.tasks if w.id in t.widget_ids),
+                (t.id for t in graph.tasks if any(widget.id == w.id for widget in t.widgets)),
                 graph.tasks[0].id if graph.tasks else "",
             ),
             title=w.title,
             widget_type=w.widget.widget_type,
-            data_node_ids=w.data_node_ids,
+            data_node_ids=[data_node.id for data_node in w.data_nodes],
         )
         for w in target_widget_nodes
     ]
@@ -717,7 +702,13 @@ def _update_widgets(
         title=graph.title,
         description=graph.description,
         tasks=[
-            TaskNodeGenerationPlan(id=t.id, title=t.title, order=t.order, widget_ids=t.widget_ids)
+            TaskNodeGenerationPlan(
+                id=t.id,
+                title=t.title,
+                description=t.description,
+                order=t.order,
+                widget_ids=[widget.id for widget in t.widgets],
+            )
             for t in graph.tasks
         ],
         data_nodes=[
@@ -735,6 +726,7 @@ def _update_widgets(
     )
 
     graph_snapshot = working_graph
+    existing_data_nodes = {data_node.id: data_node for data_node in graph.data_nodes}
     max_workers = min(len(existing_plans), _WIDGET_PARALLEL_MAX_WORKERS)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_plan: dict[
@@ -756,13 +748,13 @@ def _update_widgets(
             try:
                 widget_sql = future.result()
                 widget_node = widget_sql.widget_node
-                widget_node = _normalize_widget_node(widget_node, widget_plan)
-                context_key = _context_key_for_widget_plan(working_graph, widget_plan)
+                widget_node = _normalize_widget_node(widget_node, widget_plan, existing_data_nodes)
+                context_key = _context_key_for_widget_node(widget_node)
                 if context_key is not None:
                     widget_node = _bind_widget_to_data_context(widget_node, context_key)
                 working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
                 working_graph, working_context = _attach_widget_sql_result(
-                    working_graph, widget_node, widget_sql.sql, working_context
+                    working_graph, widget_node.id, widget_sql.sql, working_context
                 )
             except Exception as exc:
                 for pending in future_to_plan:
@@ -783,7 +775,6 @@ def _update_widgets(
                 context=working_context,
             )
 
-    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
     yield ScenarioGraphGenerationEvent(
         status="completed",
         message="widget の再生成が完了しました。",
@@ -854,12 +845,7 @@ def _update_data_nodes(
                 "primary_fields": [str(col) for col in dataframe.columns],
             }
         )
-        new_data_nodes = [
-            updated_node if dn.id == data_id else dn for dn in working_graph.data_nodes
-        ]
-        working_graph = ScenarioGraph.model_validate(
-            working_graph.model_copy(update={"data_nodes": new_data_nodes}).model_dump(mode="json")
-        )
+        working_graph = _replace_data_node(working_graph, updated_node)
         next_context = dict(working_context)
         next_context[updated_node.context_key] = dataframe
         working_context = next_context
@@ -872,7 +858,6 @@ def _update_data_nodes(
             context=working_context,
         )
 
-    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
     yield ScenarioGraphGenerationEvent(
         status="completed",
         message="data node SQL の再生成が完了しました。",
@@ -901,26 +886,6 @@ class _DataSqlOnly(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     sql: str
-
-
-def _remove_nodes(
-    graph: ScenarioGraph,
-    widget_ids: set[str],
-    data_ids: set[str],
-) -> ScenarioGraph:
-    tasks = [
-        t.model_copy(
-            update={"widget_ids": [wid for wid in t.widget_ids if wid not in widget_ids]}
-        )
-        for t in graph.tasks
-    ]
-    widget_nodes = [w for w in graph.widget_nodes if w.id not in widget_ids]
-    data_nodes = [dn for dn in graph.data_nodes if dn.id not in data_ids]
-    return ScenarioGraph.model_validate(
-        graph.model_copy(
-            update={"tasks": tasks, "widget_nodes": widget_nodes, "data_nodes": data_nodes}
-        ).model_dump(mode="json")
-    )
 
 
 def _replace_task_node(graph: ScenarioGraph, task: TaskNode) -> ScenarioGraph:
@@ -1065,13 +1030,13 @@ def _build_generation_prompt(
 - widget は既存 WidgetSpec の discriminated union です。
 - widget.widget_type は下記の利用可能な値だけを使ってください。
 - データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。
-- data_nodes.model_name は下記のDWHモデル名だけを使ってください。
-- data_nodes.context_key は必ず dwh_{{model_name}} にしてください。
+- 各 TaskNode は widgets に表示順の WidgetNode を含めてください。
+- 各 WidgetNode は data_nodes に参照する DataNode を含めてください。
+- DataNode.model_name は下記のDWHモデル名だけを使ってください。
+- DataNode.context_key は必ず dwh_{{model_name}} にしてください。
 - 各 widget の data_key は生成済み data node の context_key だけを参照してください。
 - chart/table/dataframe widget の x/y/column_order は、参照先DWHモデルのフィールド名だけを使ってください。
-- scenario_to_task, task_to_widget, widget_to_data の edges を明示してください。
-- task.widget_ids はそのタスクで表示する widget node ID を表示順に並べてください。
-- 存在しない task/widget/data ID を参照しないでください。
+- edges、トップレベル widget_nodes、トップレベル data_nodes は出力しないでください。
 
 利用可能なDWHモデルと主要フィールド:
 {dwh_summary}
@@ -1177,7 +1142,7 @@ def _build_node_prompt(
     node_type: str,
     node_plan: object,
 ) -> str:
-    context_summary = _build_context_prompt_section_from_graph(graph)
+    context_summary = _build_context_prompt_section_from_graph_or_plan(graph, plan)
     output_contract = (
         "- WidgetNode 生成では WidgetNodeSqlGeneration JSON を出力してください。\n"
         "- WidgetNodeSqlGeneration.sql は widget 専用 data node のための単一SELECT文にしてください。\n"
@@ -1291,6 +1256,25 @@ def _build_context_prompt_section_from_graph(graph: ScenarioGraph) -> str:
     return "\n".join(lines)
 
 
+def _build_context_prompt_section_from_graph_or_plan(
+    graph: ScenarioGraph,
+    plan: ScenarioGraphGenerationPlan,
+) -> str:
+    if graph.data_nodes:
+        return _build_context_prompt_section_from_graph(graph)
+    if not plan.data_nodes:
+        return "- まだ生成済み data node はありません。"
+    lines: list[str] = []
+    for data_plan in plan.data_nodes:
+        context_key = data_plan.context_key or f"sql_{data_plan.id}"
+        lines.append(
+            f"- {context_key} "
+            f"(model_name: {data_plan.model_name}, "
+            f"columns: {', '.join(data_plan.primary_fields)})"
+        )
+    return "\n".join(lines)
+
+
 def _describe_context_columns_from_fields(fields: list[str]) -> str:
     if not fields:
         return ""
@@ -1339,21 +1323,7 @@ def _normalize_task_node(
         title=task.title or plan.title,
         description=task.description if task.description is not None else plan.description,
         order=plan.order,
-        widget_ids=plan.widget_ids,
-    )
-
-
-def _normalize_data_node(
-    data_node: DataNode,
-    plan: DataNodeGenerationPlan,
-) -> DataNode:
-    return DataNode(
-        id=plan.id,
-        context_key=plan.context_key or f"sql_{plan.id}",
-        model_name=plan.model_name,
-        data_type=data_node.data_type or plan.data_type,
-        description=data_node.description or plan.description,
-        primary_fields=data_node.primary_fields or plan.primary_fields,
+        widgets=[],
     )
 
 
@@ -1372,17 +1342,10 @@ def _build_data_node_from_plan(plan: DataNodeGenerationPlan) -> DataNode:
     )
 
 
-def _context_key_for_widget_plan(
-    graph: ScenarioGraph,
-    plan: WidgetNodeGenerationPlan,
-) -> str | None:
-    if not plan.data_node_ids:
+def _context_key_for_widget_node(widget_node: WidgetNode) -> str | None:
+    if not widget_node.data_nodes:
         return None
-    data_by_id = {data_node.id: data_node for data_node in graph.data_nodes}
-    data_node = data_by_id.get(plan.data_node_ids[0])
-    if data_node is None:
-        return None
-    return data_node.context_key
+    return widget_node.data_nodes[0].context_key
 
 
 def _bind_widget_to_data_context(widget_node: WidgetNode, context_key: str) -> WidgetNode:
@@ -1393,7 +1356,7 @@ def _bind_widget_to_data_context(widget_node: WidgetNode, context_key: str) -> W
             "id": widget_node.id,
             "title": widget_node.title,
             "widget": widget_dump,
-            "data_node_ids": widget_node.data_node_ids,
+            "data_nodes": [data_node.model_dump(mode="json") for data_node in widget_node.data_nodes],
         }
     )
 
@@ -1413,24 +1376,20 @@ def _replace_data_keys(value: object, context_key: str) -> None:
 
 def _attach_widget_sql_result(
     graph: ScenarioGraph,
-    widget_node: WidgetNode,
+    widget_id: str,
     sql: str,
     context: dict[str, object],
 ) -> tuple[ScenarioGraph, dict[str, object]]:
-    if not widget_node.data_node_ids:
-        raise ValueError(f"widget node '{widget_node.id}' に data node 参照がありません。")
-    data_node_id = widget_node.data_node_ids[0]
-    data_nodes: list[DataNode] = []
-    target_node: DataNode | None = None
-    for data_node in graph.data_nodes:
-        if data_node.id == data_node_id:
-            target_node = data_node
-            continue
-        data_nodes.append(data_node)
+    widget_node = _find_widget_node(graph, widget_id)
+    if widget_node is None:
+        raise ValueError(f"widget node '{widget_id}' が見つかりません。")
+    if not widget_node.data_nodes:
+        raise ValueError(f"widget node '{widget_id}' に data node 参照がありません。")
+    target_node = widget_node.data_nodes[0]
     if target_node is None:
         raise ValueError(
             f"widget node '{widget_node.id}' が存在しない data node "
-            f"'{data_node_id}' を参照しています。"
+            "を参照しています。"
         )
 
     dataframe = execute_read_sql(sql)
@@ -1440,21 +1399,15 @@ def _attach_widget_sql_result(
             "primary_fields": [str(column) for column in dataframe.columns],
         }
     )
-    data_nodes.append(updated_node)
-    data_nodes = sorted(data_nodes, key=lambda node: node.id)
     next_context = dict(context)
     next_context[updated_node.context_key] = dataframe
-    return (
-        ScenarioGraph.model_validate(
-            graph.model_copy(update={"data_nodes": data_nodes}).model_dump(mode="json")
-        ),
-        next_context,
-    )
+    return _replace_data_node(graph, updated_node), next_context
 
 
 def _normalize_widget_node(
     widget_node: WidgetNode,
     plan: WidgetNodeGenerationPlan,
+    data_nodes_by_id: Mapping[str, DataNode],
 ) -> WidgetNode:
     widget_dump = widget_node.widget.model_dump(mode="json")
     widget_dump["widget_type"] = plan.widget_type
@@ -1462,7 +1415,11 @@ def _normalize_widget_node(
         id=plan.id,
         title=widget_node.title if widget_node.title is not None else plan.title,
         widget=widget_dump,
-        data_node_ids=plan.data_node_ids,
+        data_nodes=[
+            data_nodes_by_id[data_node_id]
+            for data_node_id in plan.data_node_ids
+            if data_node_id in data_nodes_by_id
+        ],
     )
 
 
@@ -1471,20 +1428,7 @@ def _append_task_node(graph: ScenarioGraph, task: TaskNode) -> ScenarioGraph:
     tasks.append(task)
     tasks = sorted(tasks, key=lambda node: (node.order, node.id))
     return ScenarioGraph.model_validate(
-        graph.model_copy(
-            update={
-                "tasks": tasks,
-                "edges": _build_edges_for_parts(graph.id, tasks, graph.widget_nodes),
-            }
-        ).model_dump(mode="json")
-    )
-
-
-def _append_data_node(graph: ScenarioGraph, data_node: DataNode) -> ScenarioGraph:
-    data_nodes = [existing for existing in graph.data_nodes if existing.id != data_node.id]
-    data_nodes.append(data_node)
-    return ScenarioGraph.model_validate(
-        graph.model_copy(update={"data_nodes": data_nodes}).model_dump(mode="json")
+        graph.model_copy(update={"tasks": tasks}).model_dump(mode="json")
     )
 
 
@@ -1493,19 +1437,23 @@ def _append_widget_node(
     widget_node: WidgetNode,
     plan: ScenarioGraphGenerationPlan,
 ) -> ScenarioGraph:
-    widget_node = _drop_unknown_data_references(widget_node, graph)
-    widget_nodes = [existing for existing in graph.widget_nodes if existing.id != widget_node.id]
-    widget_nodes.append(widget_node)
-    widget_nodes = _sort_widget_nodes_by_plan(widget_nodes, plan)
-    tasks = _ensure_task_references_widget(graph.tasks, widget_node.id, plan)
+    widget_plan = next(
+        (candidate for candidate in plan.widget_nodes if candidate.id == widget_node.id),
+        None,
+    )
+    if widget_plan is None:
+        return graph
+    tasks: list[TaskNode] = []
+    for task in graph.tasks:
+        if task.id != widget_plan.task_id:
+            tasks.append(task)
+            continue
+        widgets = [existing for existing in task.widgets if existing.id != widget_node.id]
+        widgets.append(widget_node)
+        widgets = _sort_widget_nodes_by_plan(widgets, plan)
+        tasks.append(task.model_copy(update={"widgets": widgets}))
     return ScenarioGraph.model_validate(
-        graph.model_copy(
-            update={
-                "tasks": tasks,
-                "widget_nodes": widget_nodes,
-                "edges": _build_edges_for_parts(graph.id, tasks, widget_nodes),
-            }
-        ).model_dump(mode="json")
+        graph.model_copy(update={"tasks": tasks}).model_dump(mode="json")
     )
 
 
@@ -1523,78 +1471,21 @@ def _sort_widget_nodes_by_plan(
     )
 
 
-def _ensure_task_references_widget(
-    tasks: list[TaskNode],
-    widget_id: str,
-    plan: ScenarioGraphGenerationPlan,
-) -> list[TaskNode]:
-    widget_plan = next(
-        (candidate for candidate in plan.widget_nodes if candidate.id == widget_id),
-        None,
-    )
-    if widget_plan is None:
-        return tasks
-    updated: list[TaskNode] = []
-    for task in tasks:
-        if task.id != widget_plan.task_id or widget_id in task.widget_ids:
-            updated.append(task)
-            continue
-        updated.append(task.model_copy(update={"widget_ids": [*task.widget_ids, widget_id]}))
-    return sorted(updated, key=lambda node: (node.order, node.id))
+def _find_widget_node(graph: ScenarioGraph, widget_id: str) -> WidgetNode | None:
+    return next((widget for widget in graph.widget_nodes if widget.id == widget_id), None)
 
 
-def _drop_unknown_data_references(
-    widget_node: WidgetNode,
-    graph: ScenarioGraph,
-) -> WidgetNode:
-    data_node_ids = {data_node.id for data_node in graph.data_nodes}
-    return widget_node.model_copy(
-        update={
-            "data_node_ids": [
-                data_node_id
-                for data_node_id in widget_node.data_node_ids
-                if data_node_id in data_node_ids
+def _replace_data_node(graph: ScenarioGraph, updated_node: DataNode) -> ScenarioGraph:
+    tasks: list[TaskNode] = []
+    for task in graph.tasks:
+        widgets: list[WidgetNode] = []
+        for widget in task.widgets:
+            data_nodes = [
+                updated_node if data_node.id == updated_node.id else data_node
+                for data_node in widget.data_nodes
             ]
-        }
+            widgets.append(widget.model_copy(update={"data_nodes": data_nodes}))
+        tasks.append(task.model_copy(update={"widgets": widgets}))
+    return ScenarioGraph.model_validate(
+        graph.model_copy(update={"tasks": tasks}).model_dump(mode="json")
     )
-
-
-def _build_edges(graph: ScenarioGraph) -> list[GraphEdge]:
-    return _build_edges_for_parts(graph.id, graph.tasks, graph.widget_nodes)
-
-
-def _build_edges_for_parts(
-    scenario_id: str,
-    tasks: list[TaskNode],
-    widget_nodes: list[WidgetNode],
-) -> list[GraphEdge]:
-    edges: list[GraphEdge] = []
-    widget_by_id = {widget.id: widget for widget in widget_nodes}
-    for task in tasks:
-        edges.append(
-            GraphEdge(
-                source_id=scenario_id,
-                target_id=task.id,
-                edge_type="scenario_to_task",
-            )
-        )
-        for widget_id in task.widget_ids:
-            widget = widget_by_id.get(widget_id)
-            if widget is None:
-                continue
-            edges.append(
-                GraphEdge(
-                    source_id=task.id,
-                    target_id=widget.id,
-                    edge_type="task_to_widget",
-                )
-            )
-            for data_node_id in widget.data_node_ids:
-                edges.append(
-                    GraphEdge(
-                        source_id=widget.id,
-                        target_id=data_node_id,
-                        edge_type="widget_to_data",
-                    )
-                )
-    return edges

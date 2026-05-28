@@ -85,6 +85,14 @@ class TestDisplayWidgets:
         spec = MarkdownSpec(body="# 所見\n正常範囲内")
         assert spec.widget_type == WidgetType.MARKDOWN
 
+    def test_markdown_spec_with_data_key(self) -> None:
+        spec = MarkdownSpec(data_key="patient_summary")
+        assert spec.data_key == "patient_summary"
+
+    def test_markdown_spec_requires_body_or_data_key(self) -> None:
+        with pytest.raises(ValidationError):
+            MarkdownSpec()
+
     def test_text_spec(self) -> None:
         spec = TextSpec(body="プレインテキスト")
         assert spec.widget_type == WidgetType.TEXT

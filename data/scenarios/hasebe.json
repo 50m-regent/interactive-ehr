@@ -1,0 +1,168 @@
+{
+  "id": "thyroid_postop_followup",
+  "title": "甲状腺手術後 定期フォロー",
+  "description": "耳鼻咽喉科・頭頸部外科の定期再診で、甲状腺機能・超音波所見・チラーヂン補充量を評価するシナリオ。",
+  "tasks": [
+    {
+      "id": "task_1",
+      "title": "直近の甲状腺機能の確認",
+      "description": "TSH, fT4, fT3 の推移を確認する。",
+      "order": 1,
+      "widgets": [
+        {
+          "id": "widget_1",
+          "title": "TSH, fT4, fT3 推移",
+          "widget": {
+            "widget_type": "line_chart",
+            "data_key": "chart_tsh_ft4_ft3",
+            "x": "検査日",
+            "y": [
+              "TSH",
+              "fT4",
+              "fT3"
+            ],
+            "x_label": "採血日",
+            "y_label": "検査値"
+          },
+          "data_nodes": [
+            {
+              "id": "data_1",
+              "context_key": "chart_tsh_ft4_ft3",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "TSH, fT4, fT3 の直近12か月推移",
+              "primary_fields": [
+                "検査日",
+                "TSH",
+                "fT4",
+                "fT3"
+              ],
+              "sql": "SELECT \"報告日\" AS \"検査日\", MAX(CASE WHEN \"検査項目\"='TSH' THEN \"結果(数値)\" END) AS \"TSH\", MAX(CASE WHEN \"検査項目\"='fT4' THEN \"結果(数値)\" END) AS \"fT4\", MAX(CASE WHEN \"検査項目\"='fT3' THEN \"結果(数値)\" END) AS \"fT3\" FROM \"検体検査結果\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"報告日\">=date('now','-12 months') AND \"検査項目\" IN ('TSH','fT4','fT3') GROUP BY \"報告日\" ORDER BY \"報告日\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_2",
+      "title": "直近の超音波画像の確認",
+      "description": "残存甲状腺の形態変化を前回と比較する。",
+      "order": 2,
+      "widgets": [
+        {
+          "id": "widget_2",
+          "title": "超音波画像所見比較",
+          "widget": {
+            "widget_type": "markdown",
+            "data_key": "md_echo_compare"
+          },
+          "data_nodes": [
+            {
+              "id": "data_2",
+              "context_key": "md_echo_compare",
+              "model_name": null,
+              "data_type": "scalar",
+              "description": "甲状腺超音波の直近2回比較",
+              "primary_fields": [
+                "echo_compare_markdown"
+              ],
+              "sql": "WITH recent AS (SELECT \"報告日\", COALESCE(\"所見\", '-') AS \"所見\", ROW_NUMBER() OVER (ORDER BY \"報告日\" DESC) AS rn FROM \"生理検査レポート\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"レポート名\" LIKE '%甲状腺超音波%' ) SELECT '### 超音波所見（直近比較）' || char(10) || '- 最新(' || COALESCE((SELECT \"報告日\" FROM recent WHERE rn=1), '-') || '): ' || COALESCE((SELECT \"所見\" FROM recent WHERE rn=1), '-') || char(10) || '- 前回(' || COALESCE((SELECT \"報告日\" FROM recent WHERE rn=2), '-') || '): ' || COALESCE((SELECT \"所見\" FROM recent WHERE rn=2), '-') AS \"echo_compare_markdown\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_3",
+      "title": "精密検査検討のための所見確認",
+      "description": "最新の甲状腺超音波所見を確認する。",
+      "order": 3,
+      "widgets": [
+        {
+          "id": "widget_3",
+          "title": "最新超音波所見",
+          "widget": {
+            "widget_type": "markdown",
+            "data_key": "md_latest_echo_finding"
+          },
+          "data_nodes": [
+            {
+              "id": "data_3",
+              "context_key": "md_latest_echo_finding",
+              "model_name": null,
+              "data_type": "scalar",
+              "description": "精密検査検討のための最新超音波所見",
+              "primary_fields": [
+                "latest_echo_finding_markdown"
+              ],
+              "sql": "WITH latest AS (SELECT \"報告日\", COALESCE(\"所見\", '-') AS \"所見\" FROM \"生理検査レポート\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"レポート名\" LIKE '%甲状腺超音波%' ORDER BY \"報告日\" DESC LIMIT 1) SELECT '### 最新の超音波所見' || char(10) || '- 報告日: ' || COALESCE((SELECT \"報告日\" FROM latest), '-') || char(10) || '- 所見: ' || COALESCE((SELECT \"所見\" FROM latest), '-') AS \"latest_echo_finding_markdown\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_4",
+      "title": "チラーヂン補充量の確認",
+      "description": "外来処方におけるチラーヂン補充量の推移を確認する。",
+      "order": 4,
+      "widgets": [
+        {
+          "id": "widget_4",
+          "title": "チラーヂン投与量推移",
+          "widget": {
+            "widget_type": "line_chart",
+            "data_key": "chart_levothyroxine_dose",
+            "x": "処方日",
+            "y": "チラーヂン量(μg/日)",
+            "x_label": "処方日",
+            "y_label": "μg/日"
+          },
+          "data_nodes": [
+            {
+              "id": "data_4",
+              "context_key": "chart_levothyroxine_dose",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "チラーヂン補充量の直近12か月推移",
+              "primary_fields": [
+                "処方日",
+                "チラーヂン量(μg/日)"
+              ],
+              "sql": "SELECT \"服薬開始日\" AS \"処方日\", CAST(\"一日量\" AS REAL) AS \"チラーヂン量(μg/日)\" FROM \"処方\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"薬剤名\" LIKE '%チラーヂン%' AND \"服薬開始日\">=date('now','-12 months') ORDER BY \"服薬開始日\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_5",
+      "title": "チラーヂン補充量変更のための情報確認",
+      "description": "直近の甲状腺機能と最新のチラーヂン補充量を確認する。",
+      "order": 5,
+      "widgets": [
+        {
+          "id": "widget_5",
+          "title": "最新甲状腺機能と補充量",
+          "widget": {
+            "widget_type": "markdown",
+            "data_key": "md_latest_levothyroxine_status"
+          },
+          "data_nodes": [
+            {
+              "id": "data_5",
+              "context_key": "md_latest_levothyroxine_status",
+              "model_name": null,
+              "data_type": "scalar",
+              "description": "直近の甲状腺機能と最新チラーヂン補充量",
+              "primary_fields": [
+                "latest_levothyroxine_status_markdown"
+              ],
+              "sql": "WITH latest_labs AS (SELECT MAX(CASE WHEN \"検査項目\"='TSH' THEN \"結果(数値)\" END) AS tsh, MAX(CASE WHEN \"検査項目\"='fT4' THEN \"結果(数値)\" END) AS ft4, MAX(CASE WHEN \"検査項目\"='fT3' THEN \"結果(数値)\" END) AS ft3, \"報告日\" FROM \"検体検査結果\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"検査項目\" IN ('TSH','fT4','fT3') GROUP BY \"報告日\" ORDER BY \"報告日\" DESC LIMIT 1), latest_dose AS (SELECT CAST(\"一日量\" AS REAL) AS dose, \"一日量単位\", \"服薬開始日\" FROM \"処方\" WHERE \"患者ID\"='HASEBE_THYROID_001' AND \"薬剤名\" LIKE '%チラーヂン%' ORDER BY \"服薬開始日\" DESC LIMIT 1) SELECT '### 最新の甲状腺機能とチラーヂン補充量' || char(10) || '- 検査日: ' || COALESCE((SELECT \"報告日\" FROM latest_labs), '-') || char(10) || '- TSH: ' || COALESCE(CAST((SELECT tsh FROM latest_labs) AS TEXT), '-') || ', fT4: ' || COALESCE(CAST((SELECT ft4 FROM latest_labs) AS TEXT), '-') || ', fT3: ' || COALESCE(CAST((SELECT ft3 FROM latest_labs) AS TEXT), '-') || char(10) || '- 最新処方日: ' || COALESCE((SELECT \"服薬開始日\" FROM latest_dose), '-') || char(10) || '- チラーヂン補充量: ' || COALESCE(CAST((SELECT dose FROM latest_dose) AS TEXT), '-') || ' ' || COALESCE((SELECT \"一日量単位\" FROM latest_dose), 'μg/日') AS \"latest_levothyroxine_status_markdown\""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

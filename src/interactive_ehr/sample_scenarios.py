@@ -6,7 +6,6 @@ import pandas as pd
 
 from interactive_ehr.scenario_graph import (
     DataNode,
-    GraphEdge,
     ScenarioGraph,
     TaskNode,
     WidgetNode,
@@ -234,44 +233,63 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
     """Return the default task graph based on the Notion chronic disease example."""
 
     data_nodes = [_data_node_from_spec(spec) for spec in SAMPLE_DATA_NODE_SPECS]
+    data_node_by_id = {data_node.id: data_node for data_node in data_nodes}
     widgets = _chronic_disease_widgets()
     widget_nodes = [
         WidgetNode(
             id=f"widget_{index}",
             title=type(widget).__name__,
             widget=widget,
-            data_node_ids=_referenced_data_node_ids(widget, data_nodes),
+            data_nodes=[
+                data_node_by_id[data_node_id]
+                for data_node_id in _referenced_data_node_ids(widget, data_nodes)
+            ],
         )
         for index, widget in enumerate(widgets, start=1)
     ]
+    widget_node_by_id = {widget_node.id: widget_node for widget_node in widget_nodes}
     tasks = [
         TaskNode(
             id="task_bp_kidney",
             title="血圧・腎機能評価",
             description="最近の血圧コントロール状況と腎機能の経時的変化を評価する。",
             order=1,
-            widget_ids=["widget_1", "widget_2", "widget_3"],
+            widgets=[
+                widget_node_by_id["widget_1"],
+                widget_node_by_id["widget_2"],
+                widget_node_by_id["widget_3"],
+            ],
         ),
         TaskNode(
             id="task_side_effect_adherence",
             title="副作用・服薬確認",
             description="現在の処方内容、過去のカルテ記載から副作用と服薬状況を確認する。",
             order=2,
-            widget_ids=["widget_4", "widget_5", "widget_6"],
+            widgets=[
+                widget_node_by_id["widget_4"],
+                widget_node_by_id["widget_5"],
+                widget_node_by_id["widget_6"],
+            ],
         ),
         TaskNode(
             id="task_prescription_adjustment",
             title="検査に基づく処方調整",
             description="直近の検査結果、現在処方、過去記載を合わせて処方調整を検討する。",
             order=3,
-            widget_ids=["widget_7", "widget_8"],
+            widgets=[
+                widget_node_by_id["widget_7"],
+                widget_node_by_id["widget_8"],
+            ],
         ),
         TaskNode(
             id="task_lifestyle_guidance",
             title="生活習慣指導",
             description="患者向け資料を使い、生活習慣の重要性を再度指導する。",
             order=4,
-            widget_ids=["widget_9", "widget_10"],
+            widgets=[
+                widget_node_by_id["widget_9"],
+                widget_node_by_id["widget_10"],
+            ],
         ),
     ]
     graph = ScenarioGraph(
@@ -279,9 +297,6 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
         title="複数の慢性疾患を持つ高齢患者の外来診察",
         description="Notionのタスク仮定例に基づく、血圧・腎機能・処方・生活指導のサンプル。",
         tasks=tasks,
-        data_nodes=data_nodes,
-        widget_nodes=widget_nodes,
-        edges=_build_edges("chronic_disease_outpatient", tasks, widget_nodes),
     )
     context = build_sql_context_for_graph(graph)
     return graph, context
@@ -336,7 +351,11 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
         ColumnsSpec(
             widths=[1, 1, 1],
             columns=[
-                [MetricSpec(label="降圧・腎保護", value_key="metric_antihypertensive_rx")],
+                [
+                    MetricSpec(
+                        label="降圧・腎保護", value_key="metric_antihypertensive_rx"
+                    )
+                ],
                 [MetricSpec(label="糖尿病薬", value_key="metric_diabetes_rx")],
                 [MetricSpec(label="脂質薬", value_key="metric_lipid_rx")],
             ],
@@ -366,7 +385,11 @@ def _chronic_disease_widgets() -> list[AnyWidget]:
         ColumnsSpec(
             widths=[1, 1],
             columns=[
-                [MetricSpec(label="本日の論点", value_key="metric_latest_exam_summary")],
+                [
+                    MetricSpec(
+                        label="本日の論点", value_key="metric_latest_exam_summary"
+                    )
+                ],
                 [MetricSpec(label="処方調整メモ", value_key="metric_adjustment_note")],
             ],
         ),
@@ -397,37 +420,6 @@ def _data_node_from_spec(spec: dict[str, object]) -> DataNode:
         primary_fields=[str(field) for field in spec["primary_fields"]],
         sql=str(spec["sql"]),
     )
-
-
-def _build_edges(
-    scenario_id: str,
-    tasks: list[TaskNode],
-    widget_nodes: list[WidgetNode],
-) -> list[GraphEdge]:
-    edges = [
-        GraphEdge(source_id=scenario_id, target_id=task.id, edge_type="scenario_to_task")
-        for task in tasks
-    ]
-    widget_by_id = {widget.id: widget for widget in widget_nodes}
-    for task in tasks:
-        for widget_id in task.widget_ids:
-            widget_node = widget_by_id[widget_id]
-            edges.append(
-                GraphEdge(
-                    source_id=task.id,
-                    target_id=widget_node.id,
-                    edge_type="task_to_widget",
-                )
-            )
-            for data_node_id in widget_node.data_node_ids:
-                edges.append(
-                    GraphEdge(
-                        source_id=widget_node.id,
-                        target_id=data_node_id,
-                        edge_type="widget_to_data",
-                    )
-                )
-    return edges
 
 
 def _referenced_data_node_ids(

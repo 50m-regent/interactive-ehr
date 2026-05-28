@@ -14,7 +14,6 @@ from interactive_ehr.sample_scenarios import get_chronic_disease_graph_scenario
 from interactive_ehr.scenario_graph import (
     DataNode,
     DataNodeGenerationPlan,
-    GraphEdge,
     ScenarioGraph,
     ScenarioGraphGenerationPlan,
     ScenarioGraphUpdateDecision,
@@ -31,11 +30,18 @@ from interactive_ehr.scenario_graph import (
     render_scenario_graph,
     update_scenario_graph_incrementally,
 )
-from interactive_ehr.widgets import MarkdownSpec, TableSpec, WidgetType
+from interactive_ehr.widgets import LineChartSpec, MarkdownSpec, TableSpec, WidgetType
 from tests.test_renderer import FakeContainer, FakeStreamlit
 
 
 def _minimal_graph() -> ScenarioGraph:
+    data_node = DataNode(
+        id="data_1",
+        context_key="rows",
+        data_type="list",
+        description="rows",
+        primary_fields=["name"],
+    )
     return ScenarioGraph(
         id="sample",
         title="sample",
@@ -44,41 +50,14 @@ def _minimal_graph() -> ScenarioGraph:
                 id="task_1",
                 title="確認",
                 order=1,
-                widget_ids=["widget_1"],
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=TableSpec(data_key="rows"),
+                        data_nodes=[data_node],
+                    )
+                ],
             )
-        ],
-        data_nodes=[
-            DataNode(
-                id="data_1",
-                context_key="rows",
-                data_type="list",
-                description="rows",
-                primary_fields=["name"],
-            )
-        ],
-        widget_nodes=[
-            WidgetNode(
-                id="widget_1",
-                widget=TableSpec(data_key="rows"),
-                data_node_ids=["data_1"],
-            )
-        ],
-        edges=[
-            GraphEdge(
-                source_id="sample",
-                target_id="task_1",
-                edge_type="scenario_to_task",
-            ),
-            GraphEdge(
-                source_id="task_1",
-                target_id="widget_1",
-                edge_type="task_to_widget",
-            ),
-            GraphEdge(
-                source_id="widget_1",
-                target_id="data_1",
-                edge_type="widget_to_data",
-            ),
         ],
     )
 
@@ -87,7 +66,7 @@ def test_scenario_graph_validates_widget_union() -> None:
     graph = ScenarioGraph.model_validate(_minimal_graph().model_dump(mode="json"))
 
     assert isinstance(graph.widget_nodes[0].widget, TableSpec)
-    assert graph.edges[0].edge_type == "scenario_to_task"
+    assert graph.tasks[0].widgets[0].data_nodes[0].id == "data_1"
 
 
 def test_parse_scenario_graph_json_accepts_valid_json() -> None:
@@ -127,6 +106,45 @@ def test_render_scenario_graph_uses_task_tabs_and_widget_renderer(
     )
 
 
+def test_render_scenario_graph_shows_chart_widget_title(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeStreamlit()
+    monkeypatch.setattr(scenario_graph, "st", fake)
+    render_widget_mock = MagicMock()
+    monkeypatch.setattr(scenario_graph, "render_widget", render_widget_mock)
+    data_node = DataNode(
+        id="data_1",
+        context_key="trend",
+        data_type="dataframe",
+        description="trend",
+    )
+    graph = ScenarioGraph(
+        id="sample",
+        title="sample",
+        tasks=[
+            TaskNode(
+                id="task_1",
+                title="確認",
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        title="HbA1c 推移",
+                        widget=LineChartSpec(data_key="trend", x="日付", y="HbA1c"),
+                        data_nodes=[data_node],
+                    )
+                ],
+            )
+        ],
+    )
+
+    render_scenario_graph(graph, {"trend": [{"日付": "2026-01-01", "HbA1c": 7.1}]})
+
+    markdown_calls = [call for call in fake.calls if call.name == "markdown"]
+    assert [call.args[0] for call in markdown_calls] == ["#### HbA1c 推移"]
+    render_widget_mock.assert_called_once()
+
+
 def test_render_scenario_graph_does_not_render_task_description(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -142,7 +160,6 @@ def test_render_scenario_graph_does_not_render_task_description(
                 id="task_1",
                 title="確認",
                 description="このタスクの説明文は電子カルテ画面には表示しない。",
-                widget_ids=[],
             )
         ],
     )
@@ -166,22 +183,20 @@ def test_render_scenario_graph_warns_for_missing_references(
             TaskNode(
                 id="task_1",
                 title="確認",
-                widget_ids=["missing_widget", "widget_1"],
-            )
-        ],
-        data_nodes=[
-            DataNode(
-                id="data_1",
-                context_key="missing_context",
-                data_type="list",
-                description="missing",
-            )
-        ],
-        widget_nodes=[
-            WidgetNode(
-                id="widget_1",
-                widget=MarkdownSpec(body="body"),
-                data_node_ids=["missing_data", "data_1"],
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=MarkdownSpec(body="body"),
+                        data_nodes=[
+                            DataNode(
+                                id="data_1",
+                                context_key="missing_context",
+                                data_type="list",
+                                description="missing",
+                            )
+                        ],
+                    )
+                ],
             )
         ],
     )
@@ -189,10 +204,8 @@ def test_render_scenario_graph_warns_for_missing_references(
     render_scenario_graph(graph, {})
 
     warnings = [call.args[0] for call in fake.calls if call.name == "warning"]
-    assert len(warnings) == 3
-    assert "missing_widget" in warnings[0]
-    assert "missing_data" in warnings[1]
-    assert "missing_context" in warnings[2]
+    assert len(warnings) == 1
+    assert "missing_context" in warnings[0]
     render_widget_mock.assert_called_once()
 
 
@@ -210,14 +223,20 @@ def test_render_scenario_graph_can_suppress_missing_reference_warnings(
             TaskNode(
                 id="task_1",
                 title="確認",
-                widget_ids=["missing_widget", "widget_1"],
-            )
-        ],
-        widget_nodes=[
-            WidgetNode(
-                id="widget_1",
-                widget=MarkdownSpec(body="body"),
-                data_node_ids=["missing_data"],
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=MarkdownSpec(body="body"),
+                        data_nodes=[
+                            DataNode(
+                                id="data_1",
+                                context_key="missing_context",
+                                data_type="list",
+                                description="missing",
+                            )
+                        ],
+                    )
+                ],
             )
         ],
     )
@@ -339,28 +358,12 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
         "completed",
     ]
     assert events[1].graph.tasks[0].id == "task_1"
-    assert events[2].graph.data_nodes[0].id == "data_1"
+    assert events[2].graph.data_nodes == []
     assert events[2].context == {}
     assert events[3].graph.widget_nodes[0].id == "widget_1"
     assert "sql_data_1" in events[3].context
     final_graph = events[-1].graph
-    assert final_graph.edges == [
-        GraphEdge(
-            source_id="generated",
-            target_id="task_1",
-            edge_type="scenario_to_task",
-        ),
-        GraphEdge(
-            source_id="task_1",
-            target_id="widget_1",
-            edge_type="task_to_widget",
-        ),
-        GraphEdge(
-            source_id="widget_1",
-            target_id="data_1",
-            edge_type="widget_to_data",
-        ),
-    ]
+    assert final_graph.tasks[0].widgets[0].data_nodes[0].id == "data_1"
     assert client.generate.call_count == 3
 
 
@@ -462,12 +465,7 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
     final_graph = events[-1].graph
-    assert final_graph.widget_nodes[0].data_node_ids == ["data_1"]
-    assert final_graph.edges[-1] == GraphEdge(
-        source_id="widget_1",
-        target_id="data_1",
-        edge_type="widget_to_data",
-    )
+    assert [data_node.id for data_node in final_graph.widget_nodes[0].data_nodes] == ["data_1"]
 
 
 def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
@@ -564,18 +562,23 @@ def test_build_sql_context_for_graph_executes_data_node_sql(
 ) -> None:
     execute_mock = MagicMock(return_value=_dataframe({"匿名ID": ["P001"]}))
     monkeypatch.setattr(scenario_graph, "execute_read_sql", execute_mock)
-    graph = _minimal_graph().model_copy(
-        update={
-            "data_nodes": [
-                DataNode(
-                    id="data_1",
-                    context_key="sql_data_1",
-                    data_type="dataframe",
-                    description="sql",
-                    sql='SELECT "匿名ID" FROM "患者基本"',
-                )
-            ]
-        }
+    data_node = DataNode(
+        id="data_1",
+        context_key="sql_data_1",
+        data_type="dataframe",
+        description="sql",
+        sql='SELECT "匿名ID" FROM "患者基本"',
+    )
+    graph = ScenarioGraph(
+        id="sample",
+        title="sample",
+        tasks=[
+            TaskNode(
+                id="task_1",
+                title="確認",
+                widgets=[WidgetNode(id="widget_1", widget=TableSpec(data_key="sql_data_1"), data_nodes=[data_node])],
+            )
+        ],
     )
 
     context = build_sql_context_for_graph(graph)
@@ -760,18 +763,29 @@ def test_update_incremental_scope_widget_regenerates_target_widgets(
 def test_update_incremental_scope_data_regenerates_sql_only(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    graph = _minimal_graph().model_copy(
-        update={
-            "data_nodes": [
-                DataNode(
-                    id="data_1",
-                    context_key="rows",
-                    data_type="dataframe",
-                    description="rows",
-                    sql='SELECT "匿名ID" FROM "患者基本" LIMIT 10',
-                )
-            ]
-        }
+    data_node = DataNode(
+        id="data_1",
+        context_key="rows",
+        data_type="dataframe",
+        description="rows",
+        sql='SELECT "匿名ID" FROM "患者基本" LIMIT 10',
+    )
+    graph = ScenarioGraph(
+        id="sample",
+        title="sample",
+        tasks=[
+            TaskNode(
+                id="task_1",
+                title="確認",
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=TableSpec(data_key="rows"),
+                        data_nodes=[data_node],
+                    )
+                ],
+            )
+        ],
     )
     decision = ScenarioGraphUpdateDecision(
         scope=ScenarioGraphUpdateScope.DATA,

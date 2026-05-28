@@ -137,10 +137,7 @@ def _format_current_json() -> None:
         return
 
     st.session_state[GRAPH_STATE_KEY] = graph
-    if any(data_node.sql is not None for data_node in graph.data_nodes):
-        st.session_state[CONTEXT_STATE_KEY] = build_sql_context_for_graph(graph)
-    elif any(data_node.model_name is not None for data_node in graph.data_nodes):
-        st.session_state[CONTEXT_STATE_KEY] = build_dwh_context_for_graph(graph)
+    st.session_state[CONTEXT_STATE_KEY] = _build_context_for_graph(graph)
     st.session_state[GRAPH_JSON_STATE_KEY] = _format_graph_json(graph)
 
 
@@ -154,7 +151,21 @@ def _update_graph_from_json(json_text: str) -> None:
         st.sidebar.error(f"タスクグラフの検証エラー: {exc}")
         return
 
+    current_graph = st.session_state.get(GRAPH_STATE_KEY)
+    if isinstance(current_graph, ScenarioGraph) and current_graph == graph:
+        return
+
     st.session_state[GRAPH_STATE_KEY] = graph
+    st.session_state[CONTEXT_STATE_KEY] = _build_context_for_graph(graph)
+
+
+def _build_context_for_graph(graph: ScenarioGraph) -> dict[str, object]:
+    context: dict[str, object] = {}
+    if any(data_node.model_name is not None for data_node in graph.data_nodes):
+        context.update(build_dwh_context_for_graph(graph))
+    if any(data_node.sql is not None for data_node in graph.data_nodes):
+        context.update(build_sql_context_for_graph(graph))
+    return context
 
 
 def _render_graph_preview(
