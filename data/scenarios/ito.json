@@ -1,0 +1,354 @@
+{
+  "id": "anesthesia_preop_outpatient",
+  "title": "麻酔科術前外来",
+  "description": "麻酔科医が手術前に患者背景と検査・既往・麻酔歴を確認し、麻酔リスク説明の要点を整理するシナリオ。",
+  "tasks": [
+    {
+      "id": "task_1",
+      "title": "患者の基本的な特徴の確認",
+      "description": "年齢・性別・身長・体重・BMIを確認する。",
+      "order": 1,
+      "widget_ids": [
+        "widget_1"
+      ]
+    },
+    {
+      "id": "task_2",
+      "title": "手術の確認",
+      "description": "病名、術式、予定手術時間、体位を確認する。",
+      "order": 2,
+      "widget_ids": [
+        "widget_2"
+      ]
+    },
+    {
+      "id": "task_3",
+      "title": "生活歴・アレルギーの確認",
+      "description": "喫煙歴、飲酒歴、アレルギー情報を確認する。",
+      "order": 3,
+      "widget_ids": [
+        "widget_3"
+      ]
+    },
+    {
+      "id": "task_4",
+      "title": "既往歴と治療内容の確認",
+      "description": "既往歴と治療歴（内服・手術・輸血情報）を確認する。",
+      "order": 4,
+      "widget_ids": [
+        "widget_4"
+      ]
+    },
+    {
+      "id": "task_5",
+      "title": "検査結果の確認",
+      "description": "血液検査・生理検査・放射線レポートの最新結果を確認する。",
+      "order": 5,
+      "widget_ids": [
+        "widget_5"
+      ]
+    },
+    {
+      "id": "task_6",
+      "title": "麻酔歴の確認",
+      "description": "手術歴がある場合に過去の麻酔記録を確認する。",
+      "order": 6,
+      "widget_ids": [
+        "widget_6"
+      ]
+    },
+    {
+      "id": "task_7",
+      "title": "麻酔リスクの判定",
+      "description": "説明が必要なリスクと麻酔時の注意点を整理して記入する。",
+      "order": 7,
+      "widget_ids": [
+        "widget_7"
+      ]
+    }
+  ],
+  "data_nodes": [
+    {
+      "id": "data_1",
+      "context_key": "table_t1_patient_basic",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "患者の基本情報（年齢・性別・身長・体重・BMI）",
+      "primary_fields": [
+        "匿名ID",
+        "患者ID",
+        "現在年齢",
+        "性別",
+        "身長",
+        "体重",
+        "BMI",
+        "測定日"
+      ],
+      "sql": "SELECT pb.\"匿名ID\", pb.\"患者ID\", pb.\"現在年齢\", pb.\"性別\", pp.\"身長\", pp.\"体重\", ROUND(CASE WHEN pp.\"身長\" IS NULL OR pp.\"身長\"=0 THEN NULL ELSE pp.\"体重\"/((pp.\"身長\"/100.0)*(pp.\"身長\"/100.0)) END,1) AS \"BMI\", COALESCE(pp.\"体重測定日\", pp.\"更新日\") AS \"測定日\" FROM \"患者基本\" pb LEFT JOIN \"患者プロフィール\" pp ON pb.\"患者ID\"=pp.\"患者ID\" ORDER BY pb.\"更新日\" DESC LIMIT 20"
+    },
+    {
+      "id": "data_2",
+      "context_key": "table_t2_surgery_request",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "手術申し込み情報（病名・術式・予定時間・体位）",
+      "primary_fields": [
+        "診療科",
+        "依頼病名",
+        "術式名",
+        "予定日",
+        "予定手術時間(分)",
+        "予定体位"
+      ],
+      "sql": "SELECT \"診療科\", \"依頼病名\", \"申込術式1\" AS \"術式名\", \"検索日(手術予定日)\" AS \"予定日\", \"予定手術所要時間(分)\" AS \"予定手術時間(分)\", \"予定体位1\" AS \"予定体位\" FROM \"手術依頼\" ORDER BY \"検索日(手術予定日)\" DESC LIMIT 20"
+    },
+    {
+      "id": "data_3",
+      "context_key": "table_t3_lifestyle_allergy",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "喫煙・飲酒・アレルギー情報",
+      "primary_fields": [
+        "患者ID",
+        "喫煙歴",
+        "喫煙開始年齢",
+        "喫煙中止年齢",
+        "飲酒歴",
+        "アレルギー名称",
+        "症状",
+        "フリーコメント"
+      ],
+      "sql": "SELECT pp.\"患者ID\", pp.\"喫煙\" AS \"喫煙歴\", pp.\"喫煙開始年齢\", pp.\"喫煙中止年齢\", pp.\"飲酒\" AS \"飲酒歴\", pa.\"アレルギー名称\", pa.\"症状\", pa.\"フリーコメント\" FROM \"患者プロフィール\" pp LEFT JOIN \"患者アレルギー情報\" pa ON pp.\"患者ID\"=pa.\"患者ID\" ORDER BY pp.\"更新日\" DESC LIMIT 20"
+    },
+    {
+      "id": "data_4",
+      "context_key": "table_t4_history_treatment",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "既往歴と治療内容（問診票病歴）",
+      "primary_fields": [
+        "患者ID",
+        "既往歴",
+        "治療法",
+        "手術の有無",
+        "輸血の有無",
+        "病名開始日"
+      ],
+      "sql": "SELECT \"患者ID\", \"既往歴(病名)\" AS \"既往歴\", \"治療法\", \"手術の有無\", \"輸血の有無\", \"病名開始日\" FROM \"問診票病歴\" ORDER BY \"検索日(発病日)\" DESC LIMIT 50"
+    },
+    {
+      "id": "data_5",
+      "context_key": "table_t5_exam_results",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "検査結果（検体・生理・放射線レポート）",
+      "primary_fields": [
+        "検査区分",
+        "検査項目",
+        "結果",
+        "単位",
+        "報告日"
+      ],
+      "sql": "SELECT \"検体検査\" AS \"検査区分\", \"検査項目\", COALESCE(\"結果(文字列)\", CAST(\"結果(数値)\" AS TEXT)) AS \"結果\", \"結果値単位\" AS \"単位\", \"報告日\" FROM \"検体検査結果\" UNION ALL SELECT \"生理検査\" AS \"検査区分\", \"検査項目\", COALESCE(\"検査コメント\",\"\") AS \"結果\", NULL AS \"単位\", \"報告日\" FROM \"生理検査\" UNION ALL SELECT \"放射線レポート\" AS \"検査区分\", \"レポート名\" AS \"検査項目\", COALESCE(\"所見\",\"\") AS \"結果\", NULL AS \"単位\", \"報告日\" FROM \"放射線検査レポート\" ORDER BY \"報告日\" DESC LIMIT 100"
+    },
+    {
+      "id": "data_6",
+      "context_key": "table_t6_anesthesia_history",
+      "model_name": null,
+      "data_type": "dataframe",
+      "description": "過去手術の麻酔関連情報",
+      "primary_fields": [
+        "患者ID",
+        "手術実施日",
+        "実施術式1",
+        "麻酔科医1",
+        "麻酔時間(分)",
+        "麻酔開始日時",
+        "麻酔終了日時"
+      ],
+      "sql": "SELECT \"患者ID\", \"検索日(手術実施日)\" AS \"手術実施日\", \"実施術式1\", \"麻酔科医1\", \"麻酔時間(分)\", \"麻酔開始日時\", \"麻酔終了日時\" FROM \"手術実施\" ORDER BY \"検索日(手術実施日)\" DESC LIMIT 20"
+    }
+  ],
+  "widget_nodes": [
+    {
+      "id": "widget_1",
+      "title": "患者情報一覧",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t1_patient_basic"
+      },
+      "data_node_ids": [
+        "data_1"
+      ]
+    },
+    {
+      "id": "widget_2",
+      "title": "手術申し込み内容一覧",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t2_surgery_request"
+      },
+      "data_node_ids": [
+        "data_2"
+      ]
+    },
+    {
+      "id": "widget_3",
+      "title": "生活歴・アレルギー歴一覧",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t3_lifestyle_allergy"
+      },
+      "data_node_ids": [
+        "data_3"
+      ]
+    },
+    {
+      "id": "widget_4",
+      "title": "既往歴と治療内容",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t4_history_treatment"
+      },
+      "data_node_ids": [
+        "data_4"
+      ]
+    },
+    {
+      "id": "widget_5",
+      "title": "検査結果一覧",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t5_exam_results"
+      },
+      "data_node_ids": [
+        "data_5"
+      ]
+    },
+    {
+      "id": "widget_6",
+      "title": "麻酔歴の確認",
+      "widget": {
+        "widget_type": "table",
+        "data_key": "table_t6_anesthesia_history"
+      },
+      "data_node_ids": [
+        "data_6"
+      ]
+    },
+    {
+      "id": "widget_7",
+      "title": "麻酔リスク記入",
+      "widget": {
+        "widget_type": "text_input",
+        "label": "麻酔リスク（#で列挙）",
+        "default_value": "",
+        "placeholder": "例: #気道確保困難 #呼吸器合併症",
+        "max_chars": 5000
+      },
+      "data_node_ids": []
+    }
+  ],
+  "edges": [
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_1",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_2",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_3",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_4",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_5",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_6",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "anesthesia_preop_outpatient",
+      "target_id": "task_7",
+      "edge_type": "scenario_to_task"
+    },
+    {
+      "source_id": "task_1",
+      "target_id": "widget_1",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_2",
+      "target_id": "widget_2",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_3",
+      "target_id": "widget_3",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_4",
+      "target_id": "widget_4",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_5",
+      "target_id": "widget_5",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_6",
+      "target_id": "widget_6",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "task_7",
+      "target_id": "widget_7",
+      "edge_type": "task_to_widget"
+    },
+    {
+      "source_id": "widget_1",
+      "target_id": "data_1",
+      "edge_type": "widget_to_data"
+    },
+    {
+      "source_id": "widget_2",
+      "target_id": "data_2",
+      "edge_type": "widget_to_data"
+    },
+    {
+      "source_id": "widget_3",
+      "target_id": "data_3",
+      "edge_type": "widget_to_data"
+    },
+    {
+      "source_id": "widget_4",
+      "target_id": "data_4",
+      "edge_type": "widget_to_data"
+    },
+    {
+      "source_id": "widget_5",
+      "target_id": "data_5",
+      "edge_type": "widget_to_data"
+    },
+    {
+      "source_id": "widget_6",
+      "target_id": "data_6",
+      "edge_type": "widget_to_data"
+    }
+  ]
+}
