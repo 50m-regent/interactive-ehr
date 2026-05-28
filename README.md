@@ -39,6 +39,50 @@ uv run streamlit run src/interactive_ehr/app.py
 
 サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
 
+## Docker（インターネット非接続環境での実行）
+
+依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。Gemini APIはオフラインでは利用できませんが、起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。
+
+### 1. ビルド（ネット接続のある環境で）
+
+```bash
+docker build -t interactive-ehr:latest .
+```
+
+ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。
+
+### 2. オフライン環境へ転送
+
+```bash
+# ネット接続環境でイメージをtarに保存
+docker save interactive-ehr:latest -o interactive-ehr-image.tar
+
+# 非接続環境へtarを持ち込み、ロード
+docker load -i interactive-ehr-image.tar
+```
+
+### 3. 起動
+
+```bash
+docker run -d -p 8501:8501 --name interactive-ehr interactive-ehr:latest
+```
+
+ブラウザで http://localhost:8501 を開きます。`--network none` でも動作します（外部通信は不要）。
+
+### コードを編集する
+
+ホスト側のソースをバインドマウントすると、編集が即時反映されます（Streamlitの自動再実行）。依存関係はイメージ内の `/opt/venv` にあるため影響しません。
+
+```bash
+docker compose up -d   # ./src と ./scripts をマウントして起動
+```
+
+プロジェクトディレクトリを持ち込めない場合は、コンテナ内で直接編集できます（`nano` / `vim` 同梱）。
+
+```bash
+docker exec -it interactive-ehr nano /app/src/interactive_ehr/app.py
+```
+
 ## テスト
 
 ```bash
