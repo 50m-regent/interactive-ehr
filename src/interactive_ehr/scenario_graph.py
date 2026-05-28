@@ -208,6 +208,7 @@ def render_scenario_graph(
             for widget_node in task.widgets:
                 if show_missing_reference_warnings:
                     _warn_for_data_references(widget_node, context)
+                _render_widget_title(widget_node)
                 render_widget(widget_node.widget, context)
 
 
@@ -490,6 +491,14 @@ def _warn_for_data_references(
                 f"data node '{data_node.id}' の context_key "
                 f"'{data_node.context_key}' が表示コンテキストに存在しません。"
             )
+
+
+def _render_widget_title(widget_node: WidgetNode) -> None:
+    if widget_node.title is None:
+        return
+    if widget_node.widget.widget_type not in {WidgetType.LINE_CHART, WidgetType.BAR_CHART}:
+        return
+    st.markdown(f"#### {widget_node.title}")
 
 
 def _decide_update_scope(

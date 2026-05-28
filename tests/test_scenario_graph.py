@@ -30,7 +30,7 @@ from interactive_ehr.scenario_graph import (
     render_scenario_graph,
     update_scenario_graph_incrementally,
 )
-from interactive_ehr.widgets import MarkdownSpec, TableSpec, WidgetType
+from interactive_ehr.widgets import LineChartSpec, MarkdownSpec, TableSpec, WidgetType
 from tests.test_renderer import FakeContainer, FakeStreamlit
 
 
@@ -104,6 +104,45 @@ def test_render_scenario_graph_uses_task_tabs_and_widget_renderer(
         graph.widget_nodes[0].widget,
         {"rows": [{"name": "A"}]},
     )
+
+
+def test_render_scenario_graph_shows_chart_widget_title(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fake = FakeStreamlit()
+    monkeypatch.setattr(scenario_graph, "st", fake)
+    render_widget_mock = MagicMock()
+    monkeypatch.setattr(scenario_graph, "render_widget", render_widget_mock)
+    data_node = DataNode(
+        id="data_1",
+        context_key="trend",
+        data_type="dataframe",
+        description="trend",
+    )
+    graph = ScenarioGraph(
+        id="sample",
+        title="sample",
+        tasks=[
+            TaskNode(
+                id="task_1",
+                title="確認",
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        title="HbA1c 推移",
+                        widget=LineChartSpec(data_key="trend", x="日付", y="HbA1c"),
+                        data_nodes=[data_node],
+                    )
+                ],
+            )
+        ],
+    )
+
+    render_scenario_graph(graph, {"trend": [{"日付": "2026-01-01", "HbA1c": 7.1}]})
+
+    markdown_calls = [call for call in fake.calls if call.name == "markdown"]
+    assert [call.args[0] for call in markdown_calls] == ["#### HbA1c 推移"]
+    render_widget_mock.assert_called_once()
 
 
 def test_render_scenario_graph_does_not_render_task_description(
