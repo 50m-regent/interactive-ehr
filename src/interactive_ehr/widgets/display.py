@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from interactive_ehr.widgets._base import WidgetSpec, WidgetType
 
@@ -72,7 +72,21 @@ class MarkdownSpec(WidgetSpec):
     """
 
     widget_type: Literal[WidgetType.MARKDOWN] = WidgetType.MARKDOWN
-    body: str = Field(max_length=50_000, description="表示するマークダウンテキスト")
+    body: str | None = Field(
+        None,
+        max_length=50_000,
+        description="表示するマークダウンテキスト",
+    )
+    data_key: str | None = Field(
+        None,
+        description="表示するマークダウン文字列のコンテキストキー",
+    )
+
+    @model_validator(mode="after")
+    def _validate_body_or_data_key(self) -> MarkdownSpec:
+        if self.body is None and self.data_key is None:
+            raise ValueError("body or data_key must be provided")
+        return self
 
 
 class TextSpec(WidgetSpec):

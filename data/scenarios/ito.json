@@ -1,0 +1,268 @@
+{
+  "id": "anesthesia_preop_outpatient",
+  "title": "麻酔科術前外来",
+  "description": "同一患者の術前評価に必要な情報だけを集約したシナリオ。",
+  "tasks": [
+    {
+      "id": "task_1",
+      "title": "患者の基本的な特徴の確認",
+      "description": "基本情報と生活歴・アレルギーを文章で確認する。",
+      "order": 1,
+      "widgets": [
+        {
+          "id": "widget_1",
+          "title": "患者基本・生活歴サマリ",
+          "widget": {
+            "widget_type": "markdown",
+            "data_key": "md_t1_patient_profile"
+          },
+          "data_nodes": [
+            {
+              "id": "data_1",
+              "context_key": "md_t1_patient_profile",
+              "model_name": null,
+              "data_type": "scalar",
+              "description": "患者基本・生活歴・アレルギー要約",
+              "primary_fields": [
+                "summary_markdown"
+              ],
+              "sql": "SELECT '### 患者基本情報' || char(10) || '- 患者ID: ' || pb.\"患者ID\" || char(10) || '- 匿名ID: ' || pb.\"匿名ID\" || char(10) || '- 年齢: ' || COALESCE(CAST(pb.\"現在年齢\" AS TEXT), '-') || char(10) || '- 性別: ' || COALESCE(pb.\"性別\", '-') || char(10) || '- 身長: ' || COALESCE(CAST(pp.\"身長\" AS TEXT), '-') || ' cm' || char(10) || '- 体重: ' || COALESCE(CAST(pp.\"体重\" AS TEXT), '-') || ' kg' || char(10) || '- BMI: ' || COALESCE(CAST(ROUND(CASE WHEN pp.\"身長\" IS NULL OR pp.\"身長\"=0 THEN NULL ELSE pp.\"体重\"/((pp.\"身長\"/100.0)*(pp.\"身長\"/100.0)) END, 1) AS TEXT), '-') || char(10) || char(10) || '### 生活歴・アレルギー' || char(10) || '- 喫煙歴: ' || COALESCE(pp.\"喫煙\", '-') || char(10) || '- 喫煙開始年齢: ' || COALESCE(CAST(pp.\"喫煙開始年齢\" AS TEXT), '-') || char(10) || '- 喫煙中止年齢: ' || COALESCE(CAST(pp.\"喫煙中止年齢\" AS TEXT), '-') || char(10) || '- 飲酒歴: ' || COALESCE(pp.\"飲酒\", '-') || char(10) || '- アレルギー: ' || COALESCE(pa.\"アレルギー名称\", '-') || char(10) || '- アレルギー症状: ' || COALESCE(pa.\"症状\", '-') || char(10) || '- コメント: ' || COALESCE(pa.\"フリーコメント\", '-') AS \"summary_markdown\" FROM \"患者基本\" pb LEFT JOIN \"患者プロフィール\" pp ON pb.\"患者ID\"=pp.\"患者ID\" LEFT JOIN \"患者アレルギー情報\" pa ON pb.\"患者ID\"=pa.\"患者ID\" WHERE pb.\"患者ID\"='ITO_PREOP_001' ORDER BY COALESCE(pa.\"検索日(診断日)\", pa.\"入力日\") DESC LIMIT 1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_2",
+      "title": "手術の確認",
+      "description": "該当患者の手術依頼情報を確認する。",
+      "order": 2,
+      "widgets": [
+        {
+          "id": "widget_2",
+          "title": "手術情報",
+          "widget": {
+            "widget_type": "table",
+            "data_key": "table_t2_surgery_request"
+          },
+          "data_nodes": [
+            {
+              "id": "data_2",
+              "context_key": "table_t2_surgery_request",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "手術依頼情報（該当患者）",
+              "primary_fields": [
+                "患者ID",
+                "依頼病名",
+                "術式名",
+                "予定日",
+                "予定手術時間(分)",
+                "予定体位",
+                "麻酔科依頼の有無"
+              ],
+              "sql": "SELECT \"患者ID\", \"依頼病名\", \"申込術式1\" AS \"術式名\", \"検索日(手術予定日)\" AS \"予定日\", \"予定手術所要時間(分)\" AS \"予定手術時間(分)\", \"予定体位1\" AS \"予定体位\", \"麻酔科依頼の有無\" FROM \"手術依頼\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"検索日(手術予定日)\" DESC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_3",
+      "title": "既往歴と治療内容の確認",
+      "description": "該当患者の既往歴と処方内容を確認する。",
+      "order": 3,
+      "widgets": [
+        {
+          "id": "widget_3",
+          "title": "既往歴",
+          "widget": {
+            "widget_type": "table",
+            "data_key": "table_t3_history"
+          },
+          "data_nodes": [
+            {
+              "id": "data_3",
+              "context_key": "table_t3_history",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "既往歴（該当患者）",
+              "primary_fields": [
+                "患者ID",
+                "既往歴",
+                "治療法",
+                "手術の有無",
+                "輸血の有無",
+                "病名開始日"
+              ],
+              "sql": "SELECT \"患者ID\", \"既往歴(病名)\" AS \"既往歴\", \"治療法\", \"手術の有無\", \"輸血の有無\", \"病名開始日\" FROM \"問診票病歴\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"検索日(発病日)\" DESC"
+            }
+          ]
+        },
+        {
+          "id": "widget_4",
+          "title": "処方内容",
+          "widget": {
+            "widget_type": "table",
+            "data_key": "table_t3_prescriptions"
+          },
+          "data_nodes": [
+            {
+              "id": "data_4",
+              "context_key": "table_t3_prescriptions",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "治療内容（処方、該当患者）",
+              "primary_fields": [
+                "患者ID",
+                "服薬開始日",
+                "薬剤名",
+                "一日量",
+                "一日量単位",
+                "用法"
+              ],
+              "sql": "SELECT \"患者ID\", \"服薬開始日\", \"薬剤名\", \"一日量\", \"一日量単位\", \"用法\" FROM \"処方\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"服薬開始日\" DESC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_4",
+      "title": "検査結果の確認",
+      "description": "該当患者の検査推移を項目群ごとに確認する。",
+      "order": 4,
+      "widgets": [
+        {
+          "id": "widget_5",
+          "title": "血算推移",
+          "widget": {
+            "widget_type": "line_chart",
+            "data_key": "chart_t4_cbc",
+            "x": "検査日",
+            "y": [
+              "Hb",
+              "WBC",
+              "Plt"
+            ],
+            "x_label": "検査日",
+            "y_label": "値"
+          },
+          "data_nodes": [
+            {
+              "id": "data_5",
+              "context_key": "chart_t4_cbc",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "血算推移（Hb/WBC/Plt）",
+              "primary_fields": [
+                "検査日",
+                "Hb",
+                "WBC",
+                "Plt"
+              ],
+              "sql": "SELECT \"報告日\" AS \"検査日\", MAX(CASE WHEN \"検査項目\"='Hb' THEN \"結果(数値)\" END) AS \"Hb\", MAX(CASE WHEN \"検査項目\"='WBC' THEN \"結果(数値)\" END) AS \"WBC\", MAX(CASE WHEN \"検査項目\"='Plt' THEN \"結果(数値)\" END) AS \"Plt\" FROM \"検体検査結果\" WHERE \"患者ID\"='ITO_PREOP_001' AND \"検査項目\" IN ('Hb', 'WBC', 'Plt') GROUP BY \"報告日\" ORDER BY \"報告日\""
+            }
+          ]
+        },
+        {
+          "id": "widget_6",
+          "title": "腎機能・電解質推移",
+          "widget": {
+            "widget_type": "line_chart",
+            "data_key": "chart_t4_renal",
+            "x": "検査日",
+            "y": [
+              "Cr",
+              "eGFR",
+              "K"
+            ],
+            "x_label": "検査日",
+            "y_label": "値"
+          },
+          "data_nodes": [
+            {
+              "id": "data_6",
+              "context_key": "chart_t4_renal",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "腎機能・電解質推移（Cr/eGFR/K）",
+              "primary_fields": [
+                "検査日",
+                "Cr",
+                "eGFR",
+                "K"
+              ],
+              "sql": "SELECT \"報告日\" AS \"検査日\", MAX(CASE WHEN \"検査項目\"='Cr' THEN \"結果(数値)\" END) AS \"Cr\", MAX(CASE WHEN \"検査項目\"='eGFR' THEN \"結果(数値)\" END) AS \"eGFR\", MAX(CASE WHEN \"検査項目\"='K' THEN \"結果(数値)\" END) AS \"K\" FROM \"検体検査結果\" WHERE \"患者ID\"='ITO_PREOP_001' AND \"検査項目\" IN ('Cr', 'eGFR', 'K') GROUP BY \"報告日\" ORDER BY \"報告日\""
+            }
+          ]
+        },
+        {
+          "id": "widget_7",
+          "title": "肝機能推移",
+          "widget": {
+            "widget_type": "line_chart",
+            "data_key": "chart_t4_liver",
+            "x": "検査日",
+            "y": [
+              "AST",
+              "ALT"
+            ],
+            "x_label": "検査日",
+            "y_label": "値"
+          },
+          "data_nodes": [
+            {
+              "id": "data_7",
+              "context_key": "chart_t4_liver",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "肝機能推移（AST/ALT）",
+              "primary_fields": [
+                "検査日",
+                "AST",
+                "ALT"
+              ],
+              "sql": "SELECT \"報告日\" AS \"検査日\", MAX(CASE WHEN \"検査項目\"='AST' THEN \"結果(数値)\" END) AS \"AST\", MAX(CASE WHEN \"検査項目\"='ALT' THEN \"結果(数値)\" END) AS \"ALT\" FROM \"検体検査結果\" WHERE \"患者ID\"='ITO_PREOP_001' AND \"検査項目\" IN ('AST', 'ALT') GROUP BY \"報告日\" ORDER BY \"報告日\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "task_5",
+      "title": "麻酔歴の確認",
+      "description": "該当患者の過去麻酔関連情報を確認する。",
+      "order": 5,
+      "widgets": [
+        {
+          "id": "widget_8",
+          "title": "麻酔歴",
+          "widget": {
+            "widget_type": "table",
+            "data_key": "table_t5_anesthesia_history"
+          },
+          "data_nodes": [
+            {
+              "id": "data_8",
+              "context_key": "table_t5_anesthesia_history",
+              "model_name": null,
+              "data_type": "dataframe",
+              "description": "麻酔歴（該当患者）",
+              "primary_fields": [
+                "患者ID",
+                "手術実施日",
+                "実施術式1",
+                "麻酔科医1",
+                "麻酔時間(分)",
+                "麻酔開始日時",
+                "麻酔終了日時"
+              ],
+              "sql": "SELECT \"患者ID\", \"検索日(手術実施日)\" AS \"手術実施日\", \"実施術式1\", \"麻酔科医1\", \"麻酔時間(分)\", \"麻酔開始日時\", \"麻酔終了日時\" FROM \"手術実施\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"検索日(手術実施日)\" DESC"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

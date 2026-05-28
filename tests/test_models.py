@@ -280,12 +280,53 @@ class TestDwhDatabase:
 
         assert dataframe.to_dict(orient="records") == [{"匿名ID": "CSV_001"}]
 
+    def test_execute_read_sql_accepts_read_only_cte(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        pd.DataFrame(
+            [{"匿名ID": "CSV_001", "性別": "男"}],
+        ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
+        db_path = tmp_path / "dwh.sqlite"
+        build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+            include_diabetes_sample=False,
+        )
+
+        dataframe = execute_read_sql(
+            'WITH latest AS (SELECT "匿名ID" FROM "患者基本") SELECT "匿名ID" FROM latest',
+            db_path=db_path,
+        )
+
+        assert dataframe.to_dict(orient="records") == [{"匿名ID": "CSV_001"}]
+
     def test_execute_read_sql_rejects_non_select(self, tmp_path: Path) -> None:
         db_path = tmp_path / "dwh.sqlite"
         db_path.touch()
 
-        with pytest.raises(ValueError, match="SELECT"):
+        with pytest.raises(ValueError, match="読み取り"):
             execute_read_sql('DROP TABLE "患者基本"', db_path=db_path)
+
+    def test_execute_read_sql_rejects_write_cte(self, tmp_path: Path) -> None:
+        csv_dir = tmp_path / "dwh"
+        csv_dir.mkdir()
+        pd.DataFrame(
+            [{"匿名ID": "CSV_001", "性別": "男"}],
+        ).to_csv(csv_dir / "患者基本.csv", index=False, encoding="utf-8-sig")
+        db_path = tmp_path / "dwh.sqlite"
+        build_dwh_database_from_csvs(
+            csv_dir=csv_dir,
+            db_path=db_path,
+            overwrite=True,
+            include_diabetes_sample=False,
+        )
+
+        with pytest.raises(ValueError, match="読み取り"):
+            execute_read_sql(
+                'WITH target AS (SELECT "匿名ID" FROM "患者基本") DELETE FROM "患者基本"',
+                db_path=db_path,
+            )
 
 
 class TestFake:

@@ -120,7 +120,7 @@ def load_dwh_dataframe(
 
     csv_path = Path(csv_dir) / f"{model_name}.csv"
     if csv_path.exists():
-        return pd.read_csv(csv_path, encoding="utf-8-sig")
+        return pd.read_csv(csv_path, encoding="utf-8-sig").head(n)
     return fake_dwh_dataframe(model_name, n=n)
 
 
