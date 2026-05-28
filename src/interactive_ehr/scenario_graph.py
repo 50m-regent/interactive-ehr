@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import concurrent.futures
 import json
 from collections.abc import Mapping
+from enum import Enum
 from typing import Iterator, Literal, cast
 
 import pandas as pd
@@ -164,6 +166,21 @@ class ScenarioGraphGenerationEvent(BaseModel):
     context: dict[str, object] = Field(default_factory=dict)
 
 
+class ScenarioGraphUpdateScope(str, Enum):
+    SCENARIO = "scenario"
+    TASK = "task"
+    WIDGET = "widget"
+    DATA = "data"
+
+
+class ScenarioGraphUpdateDecision(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    scope: ScenarioGraphUpdateScope
+    target_node_ids: list[str] = Field(default_factory=list)
+    rationale: str | None = None
+
+
 def parse_scenario_graph_json(json_text: str) -> ScenarioGraph:
     """Parse JSON text into a validated ScenarioGraph."""
 
@@ -194,8 +211,6 @@ def render_scenario_graph(
     tab_handles = st.tabs([task.title for task in tasks])
     for tab, task in zip(tab_handles, tasks, strict=True):
         with tab:
-            if task.description:
-                st.caption(task.description)
             for widget_id in task.widget_ids:
                 widget_node = widget_by_id.get(widget_id)
                 if widget_node is None:
@@ -348,40 +363,55 @@ def generate_scenario_graph_incrementally(
             context=generated_context,
         )
 
-    for widget_plan in plan.widget_nodes:
-        try:
-            widget_sql = client.generate(
-                _build_widget_node_prompt(prompt, context, plan, widget_plan, graph),
-                WidgetNodeSqlGeneration,
-            )
-            widget_node = widget_sql.widget_node
-            widget_node = _normalize_widget_node(widget_node, widget_plan)
-            context_key = _context_key_for_widget_plan(graph, widget_plan)
-            if context_key is not None:
-                widget_node = _bind_widget_to_data_context(widget_node, context_key)
-            graph = _append_widget_node(graph, widget_node, plan)
-            graph, generated_context = _attach_widget_sql_result(
-                graph,
-                widget_node,
-                widget_sql.sql,
-                generated_context,
-            )
-        except Exception as exc:
-            yield ScenarioGraphGenerationEvent(
-                status="failed",
-                message=f"widget node '{widget_plan.id}' の生成に失敗しました: {exc}",
-                graph=graph,
-                node_id=widget_plan.id,
-                context=generated_context,
-            )
-            return
-        yield ScenarioGraphGenerationEvent(
-            status="widget",
-            message=f"widget node '{widget_node.id}' とSQLを生成しました。",
-            graph=graph,
-            node_id=widget_node.id,
-            context=generated_context,
-        )
+    graph_snapshot = graph
+    if plan.widget_nodes:
+        max_workers = min(len(plan.widget_nodes), _WIDGET_PARALLEL_MAX_WORKERS)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_plan: dict[concurrent.futures.Future[WidgetNodeSqlGeneration], WidgetNodeGenerationPlan] = {
+                executor.submit(
+                    _generate_widget_sql,
+                    prompt,
+                    context,
+                    plan,
+                    widget_plan,
+                    graph_snapshot,
+                ): widget_plan
+                for widget_plan in plan.widget_nodes
+            }
+            for future in concurrent.futures.as_completed(future_to_plan):
+                widget_plan = future_to_plan[future]
+                try:
+                    widget_sql = future.result()
+                    widget_node = widget_sql.widget_node
+                    widget_node = _normalize_widget_node(widget_node, widget_plan)
+                    context_key = _context_key_for_widget_plan(graph, widget_plan)
+                    if context_key is not None:
+                        widget_node = _bind_widget_to_data_context(widget_node, context_key)
+                    graph = _append_widget_node(graph, widget_node, plan)
+                    graph, generated_context = _attach_widget_sql_result(
+                        graph,
+                        widget_node,
+                        widget_sql.sql,
+                        generated_context,
+                    )
+                except Exception as exc:
+                    for pending in future_to_plan:
+                        pending.cancel()
+                    yield ScenarioGraphGenerationEvent(
+                        status="failed",
+                        message=f"widget node '{widget_plan.id}' の生成に失敗しました: {exc}",
+                        graph=graph,
+                        node_id=widget_plan.id,
+                        context=generated_context,
+                    )
+                    return
+                yield ScenarioGraphGenerationEvent(
+                    status="widget",
+                    message=f"widget node '{widget_node.id}' とSQLを生成しました。",
+                    graph=graph,
+                    node_id=widget_node.id,
+                    context=generated_context,
+                )
 
     graph = graph.model_copy(update={"edges": _build_edges(graph)})
     yield ScenarioGraphGenerationEvent(
@@ -392,8 +422,72 @@ def generate_scenario_graph_incrementally(
     )
 
 
+def update_scenario_graph_incrementally(
+    user_prompt: str,
+    existing_graph: ScenarioGraph,
+    existing_context: Mapping[str, object],
+) -> Iterator[ScenarioGraphGenerationEvent]:
+    """Regenerate only the nodes Gemini decides need updating in existing_graph."""
+
+    try:
+        decision = _decide_update_scope(user_prompt, existing_graph)
+    except Exception as exc:
+        yield ScenarioGraphGenerationEvent(
+            status="failed",
+            message=f"更新範囲の判断に失敗しました: {exc}",
+            graph=existing_graph,
+            context=dict(existing_context),
+        )
+        return
+
+    if decision.scope == ScenarioGraphUpdateScope.SCENARIO:
+        yield from generate_scenario_graph_incrementally(user_prompt, existing_context)
+        return
+
+    if decision.scope == ScenarioGraphUpdateScope.TASK:
+        yield from _update_task_subtrees(
+            user_prompt, existing_graph, existing_context, decision.target_node_ids
+        )
+        return
+
+    if decision.scope == ScenarioGraphUpdateScope.WIDGET:
+        yield from _update_widgets(
+            user_prompt, existing_graph, existing_context, decision.target_node_ids
+        )
+        return
+
+    if decision.scope == ScenarioGraphUpdateScope.DATA:
+        yield from _update_data_nodes(
+            user_prompt, existing_graph, existing_context, decision.target_node_ids
+        )
+        return
+
+
 class _ScenarioGraphGenerator(GeminiMixin):
     """Concrete Gemini client for scenario graph generation."""
+
+
+_WIDGET_PARALLEL_MAX_WORKERS = 8
+
+
+def _generate_widget_sql(
+    user_prompt: str,
+    context: Mapping[str, object],
+    plan: ScenarioGraphGenerationPlan,
+    widget_plan: WidgetNodeGenerationPlan,
+    graph_snapshot: ScenarioGraph,
+) -> WidgetNodeSqlGeneration:
+    """Generate a single WidgetNodeSqlGeneration using a fresh Gemini client.
+
+    Each worker uses its own generator so callers do not depend on shared client
+    thread safety.
+    """
+
+    client = _ScenarioGraphGenerator()
+    return client.generate(
+        _build_widget_node_prompt(user_prompt, context, plan, widget_plan, graph_snapshot),
+        WidgetNodeSqlGeneration,
+    )
 
 
 def _warn_for_data_references(
@@ -414,6 +508,546 @@ def _warn_for_data_references(
                 f"data node '{data_node.id}' の context_key "
                 f"'{data_node.context_key}' が表示コンテキストに存在しません。"
             )
+
+
+def _decide_update_scope(
+    user_prompt: str,
+    graph: ScenarioGraph,
+) -> ScenarioGraphUpdateDecision:
+    client = _ScenarioGraphGenerator()
+    return client.generate(
+        _build_update_scope_prompt(user_prompt, graph),
+        ScenarioGraphUpdateDecision,
+    )
+
+
+def _update_task_subtrees(
+    user_prompt: str,
+    graph: ScenarioGraph,
+    context: Mapping[str, object],
+    target_task_ids: list[str],
+) -> Iterator[ScenarioGraphGenerationEvent]:
+    working_graph = graph
+    working_context = dict(context)
+
+    yield ScenarioGraphGenerationEvent(
+        status="started",
+        message=f"task subtree を再生成します: {', '.join(target_task_ids)}",
+        graph=working_graph,
+        context=working_context,
+    )
+
+    for task_id in target_task_ids:
+        task = next((t for t in working_graph.tasks if t.id == task_id), None)
+        if task is None:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"task '{task_id}' が見つかりません。",
+                graph=working_graph,
+                context=working_context,
+            )
+            return
+
+        client = _ScenarioGraphGenerator()
+        try:
+            task_plan = client.generate(
+                _build_task_subtree_plan_prompt(user_prompt, context, working_graph, task),
+                _TaskSubtreePlan,
+            )
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"task '{task_id}' の再生成計画に失敗しました: {exc}",
+                graph=working_graph,
+                node_id=task_id,
+                context=working_context,
+            )
+            return
+
+        old_widget_ids = set(task.widget_ids)
+        old_data_ids = {
+            data_node_id
+            for w in working_graph.widget_nodes
+            if w.id in old_widget_ids
+            for data_node_id in w.data_node_ids
+        }
+        working_graph = _remove_nodes(working_graph, old_widget_ids, old_data_ids)
+        working_context = {
+            k: v for k, v in working_context.items()
+            if not any(
+                dn.context_key == k and dn.id in old_data_ids
+                for dn in graph.data_nodes
+            )
+        }
+
+        new_task = _normalize_task_node(
+            TaskNode(
+                id=task_plan.id,
+                title=task_plan.title,
+                description=task_plan.description,
+                order=task_plan.order,
+                widget_ids=task_plan.widget_ids,
+            ),
+            TaskNodeGenerationPlan(
+                id=task_plan.id,
+                title=task_plan.title,
+                description=task_plan.description,
+                order=task_plan.order,
+                widget_ids=task_plan.widget_ids,
+            ),
+        )
+        working_graph = _replace_task_node(working_graph, new_task)
+
+        for data_plan in task_plan.data_nodes:
+            try:
+                data_node = _build_data_node_from_plan(data_plan)
+                working_graph = _append_data_node(working_graph, data_node)
+            except Exception as exc:
+                yield ScenarioGraphGenerationEvent(
+                    status="failed",
+                    message=f"data node '{data_plan.id}' の生成に失敗しました: {exc}",
+                    graph=working_graph,
+                    node_id=data_plan.id,
+                    context=working_context,
+                )
+                return
+
+        graph_snapshot = working_graph
+        compat_plan = _subtree_plan_to_compat(task_plan)
+
+        if task_plan.widget_nodes:
+            max_workers = min(len(task_plan.widget_nodes), _WIDGET_PARALLEL_MAX_WORKERS)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_to_plan: dict[
+                    concurrent.futures.Future[WidgetNodeSqlGeneration],
+                    WidgetNodeGenerationPlan,
+                ] = {
+                    executor.submit(
+                        _generate_widget_sql,
+                        user_prompt,
+                        context,
+                        compat_plan,
+                        widget_plan,
+                        graph_snapshot,
+                    ): widget_plan
+                    for widget_plan in task_plan.widget_nodes
+                }
+                for future in concurrent.futures.as_completed(future_to_plan):
+                    widget_plan = future_to_plan[future]
+                    try:
+                        widget_sql = future.result()
+                        widget_node = widget_sql.widget_node
+                        widget_node = _normalize_widget_node(widget_node, widget_plan)
+                        context_key = _context_key_for_widget_plan(working_graph, widget_plan)
+                        if context_key is not None:
+                            widget_node = _bind_widget_to_data_context(widget_node, context_key)
+                        working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
+                        working_graph, working_context = _attach_widget_sql_result(
+                            working_graph, widget_node, widget_sql.sql, working_context
+                        )
+                    except Exception as exc:
+                        for pending in future_to_plan:
+                            pending.cancel()
+                        yield ScenarioGraphGenerationEvent(
+                            status="failed",
+                            message=f"widget '{widget_plan.id}' の生成に失敗しました: {exc}",
+                            graph=working_graph,
+                            node_id=widget_plan.id,
+                            context=working_context,
+                        )
+                        return
+                    yield ScenarioGraphGenerationEvent(
+                        status="widget",
+                        message=f"widget '{widget_node.id}' を再生成しました。",
+                        graph=working_graph,
+                        node_id=widget_node.id,
+                        context=working_context,
+                    )
+
+    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
+    yield ScenarioGraphGenerationEvent(
+        status="completed",
+        message="task subtree の再生成が完了しました。",
+        graph=ScenarioGraph.model_validate(working_graph.model_dump(mode="json")),
+        context=working_context,
+    )
+
+
+def _update_widgets(
+    user_prompt: str,
+    graph: ScenarioGraph,
+    context: Mapping[str, object],
+    target_widget_ids: list[str],
+) -> Iterator[ScenarioGraphGenerationEvent]:
+    working_graph = graph
+    working_context = dict(context)
+
+    yield ScenarioGraphGenerationEvent(
+        status="started",
+        message=f"widget を再生成します: {', '.join(target_widget_ids)}",
+        graph=working_graph,
+        context=working_context,
+    )
+
+    target_widget_nodes = [w for w in graph.widget_nodes if w.id in target_widget_ids]
+    if not target_widget_nodes:
+        yield ScenarioGraphGenerationEvent(
+            status="failed",
+            message=f"対象 widget が見つかりません: {', '.join(target_widget_ids)}",
+            graph=working_graph,
+            context=working_context,
+        )
+        return
+
+    existing_plans = [
+        WidgetNodeGenerationPlan(
+            id=w.id,
+            task_id=next(
+                (t.id for t in graph.tasks if w.id in t.widget_ids),
+                graph.tasks[0].id if graph.tasks else "",
+            ),
+            title=w.title,
+            widget_type=w.widget.widget_type,
+            data_node_ids=w.data_node_ids,
+        )
+        for w in target_widget_nodes
+    ]
+    compat_plan = ScenarioGraphGenerationPlan(
+        id=graph.id,
+        title=graph.title,
+        description=graph.description,
+        tasks=[
+            TaskNodeGenerationPlan(id=t.id, title=t.title, order=t.order, widget_ids=t.widget_ids)
+            for t in graph.tasks
+        ],
+        data_nodes=[
+            DataNodeGenerationPlan(
+                id=dn.id,
+                model_name=dn.model_name or "",
+                context_key=dn.context_key,
+                data_type=dn.data_type,
+                description=dn.description,
+                primary_fields=dn.primary_fields,
+            )
+            for dn in graph.data_nodes
+        ],
+        widget_nodes=existing_plans,
+    )
+
+    graph_snapshot = working_graph
+    max_workers = min(len(existing_plans), _WIDGET_PARALLEL_MAX_WORKERS)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_plan: dict[
+            concurrent.futures.Future[WidgetNodeSqlGeneration],
+            WidgetNodeGenerationPlan,
+        ] = {
+            executor.submit(
+                _generate_widget_sql,
+                user_prompt,
+                context,
+                compat_plan,
+                widget_plan,
+                graph_snapshot,
+            ): widget_plan
+            for widget_plan in existing_plans
+        }
+        for future in concurrent.futures.as_completed(future_to_plan):
+            widget_plan = future_to_plan[future]
+            try:
+                widget_sql = future.result()
+                widget_node = widget_sql.widget_node
+                widget_node = _normalize_widget_node(widget_node, widget_plan)
+                context_key = _context_key_for_widget_plan(working_graph, widget_plan)
+                if context_key is not None:
+                    widget_node = _bind_widget_to_data_context(widget_node, context_key)
+                working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
+                working_graph, working_context = _attach_widget_sql_result(
+                    working_graph, widget_node, widget_sql.sql, working_context
+                )
+            except Exception as exc:
+                for pending in future_to_plan:
+                    pending.cancel()
+                yield ScenarioGraphGenerationEvent(
+                    status="failed",
+                    message=f"widget '{widget_plan.id}' の再生成に失敗しました: {exc}",
+                    graph=working_graph,
+                    node_id=widget_plan.id,
+                    context=working_context,
+                )
+                return
+            yield ScenarioGraphGenerationEvent(
+                status="widget",
+                message=f"widget '{widget_node.id}' を再生成しました。",
+                graph=working_graph,
+                node_id=widget_node.id,
+                context=working_context,
+            )
+
+    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
+    yield ScenarioGraphGenerationEvent(
+        status="completed",
+        message="widget の再生成が完了しました。",
+        graph=ScenarioGraph.model_validate(working_graph.model_dump(mode="json")),
+        context=working_context,
+    )
+
+
+def _update_data_nodes(
+    user_prompt: str,
+    graph: ScenarioGraph,
+    context: Mapping[str, object],
+    target_data_ids: list[str],
+) -> Iterator[ScenarioGraphGenerationEvent]:
+    working_graph = graph
+    working_context = dict(context)
+
+    yield ScenarioGraphGenerationEvent(
+        status="started",
+        message=f"data node SQL を再生成します: {', '.join(target_data_ids)}",
+        graph=working_graph,
+        context=working_context,
+    )
+
+    for data_id in target_data_ids:
+        data_node = next((dn for dn in working_graph.data_nodes if dn.id == data_id), None)
+        if data_node is None:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"data node '{data_id}' が見つかりません。",
+                graph=working_graph,
+                node_id=data_id,
+                context=working_context,
+            )
+            return
+
+        client = _ScenarioGraphGenerator()
+        try:
+            sql = client.generate(
+                _build_data_sql_prompt(user_prompt, data_node, working_graph),
+                _DataSqlOnly,
+            ).sql
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"data node '{data_id}' のSQL再生成に失敗しました: {exc}",
+                graph=working_graph,
+                node_id=data_id,
+                context=working_context,
+            )
+            return
+
+        try:
+            dataframe = execute_read_sql(sql)
+        except Exception as exc:
+            yield ScenarioGraphGenerationEvent(
+                status="failed",
+                message=f"data node '{data_id}' のSQL実行に失敗しました: {exc}",
+                graph=working_graph,
+                node_id=data_id,
+                context=working_context,
+            )
+            return
+
+        updated_node = data_node.model_copy(
+            update={
+                "sql": sql,
+                "primary_fields": [str(col) for col in dataframe.columns],
+            }
+        )
+        new_data_nodes = [
+            updated_node if dn.id == data_id else dn for dn in working_graph.data_nodes
+        ]
+        working_graph = ScenarioGraph.model_validate(
+            working_graph.model_copy(update={"data_nodes": new_data_nodes}).model_dump(mode="json")
+        )
+        next_context = dict(working_context)
+        next_context[updated_node.context_key] = dataframe
+        working_context = next_context
+
+        yield ScenarioGraphGenerationEvent(
+            status="data",
+            message=f"data node '{data_id}' のSQLを再生成しました。",
+            graph=working_graph,
+            node_id=data_id,
+            context=working_context,
+        )
+
+    working_graph = working_graph.model_copy(update={"edges": _build_edges(working_graph)})
+    yield ScenarioGraphGenerationEvent(
+        status="completed",
+        message="data node SQL の再生成が完了しました。",
+        graph=ScenarioGraph.model_validate(working_graph.model_dump(mode="json")),
+        context=working_context,
+    )
+
+
+class _TaskSubtreePlan(BaseModel):
+    """Minimal plan for regenerating a single task subtree."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str
+    title: str
+    description: str | None = None
+    order: int = 0
+    widget_ids: list[str] = Field(default_factory=list)
+    data_nodes: list[DataNodeGenerationPlan] = Field(default_factory=list)
+    widget_nodes: list[WidgetNodeGenerationPlan] = Field(default_factory=list)
+
+
+class _DataSqlOnly(BaseModel):
+    """Holds only the regenerated SQL for a data node."""
+
+    model_config = ConfigDict(frozen=True)
+
+    sql: str
+
+
+def _remove_nodes(
+    graph: ScenarioGraph,
+    widget_ids: set[str],
+    data_ids: set[str],
+) -> ScenarioGraph:
+    tasks = [
+        t.model_copy(
+            update={"widget_ids": [wid for wid in t.widget_ids if wid not in widget_ids]}
+        )
+        for t in graph.tasks
+    ]
+    widget_nodes = [w for w in graph.widget_nodes if w.id not in widget_ids]
+    data_nodes = [dn for dn in graph.data_nodes if dn.id not in data_ids]
+    return ScenarioGraph.model_validate(
+        graph.model_copy(
+            update={"tasks": tasks, "widget_nodes": widget_nodes, "data_nodes": data_nodes}
+        ).model_dump(mode="json")
+    )
+
+
+def _replace_task_node(graph: ScenarioGraph, task: TaskNode) -> ScenarioGraph:
+    tasks = [task if t.id == task.id else t for t in graph.tasks]
+    if task not in tasks:
+        tasks.append(task)
+    tasks = sorted(tasks, key=lambda t: (t.order, t.id))
+    return ScenarioGraph.model_validate(
+        graph.model_copy(update={"tasks": tasks}).model_dump(mode="json")
+    )
+
+
+def _subtree_plan_to_compat(plan: _TaskSubtreePlan) -> ScenarioGraphGenerationPlan:
+    return ScenarioGraphGenerationPlan(
+        id=plan.id,
+        title=plan.title,
+        description=plan.description,
+        tasks=[
+            TaskNodeGenerationPlan(
+                id=plan.id,
+                title=plan.title,
+                description=plan.description,
+                order=plan.order,
+                widget_ids=plan.widget_ids,
+            )
+        ],
+        data_nodes=plan.data_nodes,
+        widget_nodes=plan.widget_nodes,
+    )
+
+
+def _build_update_scope_prompt(user_prompt: str, graph: ScenarioGraph) -> str:
+    graph_summary = graph.model_dump_json(indent=2)
+    task_list = "\n".join(f"- id={t.id}, title={t.title}" for t in graph.tasks)
+    widget_list = "\n".join(f"- id={w.id}, type={w.widget.widget_type}" for w in graph.widget_nodes)
+    data_list = "\n".join(
+        f"- id={dn.id}, context_key={dn.context_key}" for dn in graph.data_nodes
+    )
+    return f"""\
+あなたは電子カルテ UI のタスクグラフ更新範囲を判断するアシスタントです。
+現在のグラフ構造と修正要望を読み、どの階層のノードを再生成すべきかを ScenarioGraphUpdateDecision で出力してください。
+
+判断ルール:
+- 要望が「タスクの構成・並び・全体方針」に関わるなら scope=scenario（target_node_ids は空）
+- 特定タスクの中身を変える要望なら scope=task で target_node_ids にそのtask ID
+- 特定 widget の種別・データ参照・SQL だけを変えるなら scope=widget で target_node_ids にその widget ID
+- データの取り方（SQL）だけを変えたい場合は scope=data で target_node_ids にその data node ID
+
+現在のタスク一覧:
+{task_list}
+
+現在の widget 一覧:
+{widget_list}
+
+現在の data node 一覧:
+{data_list}
+
+現在のグラフ (詳細):
+{graph_summary}
+
+ユーザー要望:
+{user_prompt}
+"""
+
+
+def _build_task_subtree_plan_prompt(
+    user_prompt: str,
+    context: Mapping[str, object],
+    graph: ScenarioGraph,
+    task: TaskNode,
+) -> str:
+    dwh_summary = _build_dwh_model_prompt_section()
+    widget_types = "\n".join(f"- {wt.value}" for wt in WidgetType)
+    return f"""\
+あなたは電子カルテ UI のタスクサブツリーを再設計するアシスタントです。
+指定された task を作り直すための _TaskSubtreePlan JSON を出力してください。
+
+制約:
+- task.id は "{task.id}" を維持してください。
+- task.order は {task.order} を維持してください。
+- widget_ids は新しい widget node ID を表示順に並べてください。
+- widget node ごとに専用 data node を 1 つ計画してください。
+- data_nodes.context_key は省略してください。アプリが sql_{{id}} を割り当てます。
+- widget_nodes.task_id は "{task.id}" にしてください。
+- data_nodes.model_name は下記のDWHモデル名だけを使ってください。
+- widget_nodes.widget_type は下記の値だけを使ってください。
+
+利用可能なDWHモデルと主要フィールド:
+{dwh_summary}
+
+利用可能な widget_type:
+{widget_types}
+
+現在の task:
+{task.model_dump_json(indent=2)}
+
+現在のグラフ (参照用):
+{graph.model_dump_json(indent=2)}
+
+ユーザー要望:
+{user_prompt}
+"""
+
+
+def _build_data_sql_prompt(
+    user_prompt: str,
+    data_node: DataNode,
+    graph: ScenarioGraph,
+) -> str:
+    return f"""\
+あなたは電子カルテ DWH のクエリ作成アシスタントです。
+以下の data node 用の SELECT SQL を生成し、_DataSqlOnly JSON として出力してください。
+
+制約:
+- 読み取り専用の SELECT のみ使ってください。INSERT/UPDATE/DELETE/DDL は禁止です。
+- テーブル名と列名はダブルクォートしてください。例: SELECT "匿名ID" FROM "患者基本" LIMIT 20
+- 既存の context_key "{data_node.context_key}" 用の SQL を生成してください。
+
+対象 data node:
+{data_node.model_dump_json(indent=2)}
+
+現在のグラフ (参照用):
+{graph.model_dump_json(indent=2)}
+
+ユーザー要望:
+{user_prompt}
+"""
 
 
 def _build_generation_prompt(
@@ -862,6 +1496,7 @@ def _append_widget_node(
     widget_node = _drop_unknown_data_references(widget_node, graph)
     widget_nodes = [existing for existing in graph.widget_nodes if existing.id != widget_node.id]
     widget_nodes.append(widget_node)
+    widget_nodes = _sort_widget_nodes_by_plan(widget_nodes, plan)
     tasks = _ensure_task_references_widget(graph.tasks, widget_node.id, plan)
     return ScenarioGraph.model_validate(
         graph.model_copy(
@@ -871,6 +1506,20 @@ def _append_widget_node(
                 "edges": _build_edges_for_parts(graph.id, tasks, widget_nodes),
             }
         ).model_dump(mode="json")
+    )
+
+
+def _sort_widget_nodes_by_plan(
+    widget_nodes: list[WidgetNode],
+    plan: ScenarioGraphGenerationPlan,
+) -> list[WidgetNode]:
+    """Order widget nodes by plan position so partial graphs render stably."""
+
+    plan_order = {widget_plan.id: index for index, widget_plan in enumerate(plan.widget_nodes)}
+    fallback = len(plan_order)
+    return sorted(
+        widget_nodes,
+        key=lambda node: (plan_order.get(node.id, fallback), node.id),
     )
 
 

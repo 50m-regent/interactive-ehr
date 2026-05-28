@@ -11,9 +11,9 @@ from interactive_ehr.scenario_graph import (
     ScenarioGraph,
     build_dwh_context_for_graph,
     build_sql_context_for_graph,
-    generate_scenario_graph_incrementally,
     parse_scenario_graph_json,
     render_scenario_graph,
+    update_scenario_graph_incrementally,
 )
 
 
@@ -30,8 +30,6 @@ def main() -> None:
         layout="wide",
     )
 
-    st.title("Interactive EHR")
-    st.markdown("タスクのグラフ構造化を用いたインタラクティブな電子カルテシステム")
     _inject_debug_json_styles()
 
     _initialize_state()
@@ -55,21 +53,16 @@ def _initialize_state() -> None:
 
 
 def _render_sidebar(preview_container: Any) -> None:
-    st.sidebar.header("シナリオ選択")
-    st.sidebar.selectbox(
-        "固定サンプル",
-        ["複数の慢性疾患を持つ高齢患者の外来診察"],
-    )
-    st.sidebar.caption("API認証なしで表示できる検証用ダミーデータです。")
-
-    st.sidebar.divider()
     st.sidebar.header("Gemini生成")
-    prompt = st.sidebar.text_area(
-        "プロンプト",
-        placeholder="例: 腎機能悪化の確認を中心に、検査推移と処方確認を分けて表示する",
-        height=160,
-    )
-    if st.sidebar.button("タスクグラフ生成", type="primary"):
+    with st.sidebar.form("prompt_form", clear_on_submit=False):
+        prompt = st.text_area(
+            "プロンプト",
+            key="user_prompt",
+            placeholder="例: 腎機能悪化の確認を中心に、検査推移と処方確認を分けて表示する",
+            height=160,
+        )
+        submitted = st.form_submit_button("タスクグラフ生成", type="primary")
+    if submitted:
         _generate_graph_from_prompt(prompt, preview_container)
 
     st.sidebar.divider()
@@ -103,8 +96,9 @@ def _generate_graph_from_prompt(
         return
 
     progress = st.sidebar.empty()
-    for event in generate_scenario_graph_incrementally(
+    for event in update_scenario_graph_incrementally(
         prompt,
+        st.session_state[GRAPH_STATE_KEY],
         st.session_state[CONTEXT_STATE_KEY],
     ):
         st.session_state[GRAPH_STATE_KEY] = event.graph
@@ -169,7 +163,6 @@ def _render_graph_preview(
     generating: bool,
 ) -> None:
     with preview_container.container():
-        st.subheader("UI プレビュー")
         graph = st.session_state[GRAPH_STATE_KEY]
         if generating and not graph.tasks:
             st.info("タスクグラフを生成しています。")
@@ -196,6 +189,14 @@ def _inject_debug_json_styles() -> None:
             font-size: 10px !important;
             line-height: 1.25 !important;
             tab-size: 4;
+        }
+        section[data-testid="stMain"] [data-testid="stMetricValue"] {
+            font-size: 1.25rem;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+        section[data-testid="stMain"] [data-testid="stMetricLabel"] {
+            font-size: 0.9rem;
         }
         </style>
         """,
