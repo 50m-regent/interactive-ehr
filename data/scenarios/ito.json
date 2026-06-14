@@ -188,6 +188,7 @@
               "description": "手術依頼情報（該当患者）",
               "primary_fields": [
                 "患者ID",
+                "依頼診療科",
                 "依頼病名",
                 "術式名",
                 "予定日",
@@ -195,7 +196,7 @@
                 "予定体位",
                 "麻酔科依頼の有無"
               ],
-              "sql": "SELECT \"患者ID\", \"依頼病名\", \"申込術式1\" AS \"術式名\", \"検索日(手術予定日)\" AS \"予定日\", \"予定手術所要時間(分)\" AS \"予定手術時間(分)\", \"予定体位1\" AS \"予定体位\", \"麻酔科依頼の有無\" FROM \"手術依頼\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"検索日(手術予定日)\" DESC"
+              "sql": "SELECT \"患者ID\", \"診療科\" AS \"依頼診療科\", \"依頼病名\", \"申込術式1\" AS \"術式名\", \"検索日(手術予定日)\" AS \"予定日\", \"予定手術所要時間(分)\" AS \"予定手術時間(分)\", \"予定体位1\" AS \"予定体位\", \"麻酔科依頼の有無\" FROM \"手術依頼\" WHERE \"患者ID\"='ITO_PREOP_001' ORDER BY \"検索日(手術予定日)\" DESC"
             }
           ]
         }
@@ -234,10 +235,9 @@
                 "区分",
                 "検査項目",
                 "最新値",
-                "単位",
                 "検査日"
               ],
-              "sql": "WITH ranked AS (SELECT \"検査項目\", \"結果(数値)\" AS \"最新値\", COALESCE(NULLIF(\"結果値単位\", ''), CASE \"検査項目\" WHEN 'Hb' THEN 'g/dL' WHEN 'WBC' THEN '×10³/μL' WHEN 'Plt' THEN '×10⁴/μL' WHEN 'Cr' THEN 'mg/dL' WHEN 'eGFR' THEN 'mL/min/1.73m²' WHEN 'K' THEN 'mEq/L' WHEN 'AST' THEN 'U/L' WHEN 'ALT' THEN 'U/L' END) AS \"単位\", \"報告日\" AS \"検査日\", ROW_NUMBER() OVER (PARTITION BY \"検査項目\" ORDER BY \"報告日\" DESC, COALESCE(\"報告時刻\", '') DESC, \"ROW_ID\" DESC) AS rn FROM \"検体検査結果\" WHERE \"患者ID\"='ITO_PREOP_001' AND \"検査項目\" IN ('Hb','WBC','Plt','Cr','eGFR','K','AST','ALT')) SELECT CASE WHEN \"検査項目\" IN ('Hb','WBC','Plt') THEN '血算' WHEN \"検査項目\" IN ('Cr','eGFR') THEN '腎機能' WHEN \"検査項目\"='K' THEN '電解質' ELSE '肝細胞障害指標' END AS \"区分\", \"検査項目\", \"最新値\", \"単位\", \"検査日\" FROM ranked WHERE rn=1 ORDER BY CASE \"検査項目\" WHEN 'Hb' THEN 1 WHEN 'WBC' THEN 2 WHEN 'Plt' THEN 3 WHEN 'Cr' THEN 4 WHEN 'eGFR' THEN 5 WHEN 'K' THEN 6 WHEN 'AST' THEN 7 WHEN 'ALT' THEN 8 END"
+              "sql": "WITH ranked AS (SELECT \"検査項目\", \"結果(数値)\" AS \"最新値\", COALESCE(NULLIF(\"結果値単位\", ''), CASE \"検査項目\" WHEN 'Hb' THEN 'g/dL' WHEN 'WBC' THEN '×10³/μL' WHEN 'Plt' THEN '×10⁴/μL' WHEN 'Cr' THEN 'mg/dL' WHEN 'eGFR' THEN 'mL/min/1.73m²' WHEN 'K' THEN 'mEq/L' WHEN 'AST' THEN 'U/L' WHEN 'ALT' THEN 'U/L' END) AS \"単位\", \"報告日\" AS \"検査日\", ROW_NUMBER() OVER (PARTITION BY \"検査項目\" ORDER BY \"報告日\" DESC, COALESCE(\"報告時刻\", '') DESC, \"ROW_ID\" DESC) AS rn FROM \"検体検査結果\" WHERE \"患者ID\"='ITO_PREOP_001' AND \"検査項目\" IN ('Hb','WBC','Plt','Cr','eGFR','K','AST','ALT')) SELECT CASE WHEN \"検査項目\" IN ('Hb','WBC','Plt') THEN '血算' WHEN \"検査項目\" IN ('Cr','eGFR') THEN '腎機能' WHEN \"検査項目\"='K' THEN '電解質' ELSE '肝細胞障害指標' END AS \"区分\", \"検査項目\", CAST(\"最新値\" AS TEXT) || ' ' || \"単位\" AS \"最新値\", \"検査日\" FROM ranked WHERE rn=1 ORDER BY CASE \"検査項目\" WHEN 'Hb' THEN 1 WHEN 'WBC' THEN 2 WHEN 'Plt' THEN 3 WHEN 'Cr' THEN 4 WHEN 'eGFR' THEN 5 WHEN 'K' THEN 6 WHEN 'AST' THEN 7 WHEN 'ALT' THEN 8 END"
             }
           ]
         },
