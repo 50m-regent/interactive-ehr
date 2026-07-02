@@ -51,16 +51,6 @@ code {
   font-size: 0.82em;
 }
 
-.citation {
-  position: absolute;
-  right: 64px;
-  bottom: 24px;
-  left: 64px;
-  margin: 0;
-  color: var(--research-muted);
-  font-size: 11px;
-}
-
 section.cover {
   padding-top: 94px;
   background:
@@ -74,7 +64,10 @@ section.cover {
 }
 
 section.cover h1 {
+  position: relative;
+  top: -40px;
   width: 92%;
+  margin: 0;
   color: var(--research-white);
   font-size: 48px;
   line-height: 1.18;
@@ -108,67 +101,65 @@ section.section h2 {
   color: var(--research-white);
 }
 
-.summary-list {
-  display: grid;
-  gap: 22px;
+section.summary table {
+  width: 100%;
   margin-top: 70px;
+  border-spacing: 0 22px;
+  border-collapse: separate;
+  font-size: 24px;
 }
 
-.summary-row {
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  align-items: center;
-  gap: 24px;
+section.summary thead {
+  display: none;
 }
 
-.summary-row > span {
+section.summary tbody tr,
+section.summary tbody tr:nth-child(even),
+section.summary td {
+  border: 0;
+  background: transparent !important;
+}
+
+section.summary td:first-child {
+  width: 148px;
   padding: 10px 16px;
   border-radius: 4px;
-  background: var(--research-navy);
+  background: var(--research-navy) !important;
   color: var(--research-white);
   text-align: center;
   font-size: 16px;
   font-weight: 700;
 }
 
-.summary-row > strong {
+section.summary td:last-child {
+  padding-left: 24px;
   color: var(--research-text);
-  font-size: 24px;
+  text-align: left;
+  font-weight: 700;
 }
 
-.columns {
+section.flow ol {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
-}
-
-.panel {
-  padding: 24px;
-  border: 2px solid var(--research-border);
-  border-radius: 8px;
-  background: var(--research-white);
-}
-
-.panel.accent {
-  border-color: rgba(224, 62, 26, 0.55);
-}
-
-.flow-row {
-  display: grid;
-  grid-template-columns: 1fr 44px 1fr 44px 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   align-items: center;
-  margin-top: 120px;
+  gap: 44px;
+  margin: 120px 0 0;
+  padding: 0;
+  counter-reset: flow-step;
+  list-style: none;
 }
 
-.flow-step {
+section.flow li {
+  position: relative;
   min-height: 128px;
   padding: 22px;
   border: 2px solid var(--research-border);
   border-radius: 8px;
   text-align: center;
+  counter-increment: flow-step;
 }
 
-.flow-step b {
+section.flow li::before {
   display: inline-grid;
   width: 32px;
   height: 32px;
@@ -177,41 +168,111 @@ section.section h2 {
   border-radius: 50%;
   background: var(--research-navy);
   color: var(--research-white);
+  content: counter(flow-step);
   font-size: 15px;
-}
-
-.flow-step.accent {
-  border-color: var(--research-accent);
-}
-
-.flow-step.accent b {
-  background: var(--research-accent);
-}
-
-.flow-arrow {
-  color: var(--research-navy);
-  text-align: center;
-  font-size: 54px;
   font-weight: 700;
 }
 
-.progress-list {
-  display: grid;
-  gap: 22px;
-  margin-top: 66px;
+section.flow li:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -34px;
+  color: var(--research-navy);
+  content: "›";
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translate(50%, -50%);
 }
 
-.progress-list > div {
+section.flow li:last-child {
+  border-color: var(--research-accent);
+}
+
+section.flow li:last-child::before {
+  background: var(--research-accent);
+}
+
+section.architecture ol,
+section.comparison ol {
   display: grid;
-  grid-template-columns: 42px 1fr;
-  align-items: center;
-  gap: 18px;
-  padding: 15px 22px;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px 56px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: card;
+}
+
+section.architecture li,
+section.comparison li {
+  padding: 24px;
   border: 2px solid var(--research-border);
   border-radius: 8px;
+  background: var(--research-white);
+  counter-increment: card;
 }
 
-.progress-list b {
+section.architecture li::before {
+  color: var(--research-navy);
+  content: counter(card) " · ";
+  font-size: 26px;
+  font-weight: 700;
+}
+
+section.architecture li > p:first-child,
+section.comparison li > p:first-child {
+  margin: 0;
+  color: var(--research-navy);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+section.architecture li > p:first-child {
+  display: inline;
+}
+
+section.architecture li > p:first-child strong,
+section.comparison li > p:first-child strong {
+  color: var(--research-navy);
+}
+
+section.architecture li:nth-child(2),
+section.comparison li:nth-child(2) {
+  border-color: rgba(224, 62, 26, 0.55);
+}
+
+section.architecture li:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+section.architecture li p,
+section.comparison li p {
+  margin: 12px 0 0;
+}
+
+section.progress ol {
+  display: grid;
+  gap: 22px;
+  margin: 66px 0 0;
+  padding: 0;
+  counter-reset: progress;
+  list-style: none;
+}
+
+section.progress li {
+  position: relative;
+  min-height: 66px;
+  padding: 15px 22px 15px 82px;
+  border: 2px solid var(--research-border);
+  border-radius: 8px;
+  counter-increment: progress;
+}
+
+section.progress li::before {
+  position: absolute;
+  top: 15px;
+  left: 22px;
   display: grid;
   width: 30px;
   height: 30px;
@@ -219,25 +280,44 @@ section.section h2 {
   border-radius: 50%;
   background: var(--research-navy);
   color: var(--research-white);
+  content: counter(progress);
   font-size: 14px;
+  font-weight: 700;
 }
 
-.timeline {
+section.timeline ol {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 110px;
+  margin: 110px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: milestone;
 }
 
-.timeline > div {
+section.timeline li {
   min-height: 110px;
   padding: 18px;
   border-top: 8px solid var(--research-navy);
   background: var(--research-surface);
+  counter-increment: milestone;
 }
 
-.timeline > div.current {
+section.timeline li:first-child {
   border-color: var(--research-accent);
+}
+
+section.timeline li strong {
+  color: var(--research-navy);
+}
+
+section.timeline li strong::before {
+  color: inherit;
+  content: counter(milestone) " · ";
+}
+
+section.timeline > p {
+  margin-top: 48px;
 }
 
 section.visual img {
@@ -246,4 +326,16 @@ section.visual img {
   max-height: 525px;
   margin: 0 auto;
   object-fit: contain;
+}
+
+section.citation blockquote {
+  position: absolute;
+  right: 64px;
+  bottom: 24px;
+  left: 64px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--research-muted);
+  font-size: 11px;
 }

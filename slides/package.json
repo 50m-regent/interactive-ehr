@@ -1,10 +1,11 @@
 {
   "name": "research-slides",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "dev": "marp --server .",
     "preview": "marp --preview",
+    "check": "node check-markdown.mjs",
     "build": "marp --pdf --pdf-outlines",
     "render": "marp --images png"
   },

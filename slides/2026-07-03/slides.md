@@ -11,7 +11,8 @@ lang: "ja"
 <!-- _class: cover -->
 <!-- _paginate: false -->
 
-# 対話的グラフ構造化を用いた<br>診療記録のタスク駆動型可視化
+# 対話的グラフ構造化を用いた
+# 診療記録のタスク駆動型可視化
 
 ###### Research Seminar · 2026-07-03
 
@@ -23,11 +24,11 @@ lang: "ja"
 
 # 研究テーマ
 
-<div class="summary-list">
-  <div class="summary-row"><span>背景</span><strong>電子カルテの膨大な情報量が、必要情報の探索負荷につながる</strong></div>
-  <div class="summary-row"><span>目的</span><strong>タスクに必要な情報だけを提示し、診療時のUXを改善する</strong></div>
-  <div class="summary-row"><span>方法</span><strong>ユーザのタスクをグラフ化し、データとUIを動的に構成する</strong></div>
-</div>
+| 項目 | 内容 |
+| --- | --- |
+| 背景 | 電子カルテの膨大な情報量が、必要情報の探索負荷につながる |
+| 目的 | タスクに必要な情報だけを提示し、診療時のUXを改善する |
+| 方法 | ユーザのタスクをグラフ化し、データとUIを動的に構成する |
 
 ---
 
@@ -35,13 +36,12 @@ lang: "ja"
 
 # 課題 — 情報量ではなく探索過程に着目
 
-<div class="flow-row">
-  <div class="flow-step"><b>1</b><span>診療記録に<br>情報が分散</span></div>
-  <div class="flow-arrow">›</div>
-  <div class="flow-step"><b>2</b><span>必要情報を<br>画面横断で探索</span></div>
-  <div class="flow-arrow">›</div>
-  <div class="flow-step accent"><b>3</b><span><strong>認知・操作負荷</strong><br>が増加</span></div>
-</div>
+1. 診療記録に\
+   情報が分散
+2. 必要情報を\
+   画面横断で探索
+3. **認知・操作負荷**\
+   が増加
 
 ---
 
@@ -49,33 +49,30 @@ lang: "ja"
 
 # 提案 — タスクを起点にUIまで構造化
 
-<div class="flow-row">
-  <div class="flow-step"><b>1</b><span>診療<br>タスク</span></div>
-  <div class="flow-arrow">›</div>
-  <div class="flow-step"><b>2</b><span>ScenarioGraph<br>を生成</span></div>
-  <div class="flow-arrow">›</div>
-  <div class="flow-step accent"><b>3</b><span>必要データと<br><strong>UIを生成</strong></span></div>
-</div>
+1. 診療\
+   タスク
+2. ScenarioGraph\
+   を生成
+3. 必要データと\
+   **UIを生成**
 
 ---
 
+<!-- _class: architecture -->
+
 # システム構成
 
-<div class="columns">
-  <div class="panel">
-    <h2>1 · Task Recognition</h2>
-    <p>プロンプトやUI操作から、ユーザが達成したいタスクを表現する。</p>
-  </div>
-  <div class="panel accent">
-    <h2>2 · Data Collection</h2>
-    <p>ScenarioGraphが要求する項目を、ローカルDWHからSQLで取得する。</p>
-  </div>
-</div>
+1. **Task Recognition**
 
-<div class="panel" style="margin-top: 28px;">
-  <h2>3 · UI Generation</h2>
-  <p>タスク・データ・ウィジェットの関係から、閲覧目的に合うUIを描画する。</p>
-</div>
+   プロンプトやUI操作から、ユーザが達成したいタスクを表現する。
+
+2. **Data Collection**
+
+   ScenarioGraphが要求する項目を、ローカルDWHからSQLで取得する。
+
+3. **UI Generation**
+
+   タスク・データ・ウィジェットの関係から、閲覧目的に合うUIを描画する。
 
 ---
 
@@ -83,39 +80,44 @@ lang: "ja"
 
 # 現在の実装
 
-<div class="progress-list">
-  <div><b>1</b><span><strong>ScenarioGraph</strong> JSONからStreamlit UIを描画</span></div>
-  <div><b>2</b><span>CSVから構築したローカルSQLite DWHをSQLで参照</span></div>
-  <div><b>3</b><span>Geminiによるグラフ生成と、編集内容の即時プレビュー</span></div>
-  <div><b>4</b><span>慢性疾患外来・周術期シナリオで表示経路を検証</span></div>
-</div>
+1. **ScenarioGraph** JSONからStreamlit UIを描画
+2. CSVから構築したローカルSQLite DWHをSQLで参照
+3. Geminiによるグラフ生成と、編集内容の即時プレビュー
+4. 慢性疾患外来・周術期シナリオで表示経路を検証
 
 ---
+
+<!-- _class: comparison -->
 
 # 修論に向けた実験計画
 
-<div class="columns">
-  <div class="panel">
-    <h2>比較</h2>
-    <p>従来の電子カルテ操作と、タスク駆動UIを用いた操作を比較する。</p>
-    <p><strong>対象候補</strong><br>医師・薬剤師などの医療従事者</p>
-  </div>
-  <div class="panel accent">
-    <h2>評価</h2>
-    <p>完了時間、操作回数、情報探索、主観的認知負荷を測定する。</p>
-    <p><strong>次の焦点</strong><br>効果検証を先行し、グラフ自動生成の必要性を判断する。</p>
-  </div>
-</div>
+1. **比較**
+
+   従来の電子カルテ操作と、タスク駆動UIを用いた操作を比較する。
+
+   **対象候補**\
+   医師・薬剤師などの医療従事者
+
+2. **評価**
+
+   完了時間、操作回数、情報探索、主観的認知負荷を測定する。
+
+   **次の焦点**\
+   効果検証を先行し、グラフ自動生成の必要性を判断する。
 
 ---
 
+<!-- _class: timeline -->
+
 # 次の予定
 
-<div class="timeline">
-  <div class="current"><b>1 · シナリオ</b><br>有識者意見を反映</div>
-  <div><b>2 · グラフ</b><br>比較条件を固定</div>
-  <div><b>3 · 実験</b><br>操作・負荷を評価</div>
-  <div><b>4 · 論文</b><br>結果を統合</div>
-</div>
+1. **シナリオ**\
+   有識者意見を反映
+2. **グラフ**\
+   比較条件を固定
+3. **実験**\
+   操作・負荷を評価
+4. **論文**\
+   結果を統合
 
-<p style="margin-top: 48px;"><strong>相談したい点:</strong> 認知負荷と作業効率を、どの指標の組み合わせで評価するか</p>
+**相談したい点:** 認知負荷と作業効率を、どの指標の組み合わせで評価するか
