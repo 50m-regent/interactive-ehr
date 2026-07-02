@@ -93,6 +93,24 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/scenario_graph.p
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
+## 研究スライド
+
+定期ゼミ用のMarpスライドは `slides/YYYY-MM-DD/` で管理します。初回のみ依存関係を導入し、ブラウザでプレビューできます。
+
+```bash
+cd slides
+npm ci
+npm run dev
+```
+
+PDFを更新する場合:
+
+```bash
+npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
+```
+
+共有テーマは `slides/theme/research.css` です。Markdown、テーマ、使用画像、最終PDFをGitで管理します。
+
 ## モデル生成
 
 DWHテーブル設計書（`data/dwh_table_design_2025-11-01.xlsx`）からPydanticモデルを自動生成:

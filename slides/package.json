@@ -1,0 +1,14 @@
+{
+  "name": "research-slides",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "marp --server .",
+    "preview": "marp --preview",
+    "build": "marp --pdf --pdf-outlines",
+    "render": "marp --images png"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "4.4.0"
+  }
+}
