@@ -1,0 +1,112 @@
+{
+  "id": "anesthesia_preop_outpatient_clinical_tasks",
+  "version": "1.0-draft",
+  "title": "麻酔科術前外来",
+  "actor": "麻酔科医",
+  "context": "手術前日までに麻酔上の注意点を確認し、患者説明と必要な他科コンサルトの準備を行う。",
+  "status": "draft",
+  "source": "data/scenarios/ito.md",
+  "scenario_completion_criteria": [
+    "麻酔リスクと説明事項の一覧が作成されている",
+    "必要な他科コンサルトの要否が確認されている"
+  ],
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "患者の基本的な特徴の確認",
+      "description": "年齢、性別、身長、体重、BMIと測定日を確認する。",
+      "order": 1,
+      "completion_criteria": ["基本属性と最新の身体測定値を確認している"],
+      "runtime_task_ids": ["task_1"],
+      "runtime_widget_ids": ["widget_1"],
+      "information_requirements": [
+        {"id": "demographics", "label": "年齢と性別", "source_systems": ["患者情報"], "runtime_data_node_ids": ["data_1"]},
+        {"id": "body_measurements", "label": "最新の身長、体重、BMI", "source_systems": ["患者情報"], "time_window": "最新", "runtime_data_node_ids": ["data_1"]},
+        {"id": "measurement_date", "label": "身体測定日", "source_systems": ["患者情報"], "time_window": "最新"}
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "手術の確認",
+      "description": "手術対象の病名、術式、予定時間、体位を確認する。",
+      "order": 2,
+      "completion_criteria": ["予定手術の内容と麻酔科依頼の有無を確認している"],
+      "runtime_task_ids": ["task_2"],
+      "runtime_widget_ids": ["widget_7"],
+      "information_requirements": [
+        {"id": "surgery_request", "label": "診療科、診断病名、術式、予定日、予定時間、体位、麻酔科依頼", "source_systems": ["手術申し込み"], "time_window": "最新", "runtime_data_node_ids": ["data_6"]}
+      ]
+    },
+    {
+      "id": "T3",
+      "title": "生活歴とアレルギーの確認",
+      "description": "喫煙、飲酒、アレルギーと症状を確認する。",
+      "order": 3,
+      "completion_criteria": ["生活歴とアレルギーの有無、内容を確認している"],
+      "runtime_task_ids": ["task_1"],
+      "runtime_widget_ids": ["widget_1"],
+      "information_requirements": [
+        {"id": "smoking", "label": "喫煙状況と禁煙期間", "source_systems": ["患者情報"], "time_window": "最新", "runtime_data_node_ids": ["data_2"]},
+        {"id": "alcohol", "label": "飲酒頻度と飲酒量", "source_systems": ["患者情報"], "time_window": "最新", "runtime_data_node_ids": ["data_2"]},
+        {"id": "allergies", "label": "アレルギー原因、症状、コメント", "source_systems": ["患者情報"], "time_window": "最新", "runtime_data_node_ids": ["data_2"]}
+      ]
+    },
+    {
+      "id": "T4",
+      "title": "既往歴と治療内容の確認",
+      "description": "既往歴、内服薬、手術歴、輸血歴を確認する。",
+      "order": 4,
+      "completion_criteria": ["麻酔に影響する既往歴と治療内容を確認している"],
+      "runtime_task_ids": ["task_1"],
+      "runtime_widget_ids": ["widget_3", "widget_4"],
+      "information_requirements": [
+        {"id": "medical_history", "label": "既往歴と治療内容", "source_systems": ["患者情報", "過去カルテ", "紹介状"], "time_window": "すべて", "runtime_data_node_ids": ["data_3"]},
+        {"id": "medications", "label": "現在と過去の内服薬", "source_systems": ["処方", "過去カルテ"], "time_window": "すべて", "runtime_data_node_ids": ["data_4"]},
+        {"id": "surgery_transfusion_history", "label": "手術歴と輸血歴", "source_systems": ["患者情報", "過去カルテ"], "time_window": "すべて", "runtime_data_node_ids": ["data_3"]}
+      ]
+    },
+    {
+      "id": "T5",
+      "title": "検査結果の確認",
+      "description": "血液、心電図、胸部レントゲン、呼吸機能の異常を確認する。",
+      "order": 5,
+      "completion_criteria": ["必要な術前検査の実施状況と異常所見を確認している"],
+      "runtime_task_ids": ["task_3"],
+      "runtime_widget_ids": ["widget_9", "widget_11", "widget_12", "widget_13"],
+      "information_requirements": [
+        {"id": "laboratory_results", "label": "直近の血液検査結果と異常値", "source_systems": ["血液検査"], "time_window": "直近1か月の最新", "runtime_data_node_ids": ["data_7", "data_8", "data_9", "data_10"]},
+        {"id": "ecg", "label": "心電図の結果", "source_systems": ["生理検査"], "time_window": "直近1か月の最新"},
+        {"id": "chest_xray", "label": "胸部レントゲンの結果", "source_systems": ["放射線検査"], "time_window": "直近1か月の最新"},
+        {"id": "pulmonary_function", "label": "呼吸機能検査の結果", "source_systems": ["生理検査"], "time_window": "直近1か月の最新"}
+      ]
+    },
+    {
+      "id": "T6",
+      "title": "麻酔歴の確認",
+      "description": "手術歴がある場合に、過去の麻酔記録と問題点を確認する。",
+      "order": 6,
+      "depends_on": ["T4"],
+      "condition": "手術歴がある",
+      "completion_criteria": ["過去の麻酔に関連する問題の有無を確認している"],
+      "runtime_task_ids": ["task_1"],
+      "runtime_widget_ids": ["widget_6"],
+      "information_requirements": [
+        {"id": "anesthesia_record", "label": "直近の麻酔記録", "source_systems": ["麻酔記録システム"], "time_window": "直近", "runtime_data_node_ids": ["data_5"]},
+        {"id": "anesthesia_complications", "label": "過去の麻酔中の問題と合併症", "source_systems": ["麻酔記録システム"], "time_window": "直近"}
+      ]
+    },
+    {
+      "id": "T7",
+      "title": "麻酔リスクの判定",
+      "description": "確認した情報から、説明事項、麻酔上の注意点、コンサルトの要否をまとめる。",
+      "order": 7,
+      "depends_on": ["T1", "T2", "T3", "T4", "T5", "T6"],
+      "completion_criteria": ["リスク、説明事項、必要なコンサルトを一覧化している"],
+      "information_requirements": [
+        {"id": "risk_list", "label": "麻酔リスクと注意点の一覧", "kind": "derived", "source_systems": []},
+        {"id": "explanation_items", "label": "患者へ説明する項目", "kind": "derived", "source_systems": []},
+        {"id": "consultation_need", "label": "他科コンサルトの要否", "kind": "derived", "source_systems": []}
+      ]
+    }
+  ]
+}

@@ -10,6 +10,18 @@
 
 UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
 
+研究評価では、診療タスクとUIのタブ構成を分けて扱います。麻酔科術前外来について、ヒアリングで得たT1〜T7の確認・判断、依存関係、完了条件、必要情報を `data/evaluation/ito_clinical_tasks.v1.json` に保存しています。このモデルは専門家確認前の `draft` であり、現時点では医学的な正解データとして扱いません。
+
+`interactive_ehr.evaluation` は、臨床タスクモデルの検証と、必要情報が現在の `ScenarioGraph` のDataNodeまで追跡できるかの監査を提供します。これにより、UIの操作時間を測る前に、必要情報の欠落を明示できます。
+
+麻酔科術前外来のdraftモデルと現在のUIを照合するには、次を実行します。
+
+```bash
+uv run python scripts/audit_clinical_task_trace.py \
+  data/evaluation/ito_clinical_tasks.v1.json \
+  data/scenarios/ito.json
+```
+
 ## セットアップ
 
 ```bash
@@ -88,7 +100,7 @@ docker exec -it interactive-ehr nano /app/src/interactive_ehr/app.py
 ```bash
 uv run pytest tests/ -v
 uv run ruff check .
-uv run ty check src/interactive_ehr/widgets src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
+uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
 ```
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
@@ -146,10 +158,16 @@ src/interactive_ehr/
     renderer.py           -- WidgetSpecをStreamlitへ描画するレンダラ
   llm/
     gemini.py             -- Gemini API (Vertex AI) 呼び出しmixin
+  evaluation/
+    task_model.py         -- 診療タスクの基準モデルと情報追跡監査
   pages/                  -- ページコンポーネント
+
+data/evaluation/
+  ito_clinical_tasks.v1.json -- 麻酔科術前外来T1〜T7のdraft基準モデル
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
   generate_fake_csvs.py   -- DWHモデルごとのfake CSVを生成
   build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
+  audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
 ```
