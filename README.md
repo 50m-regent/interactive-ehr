@@ -14,12 +14,22 @@ UIは `ScenarioGraph` JSON から描画されます。画面右側の「タス�
 
 `interactive_ehr.evaluation` は、臨床タスクモデルの検証と、必要情報が現在の `ScenarioGraph` のDataNodeまで追跡できるかの監査を提供します。これにより、UIの操作時間を測る前に、必要情報の欠落を明示できます。
 
+比較実験用の合成症例は `data/evaluation/ito_case_manifest.v0.1.json` で管理します。症例ペア、設問、採点基準、難易度、専門家確認の状態を記録し、未確定の項目があればパイロット実験を止めます。参照する臨床タスクモデルの専門家確認と、対応するScenarioGraphファイルの存在も開始条件です。現在のファイルは臨床内容を未記入にしたテンプレートであり、実験には利用できません。
+
 麻酔科術前外来のdraftモデルと現在のUIを照合するには、次を実行します。
 
 ```bash
 uv run python scripts/audit_clinical_task_trace.py \
   data/evaluation/ito_clinical_tasks.v1.json \
   data/scenarios/ito.json
+```
+
+合成症例ペアの準備状態を確認するには、次を実行します。準備未完了の場合は終了コード1を返します。
+
+```bash
+uv run python scripts/audit_evaluation_case_manifest.py \
+  data/evaluation/ito_case_manifest.v0.1.json \
+  data/evaluation/ito_clinical_tasks.v1.json
 ```
 
 ## セットアップ
@@ -159,15 +169,18 @@ src/interactive_ehr/
   llm/
     gemini.py             -- Gemini API (Vertex AI) 呼び出しmixin
   evaluation/
+    case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
   pages/                  -- ページコンポーネント
 
 data/evaluation/
   ito_clinical_tasks.v1.json -- 麻酔科術前外来T1〜T7のdraft基準モデル
+  ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
   generate_fake_csvs.py   -- DWHモデルごとのfake CSVを生成
   build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
+  audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
 ```
