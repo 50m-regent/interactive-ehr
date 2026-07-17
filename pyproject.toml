@@ -5,10 +5,12 @@ description = "タスクのグラフ構造化を用いたインタラクティ�
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "altair>=6.0.0",
     "google-genai>=1.73.1",
     "pandas>=3.0.2",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.2",
+    "requests>=2.33.1",
     "streamlit>=1.56.0",
     "watchdog>=6.0.0",
 ]

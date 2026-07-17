@@ -10,6 +10,8 @@
 
 UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
 
+折れ線グラフは、日付や数値を横軸の値に応じた間隔で表示します。線上には実測点を示すドットを重ね、マウスを合わせると日付、系列、値を確認できます。
+
 研究評価では、診療タスクとUIのタブ構成を分けて扱います。麻酔科術前外来について、ヒアリングで得たT1〜T7の確認・判断、依存関係、完了条件、必要情報を `data/evaluation/ito_clinical_tasks.v1.json` に保存しています。このモデルは専門家確認前の `draft` であり、現時点では医学的な正解データとして扱いません。
 
 `interactive_ehr.evaluation` は、臨床タスクモデルの検証と、必要情報が現在の `ScenarioGraph` のDataNodeまで追跡できるかの監査を提供します。これにより、UIの操作時間を測る前に、必要情報の欠落を明示できます。
@@ -53,6 +55,19 @@ cp .env.example .env
 - `GEMINI_LOCATION` (デフォルト: `asia-northeast1`)
 - `GEMINI_MODEL` (デフォルト: `gemini-2.5-pro`)
 
+### 閉域ネットワーク向けプロキシモード
+
+Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_URL` を設定すると
+ベンダー提供の Gemini プロキシ経由で生成します（サービスアカウント認証は不要。
+未設定なら従来どおり Vertex AI を使用）。プロキシには JSON Schema 構造化出力の
+機能がないため、スキーマをプロンプトに埋め込み、返却 JSON を Pydantic で検証します。
+
+- `GEMINI_PROXY_URL`: プロキシURL（例: `http://192.168.197.130:3000/api/gemini`）
+- `GEMINI_MODEL` (プロキシモードのデフォルト: `gemini-2.5-flash-lite`)
+- `GEMINI_PROXY_MAX_OUTPUT_TOKENS` (デフォルト: `8192`)
+- `GEMINI_PROXY_TEMPERATURE` (デフォルト: `0.2`)
+- `GEMINI_PROXY_TIMEOUT` (デフォルト: `300` 秒)
+
 ## 起動
 
 ```bash
@@ -63,7 +78,7 @@ uv run streamlit run src/interactive_ehr/app.py
 
 ## Docker（インターネット非接続環境での実行）
 
-依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。Gemini APIはオフラインでは利用できませんが、起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。
+依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。閉域内に Gemini プロキシがある場合は `-e GEMINI_PROXY_URL=...` を付けて起動するとタスクグラフ生成も利用できます（上記「閉域ネットワーク向けプロキシモード」参照）。
 
 ### 1. ビルド（ネット接続のある環境で）
 

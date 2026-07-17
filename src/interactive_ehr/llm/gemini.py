@@ -1,18 +1,25 @@
 """Gemini API連携用のmixinクラス.
 
-Vertex AI経由でGemini APIを呼び出し、Pydanticスキーマに基づく構造化出力を返す。
+デフォルトでは Vertex AI 経由で Gemini API を呼び出し、Pydanticスキーマに
+基づく構造化出力を返す。環境変数 GEMINI_PROXY_URL が設定されている場合は、
+閉域ネットワーク向けのベンダー提供プロキシ (`gemini_proxy` モジュール) に
+切り替わる。
 
 環境変数:
-    GOOGLE_APPLICATION_CREDENTIALS: サービスアカウントJSONファイルへのパス (必須)
+    GEMINI_PROXY_URL: 閉域プロキシのURL (設定するとプロキシモードに切替)
+    GOOGLE_APPLICATION_CREDENTIALS: サービスアカウントJSONファイルへのパス
+        (Vertex AIモードで必須)
     GEMINI_PROJECT: GCPプロジェクトID (デフォルト: gemini-api-project-464304)
     GEMINI_LOCATION: Vertex AIロケーション (デフォルト: asia-northeast1)
-    GEMINI_MODEL: Geminiモデル名 (デフォルト: gemini-2.5-pro)
+    GEMINI_MODEL: Geminiモデル名 (デフォルト: gemini-2.5-pro、
+        プロキシモードでは gemini-2.5-flash-lite)
+
+プロキシモード固有の環境変数は `gemini_proxy` モジュールを参照。
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from copy import deepcopy
 import json
 import os
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -21,6 +28,9 @@ from google import genai
 from google.oauth2 import service_account
 from dotenv import load_dotenv
 from pydantic import BaseModel
+
+from interactive_ehr.llm.gemini_proxy import ProxyConfig, generate_via_proxy
+from interactive_ehr.llm.schema_utils import to_gemini_response_json_schema
 
 if TYPE_CHECKING:
     from google.genai.client import Client
@@ -33,29 +43,6 @@ DEFAULT_MODEL = "gemini-2.5-pro"
 
 _CREDENTIALS_ENV = "GOOGLE_APPLICATION_CREDENTIALS"
 _SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
-_GEMINI_JSON_SCHEMA_KEYS = {
-    "$anchor",
-    "$defs",
-    "$id",
-    "$ref",
-    "additionalProperties",
-    "anyOf",
-    "description",
-    "enum",
-    "format",
-    "items",
-    "maxItems",
-    "maximum",
-    "minItems",
-    "minimum",
-    "oneOf",
-    "prefixItems",
-    "properties",
-    "propertyOrdering",
-    "required",
-    "title",
-    "type",
-}
 
 
 class GeminiMixin:
@@ -75,8 +62,7 @@ class GeminiMixin:
         self._gemini_model = None
 
     def _init_gemini(self) -> None:
-        """Geminiクライアントを初期化."""
-        load_dotenv()
+        """Vertex AI用のGeminiクライアントを初期化."""
         credentials_path = os.environ.get(_CREDENTIALS_ENV)
         if not credentials_path:
             raise RuntimeError(
@@ -107,10 +93,16 @@ class GeminiMixin:
             schema でパースされたPydanticモデルインスタンス
 
         Raises:
-            RuntimeError: 認証情報が未設定
+            RuntimeError: 認証情報が未設定、またはプロキシがエラーを返した
             ValueError: レスポンスのJSONパース失敗
             pydantic.ValidationError: スキーマ検証失敗
         """
+        load_dotenv()
+
+        proxy_config = ProxyConfig.from_env()
+        if proxy_config is not None:
+            return generate_via_proxy(prompt, schema, proxy_config)
+
         if self._gemini_client is None:
             self._init_gemini()
 
@@ -147,69 +139,9 @@ def _extract_text(response: object) -> str:
 
 
 def _to_gemini_response_json_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
-    """Convert Pydantic JSON Schema to the subset accepted by Gemini."""
-    sanitized = _sanitize_json_schema_node(deepcopy(dict(schema)))
-    _relax_recursive_layout_children(sanitized)
-    return sanitized
+    """Convert Pydantic JSON Schema to the subset accepted by Gemini.
 
-
-def _sanitize_json_schema_node(node: Any) -> Any:
-    if isinstance(node, list):
-        return [_sanitize_json_schema_node(item) for item in node]
-    if not isinstance(node, dict):
-        return node
-
-    sanitized: dict[str, Any] = {}
-    for key, value in node.items():
-        if key in {"$defs", "properties"}:
-            sanitized[key] = {
-                name: _sanitize_json_schema_node(child)
-                for name, child in value.items()
-            }
-            continue
-        if key == "const":
-            sanitized["enum"] = [value]
-            continue
-        if key not in _GEMINI_JSON_SCHEMA_KEYS:
-            continue
-        sanitized[key] = _sanitize_json_schema_node(value)
-    return sanitized
-
-
-def _relax_recursive_layout_children(schema: dict[str, Any]) -> None:
-    """Avoid required `$ref` loops in layout widget child schemas.
-
-    Gemini rejects required recursive references in JSON Schema. Layout children
-    are still validated after generation by `schema.model_validate()`.
+    実体は `schema_utils.to_gemini_response_json_schema`（プロキシバックエンドと
+    共用）。既存の利用箇所・テストとの互換のためこの名前を維持している。
     """
-    defs = schema.get("$defs")
-    if not isinstance(defs, dict):
-        return
-
-    generic_widget = {
-        "type": "object",
-        "additionalProperties": True,
-        "description": "WidgetSpec object validated by the application after generation.",
-    }
-
-    columns = defs.get("ColumnsSpec")
-    if isinstance(columns, dict):
-        columns_items = (
-            columns.get("properties", {})
-            .get("columns", {})
-            .get("items", {})
-        )
-        if isinstance(columns_items, dict):
-            columns_items["items"] = generic_widget
-
-    tabs = defs.get("TabsSpec")
-    if isinstance(tabs, dict):
-        tab_items = tabs.get("properties", {}).get("tabs", {}).get("items", {})
-        if isinstance(tab_items, dict):
-            tab_items["items"] = generic_widget
-
-    expander = defs.get("ExpanderSpec")
-    if isinstance(expander, dict):
-        children = expander.get("properties", {}).get("children", {})
-        if isinstance(children, dict):
-            children["items"] = generic_widget
+    return to_gemini_response_json_schema(schema)
