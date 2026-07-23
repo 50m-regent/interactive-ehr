@@ -8,6 +8,15 @@ Claude Code 向けの `CLAUDE.md` と同じ意図の指示を Codex 向けにま
 
 タスクのグラフ構造化を用いたインタラクティブな電子カルテシステムの研究プロジェクトです。
 
+## 作業開始時の確認
+
+1. Notionの研究ダッシュボードを取得し、現在段階、研究質問、次のチェックポイント、未完了タスクを確認します。
+2. `README.md`を読み、現在の機能、未実装事項、実行方法、検証コマンドを確認します。
+3. 現在のブランチ、未コミット変更、リモートを確認します。
+4. ユーザーの既存変更を保ち、依頼と関係のないPDF、Docker成果物、tar、スライドへ触れません。
+
+進捗、テスト件数、期限、検証対象はブランチごとに変化します。このファイルへ固定せず、Notion、`README.md`、現在のコードから確認してください。
+
 ## 開発環境
 
 - Python 3.12 を使用します。バージョンは `.python-version` で管理されています。
@@ -29,9 +38,20 @@ Claude Code 向けの `CLAUDE.md` と同じ意図の指示を Codex 向けにま
 
 - アプリ起動: `uv run streamlit run src/interactive_ehr/app.py`
 - テスト実行: `uv run pytest tests/ -v`
-- 型チェック: `uv run ty check src/interactive_ehr/widgets src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py`
+- lint: `uv run ruff check .`
+- 型チェック: `README.md`の「テスト」節に記載された対象へ`uv run ty check`を実行
 - パッケージ追加: `uv add <package>`
 - 開発用パッケージ追加: `uv add --dev <package>`
+
+## 検証の役割
+
+- pytestは、モデル、UI、LLM連携、評価処理などの実行時挙動を確認します。
+- ruffは、Pythonコードの静的な品質を確認します。
+- tyは、手書きの実行時コードを中心に型を確認します。対象は現在の`README.md`を正本とします。
+- 評価監査スクリプトが存在するブランチでは、臨床タスクからDataNodeまでの追跡状況と、症例がパイロット開始条件を満たすかを確認します。
+- 症例準備監査の終了コード1は、実行エラーとは限りません。`ready_for_pilot: false`と未完了条件を示す正常なゲート判定として扱います。
+
+専門家確認前の臨床タスクモデルと症例は医学的な正解として扱いません。専門家の判断、採点基準、重大な見落としの定義を推測で補完せず、開始条件が満たされるまで参加者を用いたパイロットを実施しません。
 
 ## 外部リソース
 
