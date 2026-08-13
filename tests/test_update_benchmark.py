@@ -27,6 +27,7 @@ from interactive_ehr.evaluation.update_benchmark import (
     artifact_to_graph,
     build_candidate_specs,
     build_paired_candidate,
+    canonical_checksum,
     compile_graph_artifact,
     evaluate_candidate,
     load_update_benchmark,
@@ -96,6 +97,11 @@ def test_benchmark_has_frozen_case_and_sequence_shape(
         assert sum(
             case.intent.change_kind is change_kind for case in evaluation_cases
         ) == 4
+    assert {
+        canonical_checksum(case.intent) for case in development_cases
+    }.isdisjoint(
+        canonical_checksum(case.intent) for case in evaluation_cases
+    )
 
 
 def test_candidate_specs_have_one_valid_three_single_and_one_compound(

@@ -23,6 +23,7 @@ from interactive_ehr.evaluation.update_benchmark import (
     RequirementDefinition,
     SequenceRunRecord,
     UpdateMethod,
+    artifact_to_graph,
     canonical_checksum,
 )
 
@@ -129,6 +130,8 @@ class RunManifest(BaseModel):
     benchmark_id: str
     benchmark_version: str
     benchmark_checksum: str
+    baseline_artifact_checksum: str
+    baseline_graph_checksum: str
     implementation_checksum: str
     random_seed: int
     bootstrap_iterations: int
@@ -248,6 +251,10 @@ def write_benchmark_artifacts(
         benchmark_id=benchmark.id,
         benchmark_version=benchmark.version,
         benchmark_checksum=run.benchmark_checksum,
+        baseline_artifact_checksum=canonical_checksum(benchmark.baseline),
+        baseline_graph_checksum=canonical_checksum(
+            artifact_to_graph(benchmark.baseline)
+        ),
         implementation_checksum=_implementation_checksum(),
         random_seed=benchmark.random_seed,
         bootstrap_iterations=benchmark.bootstrap_iterations,

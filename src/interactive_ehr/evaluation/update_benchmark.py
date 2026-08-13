@@ -33,8 +33,8 @@ class ChangeKind(str, Enum):
     NARROW_TIME_WINDOW = "narrow_time_window"
     CHANGE_VISUALIZATION = "change_visualization"
     REGROUP_DISPLAY = "regroup_display"
-    RELABEL_WIDGET = "relabel_widget"
-    CHANGE_DATA_SOURCE = "change_data_source"
+    CHANGE_TASK_FLOW = "change_task_flow"
+    CROSS_LAYER_UPDATE = "cross_layer_update"
 
 
 class FaultKind(str, Enum):
@@ -79,6 +79,7 @@ class TaskArtifact(BaseModel):
 
     id: str
     title: str
+    condition: str | None = None
     widget_ids: list[str] = Field(default_factory=list)
 
 
@@ -145,6 +146,7 @@ class GraphTaskNode(BaseModel):
 
     id: str
     title: str
+    condition: str | None = None
     widget_node_ids: list[str] = Field(default_factory=list)
 
 
@@ -235,6 +237,7 @@ class UpdateIntent(BaseModel):
     destination_task_id: str | None = None
     requested_field: str | None = None
     requested_title: str | None = None
+    requested_task_condition: str | None = None
     requested_widget_kind: Literal["table", "cards", "line_chart", "text"] | None = None
     requested_time_window_days: int | None = Field(None, ge=1)
     requested_source_table: str | None = None
@@ -243,16 +246,20 @@ class UpdateIntent(BaseModel):
     def validate_change_payload(self) -> Self:
         """Require the value needed by the selected change kind."""
 
-        required_value_by_kind = {
+        required_value_by_kind: dict[ChangeKind, object | None] = {
             ChangeKind.ADD_INFORMATION: self.requested_field,
             ChangeKind.NARROW_TIME_WINDOW: self.requested_time_window_days,
             ChangeKind.CHANGE_VISUALIZATION: self.requested_widget_kind,
             ChangeKind.REGROUP_DISPLAY: self.destination_task_id,
-            ChangeKind.RELABEL_WIDGET: self.requested_title,
-            ChangeKind.CHANGE_DATA_SOURCE: self.requested_source_table,
+            ChangeKind.CHANGE_TASK_FLOW: self.requested_task_condition,
+            ChangeKind.CROSS_LAYER_UPDATE: self.requested_field,
         }
         if required_value_by_kind[self.change_kind] is None:
             raise ValueError(f"missing requested value for {self.change_kind.value}")
+        if self.change_kind is ChangeKind.CROSS_LAYER_UPDATE and (
+            self.requested_title is None or self.requested_task_condition is None
+        ):
+            raise ValueError("cross-layer update requires task, data, and widget values")
         return self
 
 
@@ -362,6 +369,14 @@ class BenchmarkDefinition(BaseModel):
             raise ValueError("development split must contain two sequences")
         if len(evaluation_sequences) != 6:
             raise ValueError("evaluation split must contain six sequences")
+        development_intents = {
+            canonical_checksum(case.intent) for case in development_cases
+        }
+        evaluation_intents = {
+            canonical_checksum(case.intent) for case in evaluation_cases
+        }
+        if development_intents & evaluation_intents:
+            raise ValueError("development and evaluation intents must be disjoint")
         self._validate_case_references()
         self._validate_baseline_targets()
         return self
@@ -472,11 +487,18 @@ class BenchmarkDefinition(BaseModel):
                 or intent.target_widget_id in tasks[intent.destination_task_id].widget_ids
             ):
                 raise ValueError(f"display grouping does not change: {case.id}")
-        elif intent.change_kind is ChangeKind.RELABEL_WIDGET:
-            if intent.requested_title == widget.title:
-                raise ValueError(f"widget label does not change: {case.id}")
-        elif intent.requested_source_table == query.source_table:
-            raise ValueError(f"data source does not change: {case.id}")
+        elif intent.change_kind is ChangeKind.CHANGE_TASK_FLOW:
+            if intent.requested_task_condition == tasks[intent.target_task_id].condition:
+                raise ValueError(f"task flow does not change: {case.id}")
+        elif intent.change_kind is ChangeKind.CROSS_LAYER_UPDATE:
+            if (
+                intent.requested_field in widget.displayed_fields
+                or intent.requested_field in query.selected_fields
+                or intent.requested_title == widget.title
+                or intent.requested_task_condition
+                == tasks[intent.target_task_id].condition
+            ):
+                raise ValueError(f"cross-layer request does not change: {case.id}")
         if (
             intent.requested_source_table is not None
             and intent.requested_source_table
@@ -643,6 +665,7 @@ def artifact_to_graph(artifact: ArtifactState) -> GraphState:
             GraphTaskNode(
                 id=task.id,
                 title=task.title,
+                condition=task.condition,
                 widget_node_ids=task.widget_ids,
             )
             for task in artifact.tasks
@@ -670,6 +693,7 @@ def compile_graph_artifact(graph: GraphState) -> ArtifactState:
             TaskArtifact(
                 id=task_node.id,
                 title=task_node.title,
+                condition=task_node.condition,
                 widget_ids=task_node.widget_node_ids,
             )
             for task_node in graph.task_nodes
@@ -1150,27 +1174,61 @@ def _valid_operations(case: UpdateCase, *, graph: bool) -> list[PatchOperation]:
                 value=intent.target_widget_id,
             ),
         ]
-    if intent.change_kind is ChangeKind.RELABEL_WIDGET:
-        assert intent.requested_title is not None
+    if intent.change_kind is ChangeKind.CHANGE_TASK_FLOW:
+        assert intent.requested_task_condition is not None
         return [
             PatchOperation(
-                entity=widget_entity,
-                entity_id=intent.target_widget_id,
-                field="title",
+                entity=task_entity,
+                entity_id=intent.target_task_id,
+                field="condition",
                 action=PatchAction.SET,
-                value=intent.requested_title,
+                value=intent.requested_task_condition,
             )
         ]
-    assert intent.requested_source_table is not None
-    return [
+    assert intent.requested_field is not None
+    assert intent.requested_title is not None
+    assert intent.requested_task_condition is not None
+    operations = [
+        PatchOperation(
+            entity=task_entity,
+            entity_id=intent.target_task_id,
+            field="condition",
+            action=PatchAction.SET,
+            value=intent.requested_task_condition,
+        ),
+        PatchOperation(
+            entity=widget_entity,
+            entity_id=intent.target_widget_id,
+            field="title",
+            action=PatchAction.SET,
+            value=intent.requested_title,
+        ),
+        PatchOperation(
+            entity=widget_entity,
+            entity_id=intent.target_widget_id,
+            field="displayed_fields",
+            action=PatchAction.APPEND,
+            value=intent.requested_field,
+        ),
         PatchOperation(
             entity=data_entity,
             entity_id=data_id,
-            field="source_table",
-            action=PatchAction.SET,
-            value=intent.requested_source_table,
-        )
+            field="selected_fields",
+            action=PatchAction.APPEND,
+            value=intent.requested_field,
+        ),
     ]
+    if graph:
+        operations.append(
+            PatchOperation(
+                entity="data_node",
+                entity_id=data_id,
+                field="information_ids",
+                action=PatchAction.APPEND,
+                value=intent.requested_field,
+            )
+        )
+    return operations
 
 
 def _fault_operations(
@@ -1572,9 +1630,14 @@ def _oracle_intent_satisfied(
             intent.target_widget_id not in tasks[intent.target_task_id].widget_ids
             and intent.target_widget_id in tasks[intent.destination_task_id].widget_ids
         )
-    if intent.change_kind is ChangeKind.RELABEL_WIDGET:
-        return widget.title == intent.requested_title
-    return query.source_table == intent.requested_source_table
+    if intent.change_kind is ChangeKind.CHANGE_TASK_FLOW:
+        return tasks[intent.target_task_id].condition == intent.requested_task_condition
+    return (
+        tasks[intent.target_task_id].condition == intent.requested_task_condition
+        and widget.title == intent.requested_title
+        and intent.requested_field in widget.displayed_fields
+        and intent.requested_field in query.selected_fields
+    )
 
 
 def _allowed_entity_keys(case: UpdateCase) -> set[str]:
