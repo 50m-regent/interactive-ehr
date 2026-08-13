@@ -1,13 +1,16 @@
 {
   "name": "research-slides",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.4.3",
   "scripts": {
     "dev": "marp --server .",
     "preview": "marp --preview",
     "check": "node check-markdown.mjs",
+    "test": "node --test test-check-markdown.mjs",
     "build": "marp --pdf --pdf-outlines",
-    "render": "marp --images png"
+    "render": "marp --images png",
+    "build:gallery": "marp --pdf --pdf-outlines examples/component-gallery.md -o .render/component-gallery.pdf",
+    "render:gallery": "marp --images png examples/component-gallery.md -o .render/component-gallery.png"
   },
   "devDependencies": {
     "@marp-team/marp-cli": "4.4.0"

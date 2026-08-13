@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">臨床タスクから表示までの追跡関係と保護条件</title>
+  <desc id="desc">臨床タスク、必要情報、DataNode、SQL、Widgetが矢印でつながり、更新要求と保護条件が各層へ関係する図</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#224466"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Arial, "Hiragino Sans", sans-serif; fill: #224466; }
+      .body { font: 600 19px Arial, "Hiragino Sans", sans-serif; fill: #000000; }
+      .small { font: 600 16px Arial, "Hiragino Sans", sans-serif; fill: #000000; }
+      .card { fill: #ffffff; stroke: #224466; stroke-width: 3; rx: 8; }
+      .changed { fill: #ffffff; stroke: #e03e1a; stroke-width: 4; rx: 8; }
+      .band { fill: #f3f4f6; stroke: #90a1b2; stroke-width: 2; rx: 8; }
+      .arrow { stroke: #224466; stroke-width: 5; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="20" y="18" width="1160" height="66" class="band"/>
+  <text x="48" y="58" class="title">更新要求</text>
+  <text x="220" y="58" class="body">腎機能の推移を確認できるよう、表を時系列グラフへ変更する</text>
+
+  <rect x="30" y="132" width="190" height="126" class="card"/>
+  <text x="125" y="170" text-anchor="middle" class="title">臨床タスク</text>
+  <text x="125" y="212" text-anchor="middle" class="body">腎機能を確認</text>
+
+  <rect x="270" y="132" width="190" height="126" class="card"/>
+  <text x="365" y="170" text-anchor="middle" class="title">必要情報</text>
+  <text x="365" y="212" text-anchor="middle" class="body">Cr・eGFRの推移</text>
+
+  <rect x="510" y="132" width="190" height="126" class="card"/>
+  <text x="605" y="170" text-anchor="middle" class="title">DataNode</text>
+  <text x="605" y="212" text-anchor="middle" class="body">renal_history</text>
+
+  <rect x="750" y="132" width="190" height="126" class="card"/>
+  <text x="845" y="170" text-anchor="middle" class="title">SQL</text>
+  <text x="845" y="205" text-anchor="middle" class="small">検査日・項目・値を取得</text>
+  <text x="845" y="231" text-anchor="middle" class="small">対象期間を保持</text>
+
+  <rect x="990" y="132" width="190" height="126" class="changed"/>
+  <text x="1085" y="170" text-anchor="middle" class="title">Widget</text>
+  <text x="1085" y="212" text-anchor="middle" class="body">時系列グラフ</text>
+
+  <path d="M220 195 H258" class="arrow"/>
+  <path d="M460 195 H498" class="arrow"/>
+  <path d="M700 195 H738" class="arrow"/>
+  <path d="M940 195 H978" class="arrow"/>
+
+  <rect x="156" y="318" width="888" height="78" class="band"/>
+  <text x="190" y="351" class="title">保護条件</text>
+  <text x="190" y="381" class="body">最新値を残す・対象外のタスクを変えない・SQLを実行できる・追跡を切らない</text>
+</svg>
