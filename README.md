@@ -34,6 +34,37 @@ uv run python scripts/audit_evaluation_case_manifest.py \
   data/evaluation/ito_clinical_tasks.v1.json
 ```
 
+## RQ1の技術評価
+
+`data/evaluation/ui_update_benchmark.v0.4.json` は、成果物を直接変更する方式と、グラフを介して変更する方式を同じ更新要求と構造的安全要件で比較します。Geminiは呼び出しません。共通変更仕様から二方式の差分候補を決定的に生成し、独立した意味上のオラクルで正解を確認します。
+
+固定した内容は次のとおりです。
+
+- 開発セットは単発8件と3手の系列2件です。
+- 評価セットは6種類の単発変更を各4件、合計24件含みます。
+- 評価セットの各変更には妥当な候補1件、単一違反3件、複合違反1件があり、共通変更仕様は合計120件です。
+- 違反は更新範囲、安全条件、表示とデータ取得の追跡、SQL実行の4種類です。
+- 主比較では直接差分方式と完全なグラフ方式へ同じ要件を実装します。
+- グラフ方式では更新範囲、安全条件、追跡検査を個別に外した条件も測ります。
+- 95%区間はケース単位のクラスターブートストラップで求めます。除去比較のp値はケース単位の符号反転検定とHolm補正で求めます。
+
+評価を再実行するには、次を実行します。`--with-editable .` は、srcレイアウトの現在の作業ツリーを評価環境へ読み込むために指定しています。
+
+```bash
+uv run --with-editable . python scripts/run_ui_update_benchmark.py
+```
+
+結果は `results/evaluation/ui_update_benchmark_v0.4/` に保存されます。
+
+- `paired_candidates.jsonl` は共通変更仕様、直接差分、グラフ差分、各チェックサムを1候補1行で記録します。
+- `candidate_results.jsonl` は各候補と比較条件の受理結果を1実行1行で記録します。
+- `sequence_results.jsonl` は逐次更新の受理結果と棄却時の状態保持を1手1行で記録します。
+- `summary.json` は主指標、対応差、95%区間、除去比較、要件ごとの実装量を記録します。
+- `report.md` は論文執筆向けの短い結果要約です。
+- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
+
+現行v0.4は専門家確認前の合成更新要求と合成スキーマを使います。測定対象は構造的な依存関係保護です。臨床的安全性の評価、人を対象とした評価、Geminiを含むエンドツーエンド評価はまだ実施していません。
+
 ## セットアップ
 
 ```bash
@@ -184,13 +215,16 @@ src/interactive_ehr/
   llm/
     gemini.py             -- Gemini API (Vertex AI) 呼び出しmixin
   evaluation/
+    benchmark_analysis.py -- UI更新ベンチマークの統計集計と成果物出力
     case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
+    update_benchmark.py   -- 共通変更仕様、二方式の差分生成、検査、実行器
   pages/                  -- ページコンポーネント
 
 data/evaluation/
   ito_clinical_tasks.v1.json -- 麻酔科術前外来T1〜T7のdraft基準モデル
   ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
+  ui_update_benchmark.v0.4.json -- RQ1技術評価の固定入力
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
@@ -198,4 +232,10 @@ scripts/
   build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
+  run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
+
+results/evaluation/ui_update_benchmark_v0.4/
+  run_manifest.json       -- 再現条件とチェックサム
+  report.md               -- 技術評価結果の要約
+  summary.json            -- 統計集計と実装量
 ```

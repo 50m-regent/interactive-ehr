@@ -1,0 +1,515 @@
+{
+  "id": "ui-update-benchmark",
+  "version": "0.4.0",
+  "random_seed": 20260814,
+  "bootstrap_iterations": 10000,
+  "interpretation_limit": "専門家確認前の合成更新要求と合成スキーマを用いるため、結果は構造的な依存関係保護として解釈し、臨床的安全性を示す根拠には用いない。",
+  "available_fields": [
+    "patient_id",
+    "age",
+    "sex",
+    "height",
+    "weight",
+    "bmi",
+    "measurement_date",
+    "surgery_name",
+    "surgery_date",
+    "planned_minutes",
+    "position",
+    "smoking_status",
+    "alcohol_frequency",
+    "alcohol_amount",
+    "allergy",
+    "diagnosis",
+    "medication",
+    "surgery_history",
+    "transfusion_history",
+    "test_name",
+    "test_value",
+    "recorded_date",
+    "ecg",
+    "chest_xray",
+    "pulmonary_function",
+    "anesthesia_issue",
+    "anesthesia_complications",
+    "risk",
+    "recorded_days_ago",
+    "patient_name"
+  ],
+  "source_tables": [
+    "patient_info",
+    "surgery_orders",
+    "lifestyle_records",
+    "history_records",
+    "lab_results",
+    "anesthesia_records",
+    "risk_summary",
+    "patient_summary",
+    "surgical_registry",
+    "integrated_history",
+    "diagnostic_results",
+    "anesthesia_archive"
+  ],
+  "safety_policy": {
+    "id": "structural-safety-policy-v0.4",
+    "forbidden_display_fields": ["patient_name"],
+    "approved_source_tables": [
+      "patient_info",
+      "surgery_orders",
+      "lifestyle_records",
+      "history_records",
+      "lab_results",
+      "anesthesia_records",
+      "risk_summary",
+      "patient_summary",
+      "surgical_registry",
+      "integrated_history",
+      "diagnostic_results",
+      "anesthesia_archive"
+    ],
+    "source_reference": "data/evaluation/ito_clinical_tasks.v1.json",
+    "review_status": "draft",
+    "interpretation": "合成患者ID以外の直接識別子を表示せず、事前登録した合成データソースだけを参照する。"
+  },
+  "requirements": [
+    {
+      "id": "R1_update_scope",
+      "description": "更新対象に指定されていない成果物またはノードを変更しない。",
+      "runtime_comparable": true,
+      "direct_expression": "変更前後の成果物ID単位の差分を許可対象と照合する。",
+      "graph_expression": "変更前後のノードID単位の差分を許可対象と照合する。",
+      "direct_implementation": ["_validate_direct_scope"],
+      "graph_implementation": ["_validate_graph_scope"],
+      "referenced_artifacts": ["UpdateCase.intent", "ArtifactState", "GraphState"],
+      "maintenance_touchpoints": ["許可対象の定義", "直接差分検査", "グラフ差分検査"],
+      "tests": ["test_each_single_fault_is_caught_by_its_control"]
+    },
+    {
+      "id": "R2_structural_safety",
+      "description": "禁止表示項目と未承認データソースを受理しない。",
+      "runtime_comparable": true,
+      "direct_expression": "成果物の表示項目とクエリ元を共通ポリシーへ照合する。",
+      "graph_expression": "グラフからコンパイルした成果物を同じ共通ポリシーへ照合する。",
+      "direct_implementation": ["_validate_artifact_safety"],
+      "graph_implementation": ["_validate_artifact_safety"],
+      "referenced_artifacts": ["SafetyPolicy", "WidgetArtifact", "QueryArtifact"],
+      "maintenance_touchpoints": ["安全ポリシー", "共通安全検査"],
+      "tests": ["test_each_single_fault_is_caught_by_its_control"]
+    },
+    {
+      "id": "R3_display_data_trace",
+      "description": "表示項目が対応するデータ取得項目まで追跡できる。",
+      "runtime_comparable": true,
+      "direct_expression": "Widgetのquery_idと選択列を突き合わせる。",
+      "graph_expression": "WidgetNodeからDataNodeへの辺と選択列をたどる。",
+      "direct_implementation": ["_validate_artifact_trace"],
+      "graph_implementation": ["_validate_graph_trace"],
+      "referenced_artifacts": ["WidgetArtifact.query_id", "GraphWidgetNode.data_node_id"],
+      "maintenance_touchpoints": ["直接成果物の参照検査", "グラフの辺検査"],
+      "tests": ["test_each_single_fault_is_caught_by_its_control"]
+    },
+    {
+      "id": "R4_query_execution",
+      "description": "更新後の全クエリが事前登録した合成スキーマで実行できる。",
+      "runtime_comparable": true,
+      "direct_expression": "構造化クエリをSQLiteへコンパイルして実行する。",
+      "graph_expression": "DataNodeを同じ構造化クエリへコンパイルして実行する。",
+      "direct_implementation": ["_validate_queries_execute"],
+      "graph_implementation": ["_validate_queries_execute"],
+      "referenced_artifacts": ["QueryArtifact", "available_fields", "source_tables"],
+      "maintenance_touchpoints": ["合成スキーマ", "SQLコンパイラ", "実行検査"],
+      "tests": ["test_each_single_fault_is_caught_by_its_control"]
+    },
+    {
+      "id": "E1_task_information_provenance",
+      "description": "取得項目を診療タスク上の情報要件へ結び付ける。",
+      "runtime_comparable": false,
+      "direct_expression": "直接成果物だけでは保持できず、外部メタデータが必要になる。",
+      "graph_expression": "DataNodeのinformation_idsとして表現する。",
+      "direct_implementation": [],
+      "graph_implementation": ["_validate_graph_provenance"],
+      "referenced_artifacts": ["GraphDataNode.information_ids"],
+      "maintenance_touchpoints": ["情報要件ID", "DataNode", "由来検査"],
+      "tests": ["test_graph_provenance_is_recorded_outside_the_main_fault_model"]
+    },
+    {
+      "id": "E2_evidence_review_state",
+      "description": "更新要求と安全条件の根拠および確認状態を保持する。",
+      "runtime_comparable": false,
+      "direct_expression": "成果物の外にある文書または台帳が必要になる。",
+      "graph_expression": "更新仕様と制約メタデータをグラフ関連資産から参照できる。",
+      "direct_implementation": [],
+      "graph_implementation": [],
+      "referenced_artifacts": ["UpdateCase.source_reference", "SafetyPolicy.review_status"],
+      "maintenance_touchpoints": ["臨床タスクモデル", "専門家確認状態", "更新要求"],
+      "tests": ["test_benchmark_has_frozen_case_and_sequence_shape"]
+    }
+  ],
+  "baseline": {
+    "tasks": [
+      {"id": "task_basic", "title": "基本情報", "widget_ids": ["w_basic"]},
+      {"id": "task_surgery", "title": "手術", "widget_ids": ["w_surgery"]},
+      {"id": "task_lifestyle", "title": "生活歴", "widget_ids": ["w_lifestyle"]},
+      {"id": "task_history", "title": "既往歴", "widget_ids": ["w_history"]},
+      {"id": "task_tests", "title": "検査", "widget_ids": ["w_labs"]},
+      {"id": "task_anesthesia", "title": "麻酔歴", "widget_ids": ["w_anesthesia"]},
+      {"id": "task_risk", "title": "リスク", "widget_ids": ["w_risk"]}
+    ],
+    "widgets": [
+      {"id": "w_basic", "title": "患者基本情報", "kind": "cards", "query_id": "q_basic", "displayed_fields": ["patient_id", "age", "sex", "height", "weight", "bmi"]},
+      {"id": "w_surgery", "title": "予定手術", "kind": "table", "query_id": "q_surgery", "displayed_fields": ["surgery_name", "surgery_date", "planned_minutes", "position"]},
+      {"id": "w_lifestyle", "title": "生活歴とアレルギー", "kind": "table", "query_id": "q_lifestyle", "displayed_fields": ["smoking_status", "alcohol_frequency", "allergy"]},
+      {"id": "w_history", "title": "既往歴と治療", "kind": "table", "query_id": "q_history", "displayed_fields": ["diagnosis", "medication", "surgery_history"]},
+      {"id": "w_labs", "title": "術前検査", "kind": "table", "query_id": "q_labs", "displayed_fields": ["test_name", "test_value", "recorded_date"]},
+      {"id": "w_anesthesia", "title": "過去の麻酔", "kind": "table", "query_id": "q_anesthesia", "displayed_fields": ["anesthesia_issue", "recorded_date"]},
+      {"id": "w_risk", "title": "麻酔上の注意点", "kind": "text", "query_id": "q_risk", "displayed_fields": ["risk"]}
+    ],
+    "queries": [
+      {"id": "q_basic", "source_table": "patient_info", "selected_fields": ["patient_id", "age", "sex", "height", "weight", "bmi"], "time_window_days": 365},
+      {"id": "q_surgery", "source_table": "surgery_orders", "selected_fields": ["surgery_name", "surgery_date", "planned_minutes", "position"], "time_window_days": 30},
+      {"id": "q_lifestyle", "source_table": "lifestyle_records", "selected_fields": ["smoking_status", "alcohol_frequency", "allergy"], "time_window_days": 365},
+      {"id": "q_history", "source_table": "history_records", "selected_fields": ["diagnosis", "medication", "surgery_history"], "time_window_days": 3650},
+      {"id": "q_labs", "source_table": "lab_results", "selected_fields": ["test_name", "test_value", "recorded_date"], "time_window_days": 30},
+      {"id": "q_anesthesia", "source_table": "anesthesia_records", "selected_fields": ["anesthesia_issue", "recorded_date"], "time_window_days": 3650},
+      {"id": "q_risk", "source_table": "risk_summary", "selected_fields": ["risk"], "time_window_days": 30}
+    ]
+  },
+  "cases": [
+    {
+      "id": "dev-add-basic",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0/information_requirements/2",
+      "source_status": "draft",
+      "source_note": "身体測定日の欠落を補う合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "requested_field": "measurement_date"}
+    },
+    {
+      "id": "dev-add-anesthesia",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5/information_requirements/1",
+      "source_status": "draft",
+      "source_note": "麻酔合併症の欠落を補う合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_field": "anesthesia_complications"}
+    },
+    {
+      "id": "dev-time-labs",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/4/information_requirements/0/time_window",
+      "source_status": "draft",
+      "source_note": "術前検査を直近2週間へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_tests", "target_widget_id": "w_labs", "target_query_id": "q_labs", "requested_time_window_days": 14}
+    },
+    {
+      "id": "dev-time-history",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/3",
+      "source_status": "draft",
+      "source_note": "既往歴の表示期間を5年へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_history", "target_widget_id": "w_history", "target_query_id": "q_history", "requested_time_window_days": 1825}
+    },
+    {
+      "id": "dev-visual-labs",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/4",
+      "source_status": "draft",
+      "source_note": "検査推移を折れ線で見る合成更新要求。",
+      "intent": {"change_kind": "change_visualization", "target_task_id": "task_tests", "target_widget_id": "w_labs", "target_query_id": "q_labs", "requested_widget_kind": "line_chart"}
+    },
+    {
+      "id": "dev-regroup-lifestyle",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/2",
+      "source_status": "draft",
+      "source_note": "生活歴を基本情報の確認へまとめる合成更新要求。",
+      "intent": {"change_kind": "regroup_display", "target_task_id": "task_lifestyle", "target_widget_id": "w_lifestyle", "target_query_id": "q_lifestyle", "destination_task_id": "task_basic"}
+    },
+    {
+      "id": "dev-label-surgery",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/1",
+      "source_status": "draft",
+      "source_note": "手術予定を確認目的が分かる文言へ変える合成更新要求。",
+      "intent": {"change_kind": "relabel_widget", "target_task_id": "task_surgery", "target_widget_id": "w_surgery", "target_query_id": "q_surgery", "requested_title": "手術内容と麻酔科依頼"}
+    },
+    {
+      "id": "dev-source-history",
+      "split": "development",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/3/information_requirements/0/source_systems",
+      "source_status": "draft",
+      "source_note": "既往歴を統合履歴へ切り替える合成更新要求。",
+      "intent": {"change_kind": "change_data_source", "target_task_id": "task_history", "target_widget_id": "w_history", "target_query_id": "q_history", "requested_source_table": "integrated_history"}
+    },
+
+    {
+      "id": "eval-add-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0/information_requirements/2",
+      "source_status": "draft",
+      "source_note": "身体測定日を基本情報へ追加する合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "requested_field": "measurement_date"}
+    },
+    {
+      "id": "eval-add-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/2/information_requirements/1",
+      "source_status": "draft",
+      "source_note": "飲酒量を生活歴へ追加する合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_lifestyle", "target_widget_id": "w_lifestyle", "target_query_id": "q_lifestyle", "requested_field": "alcohol_amount"}
+    },
+    {
+      "id": "eval-add-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/3/information_requirements/2",
+      "source_status": "draft",
+      "source_note": "輸血歴を既往歴へ追加する合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_history", "target_widget_id": "w_history", "target_query_id": "q_history", "requested_field": "transfusion_history"}
+    },
+    {
+      "id": "eval-add-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5/information_requirements/1",
+      "source_status": "draft",
+      "source_note": "麻酔合併症を麻酔歴へ追加する合成更新要求。",
+      "intent": {"change_kind": "add_information", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_field": "anesthesia_complications"}
+    },
+
+    {
+      "id": "eval-time-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/4/information_requirements/0/time_window",
+      "source_status": "draft",
+      "source_note": "検査を直近2週間へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_tests", "target_widget_id": "w_labs", "target_query_id": "q_labs", "requested_time_window_days": 14}
+    },
+    {
+      "id": "eval-time-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/2",
+      "source_status": "draft",
+      "source_note": "生活歴を直近3か月へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_lifestyle", "target_widget_id": "w_lifestyle", "target_query_id": "q_lifestyle", "requested_time_window_days": 90}
+    },
+    {
+      "id": "eval-time-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/3",
+      "source_status": "draft",
+      "source_note": "既往歴を直近2年へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_history", "target_widget_id": "w_history", "target_query_id": "q_history", "requested_time_window_days": 730}
+    },
+    {
+      "id": "eval-time-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5/information_requirements/0/time_window",
+      "source_status": "draft",
+      "source_note": "麻酔歴を直近2年へ絞る合成更新要求。",
+      "intent": {"change_kind": "narrow_time_window", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_time_window_days": 730}
+    },
+
+    {
+      "id": "eval-visual-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0",
+      "source_status": "draft",
+      "source_note": "基本属性をカード表示に保つ更新経路を検証する合成要求。",
+      "intent": {"change_kind": "change_visualization", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "requested_widget_kind": "table"}
+    },
+    {
+      "id": "eval-visual-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/4",
+      "source_status": "draft",
+      "source_note": "検査値を推移表示へ変える合成更新要求。",
+      "intent": {"change_kind": "change_visualization", "target_task_id": "task_tests", "target_widget_id": "w_labs", "target_query_id": "q_labs", "requested_widget_kind": "line_chart"}
+    },
+    {
+      "id": "eval-visual-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/6",
+      "source_status": "draft",
+      "source_note": "リスク一覧をカード表示へ変える合成更新要求。",
+      "intent": {"change_kind": "change_visualization", "target_task_id": "task_risk", "target_widget_id": "w_risk", "target_query_id": "q_risk", "requested_widget_kind": "cards"}
+    },
+    {
+      "id": "eval-visual-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5",
+      "source_status": "draft",
+      "source_note": "麻酔歴を文章表示へ変える合成更新要求。",
+      "intent": {"change_kind": "change_visualization", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_widget_kind": "text"}
+    },
+
+    {
+      "id": "eval-regroup-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0",
+      "source_status": "draft",
+      "source_note": "基本情報をリスク確認タブへまとめる合成更新要求。",
+      "intent": {"change_kind": "regroup_display", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "destination_task_id": "task_risk"}
+    },
+    {
+      "id": "eval-regroup-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/2",
+      "source_status": "draft",
+      "source_note": "生活歴を既往歴の確認へまとめる合成更新要求。",
+      "intent": {"change_kind": "regroup_display", "target_task_id": "task_lifestyle", "target_widget_id": "w_lifestyle", "target_query_id": "q_lifestyle", "destination_task_id": "task_history"}
+    },
+    {
+      "id": "eval-regroup-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5",
+      "source_status": "draft",
+      "source_note": "麻酔歴を既往歴の確認へまとめる合成更新要求。",
+      "intent": {"change_kind": "regroup_display", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "destination_task_id": "task_history"}
+    },
+    {
+      "id": "eval-regroup-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/6",
+      "source_status": "draft",
+      "source_note": "リスク表示を手術確認へまとめる合成更新要求。",
+      "intent": {"change_kind": "regroup_display", "target_task_id": "task_risk", "target_widget_id": "w_risk", "target_query_id": "q_risk", "destination_task_id": "task_surgery"}
+    },
+
+    {
+      "id": "eval-label-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0",
+      "source_status": "draft",
+      "source_note": "基本情報の見出しを確認内容へ合わせる合成更新要求。",
+      "intent": {"change_kind": "relabel_widget", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "requested_title": "基本属性と身体測定"}
+    },
+    {
+      "id": "eval-label-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/1",
+      "source_status": "draft",
+      "source_note": "手術の見出しを確認内容へ合わせる合成更新要求。",
+      "intent": {"change_kind": "relabel_widget", "target_task_id": "task_surgery", "target_widget_id": "w_surgery", "target_query_id": "q_surgery", "requested_title": "術式・時間・体位"}
+    },
+    {
+      "id": "eval-label-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/3",
+      "source_status": "draft",
+      "source_note": "既往歴の見出しを確認内容へ合わせる合成更新要求。",
+      "intent": {"change_kind": "relabel_widget", "target_task_id": "task_history", "target_widget_id": "w_history", "target_query_id": "q_history", "requested_title": "既往歴・内服・手術歴"}
+    },
+    {
+      "id": "eval-label-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5",
+      "source_status": "draft",
+      "source_note": "麻酔歴の見出しを確認内容へ合わせる合成更新要求。",
+      "intent": {"change_kind": "relabel_widget", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_title": "麻酔歴と合併症"}
+    },
+
+    {
+      "id": "eval-source-01",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/0/information_requirements/0/source_systems",
+      "source_status": "draft",
+      "source_note": "基本情報を患者サマリへ切り替える合成更新要求。",
+      "intent": {"change_kind": "change_data_source", "target_task_id": "task_basic", "target_widget_id": "w_basic", "target_query_id": "q_basic", "requested_source_table": "patient_summary"}
+    },
+    {
+      "id": "eval-source-02",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/1/information_requirements/0/source_systems",
+      "source_status": "draft",
+      "source_note": "手術予定を手術台帳へ切り替える合成更新要求。",
+      "intent": {"change_kind": "change_data_source", "target_task_id": "task_surgery", "target_widget_id": "w_surgery", "target_query_id": "q_surgery", "requested_source_table": "surgical_registry"}
+    },
+    {
+      "id": "eval-source-03",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/4/information_requirements/0/source_systems",
+      "source_status": "draft",
+      "source_note": "検査結果を診断結果テーブルへ切り替える合成更新要求。",
+      "intent": {"change_kind": "change_data_source", "target_task_id": "task_tests", "target_widget_id": "w_labs", "target_query_id": "q_labs", "requested_source_table": "diagnostic_results"}
+    },
+    {
+      "id": "eval-source-04",
+      "split": "evaluation",
+      "source_reference": "data/evaluation/ito_clinical_tasks.v1.json#/tasks/5/information_requirements/0/source_systems",
+      "source_status": "draft",
+      "source_note": "麻酔歴を麻酔記録保管庫へ切り替える合成更新要求。",
+      "intent": {"change_kind": "change_data_source", "target_task_id": "task_anesthesia", "target_widget_id": "w_anesthesia", "target_query_id": "q_anesthesia", "requested_source_table": "anesthesia_archive"}
+    }
+  ],
+  "sequences": [
+    {
+      "id": "dev-sequence-01",
+      "split": "development",
+      "steps": [
+        {"case_id": "dev-add-basic", "faults": []},
+        {"case_id": "dev-visual-labs", "faults": []},
+        {"case_id": "dev-label-surgery", "faults": ["traceability_break"]}
+      ]
+    },
+    {
+      "id": "dev-sequence-02",
+      "split": "development",
+      "steps": [
+        {"case_id": "dev-time-history", "faults": []},
+        {"case_id": "dev-source-history", "faults": []},
+        {"case_id": "dev-regroup-lifestyle", "faults": ["safety_violation"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-01",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-add-01", "faults": []},
+        {"case_id": "eval-time-01", "faults": []},
+        {"case_id": "eval-label-02", "faults": ["out_of_scope_mutation"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-02",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-visual-01", "faults": []},
+        {"case_id": "eval-add-02", "faults": []},
+        {"case_id": "eval-source-01", "faults": ["safety_violation"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-03",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-label-03", "faults": []},
+        {"case_id": "eval-time-04", "faults": []},
+        {"case_id": "eval-regroup-04", "faults": ["traceability_break"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-04",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-source-03", "faults": []},
+        {"case_id": "eval-visual-04", "faults": []},
+        {"case_id": "eval-add-03", "faults": ["execution_failure"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-05",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-regroup-02", "faults": []},
+        {"case_id": "eval-label-01", "faults": []},
+        {"case_id": "eval-time-02", "faults": ["out_of_scope_mutation"]}
+      ]
+    },
+    {
+      "id": "eval-sequence-06",
+      "split": "evaluation",
+      "steps": [
+        {"case_id": "eval-source-04", "faults": []},
+        {"case_id": "eval-add-04", "faults": []},
+        {"case_id": "eval-visual-03", "faults": ["safety_violation"]}
+      ]
+    }
+  ]
+}
