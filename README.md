@@ -112,7 +112,7 @@ npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
 ```
 
 共有テーマは `slides/theme/research.css` です。Markdown、テーマ、使用画像、最終PDFをGitで管理します。
-2026年8月14日の資料は、監査可能な臨床UI更新の研究質問、評価設計、ゼミでの相談事項を説明します。
+2026年8月14日の資料は、監査可能な臨床UI更新の研究質問を組み立てた議論、評価設計、ゼミでの相談事項を説明します。
 
 ## モデル生成
 
