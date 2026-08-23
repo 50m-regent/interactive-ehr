@@ -82,23 +82,37 @@ uv run --with-editable . python -m streamlit run src/interactive_ehr/app.py
 
 依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。閉域内に Gemini プロキシがある場合は `-e GEMINI_PROXY_URL=...` を付けて起動するとタスクグラフ生成も利用できます（上記「閉域ネットワーク向けプロキシモード」参照）。
 
-### 1. ビルド（ネット接続のある環境で）
+### 1. Linux AMD64イメージをビルド（ネット接続のある環境で）
 
 ```bash
-docker build -t interactive-ehr:latest .
+docker buildx build \
+  --platform linux/amd64 \
+  --load \
+  -t interactive-ehr:2026-08-24-ui \
+  -t interactive-ehr:latest \
+  .
 ```
 
 ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。
+イメージに入るのは合成データだけです。院内DWHは院内環境でバックアップと整合性確認を行ってから反映します。
 
 ### 2. オフライン環境へ転送
 
 ```bash
-# ネット接続環境でイメージをtarに保存
-docker save interactive-ehr:latest -o interactive-ehr-image.tar
+# ネット接続環境で圧縮イメージとチェックサムを作成
+mkdir -p dist
+docker save interactive-ehr:2026-08-24-ui interactive-ehr:latest \
+  | gzip -n > dist/interactive-ehr-amd64-20260824.tar.gz
+cd dist
+shasum -a 256 interactive-ehr-amd64-20260824.tar.gz \
+  > interactive-ehr-amd64-20260824.tar.gz.sha256
 
-# 非接続環境へtarを持ち込み、ロード
-docker load -i interactive-ehr-image.tar
+# 非接続環境へ2ファイルを持ち込み、検証してロード
+sha256sum -c interactive-ehr-amd64-20260824.tar.gz.sha256
+docker load -i interactive-ehr-amd64-20260824.tar.gz
 ```
+
+稼働中の院内DWHを保持したままUIだけを更新する手順は `DEPLOY.md` にあります。
 
 ### 3. 起動
 
@@ -134,7 +148,7 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 ## 発表資料
 
-医師向けのUI生成システムデモ資料は `slides/2026-08-24/` にあります。
+Research Meeting資料は `slides/2026-08-24/` にあります。
 Markdownを編集した後は、次のコマンドで検査とPDF出力を行います。
 
 ```bash
@@ -211,8 +225,10 @@ data/scenarios/
   ito.json                -- 麻酔科術前外来の初期表示ScenarioGraph
 
 slides/
-  2026-08-24/             -- 医師向けUI生成システムデモ資料と画面画像
+  2026-08-24/             -- Research Meeting資料と画面画像
   theme/                  -- Marp共通テーマ
+
+dist/                     -- Git管理しないDocker配布物
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
