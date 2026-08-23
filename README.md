@@ -148,7 +148,7 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 ## 発表資料
 
-Research Meeting資料は `slides/2026-08-24/` にあります。
+Research Meeting資料は `slides/2026-08-24/` にあります。日本語版は `slides.md`、英語版は `slides.en.md` です。
 Markdownを編集した後は、次のコマンドで検査とPDF出力を行います。
 
 ```bash
@@ -157,6 +157,8 @@ npm ci
 npm test
 npm run check -- 2026-08-24/slides.md
 npm run build -- 2026-08-24/slides.md -o 2026-08-24/slides.pdf
+npm run check -- 2026-08-24/slides.en.md
+npm run build -- 2026-08-24/slides.en.md -o 2026-08-24/slides.en.pdf
 ```
 
 ## モデル生成
