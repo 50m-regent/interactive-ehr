@@ -132,6 +132,19 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
+## 発表資料
+
+医師向けのUI生成システムデモ資料は `slides/2026-08-24/` にあります。
+Markdownを編集した後は、次のコマンドで検査とPDF出力を行います。
+
+```bash
+cd slides
+npm ci
+npm test
+npm run check -- 2026-08-24/slides.md
+npm run build -- 2026-08-24/slides.md -o 2026-08-24/slides.pdf
+```
+
 ## モデル生成
 
 DWHテーブル設計書（`data/dwh_table_design_2025-11-01.xlsx`）からPydanticモデルを自動生成:
@@ -196,6 +209,10 @@ data/evaluation/
   ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
 data/scenarios/
   ito.json                -- 麻酔科術前外来の初期表示ScenarioGraph
+
+slides/
+  2026-08-24/             -- 医師向けUI生成システムデモ資料と画面画像
+  theme/                  -- Marp共通テーマ
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成

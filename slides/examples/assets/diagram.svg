@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
+  <title id="title">タスクに基づくUI生成の構成図</title>
+  <desc id="description">ユーザ入力からタスク認識、データ収集、UI生成へ進む構成図</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#224466"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="560" fill="#ffffff"/>
+  <g font-family="Arial, Hiragino Sans, sans-serif" font-weight="700">
+    <rect x="40" y="170" width="190" height="110" rx="10" fill="#ffffff" stroke="#224466" stroke-width="3"/>
+    <text x="135" y="217" text-anchor="middle" font-size="28" fill="#224466">ユーザ入力</text>
+    <text x="135" y="250" text-anchor="middle" font-size="20" fill="#000000">文章・操作</text>
+
+    <rect x="315" y="110" width="250" height="150" rx="10" fill="#dfefff" stroke="#224466" stroke-width="3"/>
+    <rect x="335" y="88" width="126" height="34" rx="7" fill="#224466"/>
+    <text x="398" y="112" text-anchor="middle" font-size="18" fill="#ffffff">タスク認識</text>
+    <text x="440" y="180" text-anchor="middle" font-size="25" fill="#224466">目的を構造化</text>
+
+    <rect x="315" y="340" width="250" height="150" rx="10" fill="#e7f7e7" stroke="#224466" stroke-width="3"/>
+    <rect x="335" y="318" width="126" height="34" rx="7" fill="#224466"/>
+    <text x="398" y="342" text-anchor="middle" font-size="18" fill="#ffffff">データ収集</text>
+    <text x="440" y="410" text-anchor="middle" font-size="25" fill="#224466">記録を取得</text>
+
+    <rect x="690" y="170" width="270" height="150" rx="10" fill="#dfefff" stroke="#224466" stroke-width="3"/>
+    <rect x="710" y="148" width="106" height="34" rx="7" fill="#224466"/>
+    <text x="763" y="172" text-anchor="middle" font-size="18" fill="#ffffff">UI生成</text>
+    <text x="825" y="238" text-anchor="middle" font-size="25" fill="#224466">表示を選択</text>
+    <text x="825" y="274" text-anchor="middle" font-size="20" fill="#000000">一覧・時系列</text>
+
+    <rect x="1030" y="190" width="130" height="110" rx="10" fill="#ffffff" stroke="#e03e1a" stroke-width="3"/>
+    <text x="1095" y="238" text-anchor="middle" font-size="28" fill="#e03e1a">UI</text>
+    <text x="1095" y="270" text-anchor="middle" font-size="18" fill="#000000">必要情報</text>
+  </g>
+  <g fill="none" stroke="#224466" stroke-width="5" marker-end="url(#arrow)">
+    <path d="M230 225 H305"/>
+    <path d="M440 260 V330"/>
+    <path d="M565 185 H680"/>
+    <path d="M565 415 H620 Q660 415 660 375 V310 Q660 245 680 245"/>
+    <path d="M960 245 H1020"/>
+  </g>
+</svg>
