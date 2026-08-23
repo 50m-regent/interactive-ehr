@@ -154,7 +154,7 @@ def test_render_scenario_graph_shows_chart_widget_title(
     render_widget_mock.assert_called_once()
 
 
-def test_render_scenario_graph_renders_task_description(
+def test_render_scenario_graph_does_not_render_task_description(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     fake = FakeStreamlit()
@@ -168,15 +168,14 @@ def test_render_scenario_graph_renders_task_description(
             TaskNode(
                 id="task_1",
                 title="確認",
-                description="このタスクで確認する内容を表示する。",
+                description="生成処理へ渡すタスクの説明。",
             )
         ],
     )
 
     render_scenario_graph(graph, {})
 
-    markdown_calls = [call.args[0] for call in fake.calls if call.name == "markdown"]
-    assert markdown_calls == ["このタスクで確認する内容を表示する。"]
+    assert "markdown" not in [call.name for call in fake.calls]
 
 
 def test_render_scenario_graph_warns_for_missing_references(

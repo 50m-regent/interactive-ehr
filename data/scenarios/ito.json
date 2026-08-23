@@ -84,7 +84,7 @@
           "title": null,
           "widget": {
             "widget_type": "markdown",
-            "body": "---\n### 既往歴と治療内容の確認"
+            "body": "---"
           },
           "data_nodes": []
         },
@@ -157,7 +157,7 @@
           "title": null,
           "widget": {
             "widget_type": "markdown",
-            "body": "---\n### 麻酔歴の確認"
+            "body": "---"
           },
           "data_nodes": []
         },
@@ -250,15 +250,6 @@
       "order": 3,
       "widgets": [
         {
-          "id": "widget_8",
-          "title": null,
-          "widget": {
-            "widget_type": "markdown",
-            "body": "### 最新検査値"
-          },
-          "data_nodes": []
-        },
-        {
           "id": "widget_9",
           "title": "最新検査値一覧",
           "widget": {
@@ -294,7 +285,7 @@
           "title": null,
           "widget": {
             "widget_type": "markdown",
-            "body": "### 検査値推移\n血算と腎機能・電解質は単位・尺度が異なるため個別表示し、同じ単位で比較できるAST・ALTのみ同一グラフに表示します。"
+            "body": "---"
           },
           "data_nodes": []
         },

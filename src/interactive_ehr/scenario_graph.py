@@ -222,7 +222,7 @@ def render_scenario_graph(
                 ),
                 context,
             )
-            _render_task_context(task, summaries)
+            _render_task_source_summary(summaries)
             for widget_node in task.widgets:
                 if show_missing_reference_warnings:
                     _warn_for_data_references(widget_node, context)
@@ -530,14 +530,11 @@ def _render_widget_title(widget_node: WidgetNode) -> None:
     st.markdown(f"#### {widget_node.title}")
 
 
-def _render_task_context(
-    task: TaskNode,
+def _render_task_source_summary(
     summaries: list[DataProvenanceSummary],
 ) -> None:
-    """タスクの目的と主要な情報源をタブ上部へ表示する。"""
+    """主要な情報源と最終データ日時をタブ上部へ表示する。"""
 
-    if task.description is not None:
-        st.markdown(task.description)
     if not summaries:
         return
     source_text, latest_text = source_overview(summaries)
@@ -550,9 +547,6 @@ def _render_provenance_panel(summaries: list[DataProvenanceSummary]) -> None:
     if not summaries:
         return
     with st.expander("情報源と取得条件", expanded=False):
-        st.caption(
-            "表示内容ごとの情報源、最終データ日時、件数、欠損状態を確認できます。"
-        )
         st.dataframe(
             [summary.as_row() for summary in summaries],
             hide_index=True,
@@ -562,9 +556,6 @@ def _render_provenance_panel(summaries: list[DataProvenanceSummary]) -> None:
         if not sql_summaries:
             return
         st.markdown("##### 取得SQL")
-        st.caption(
-            "ローカルDWHへ実行した読み取り専用SQLです。患者の表示値はJSONへ埋め込んでいません。"
-        )
         for summary in sql_summaries:
             st.markdown(f"{summary.description}")
             st.code(summary.sql, language="sql", wrap_lines=True)

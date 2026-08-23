@@ -85,7 +85,6 @@ def _render_sidebar(preview_container: Any) -> None:
     """デモ選択と折りたたんだUI編集ツールをサイドバーへ表示する。"""
 
     st.sidebar.markdown("## Interactive EHR")
-    st.sidebar.caption("研究用の合成症例デモ")
     selected_sample = st.sidebar.selectbox(
         "表示するシナリオ",
         list(SAMPLE_FACTORIES),
@@ -93,9 +92,6 @@ def _render_sidebar(preview_container: Any) -> None:
     )
     if selected_sample != st.session_state[CURRENT_SAMPLE_STATE_KEY]:
         _reset_to_sample(selected_sample)
-    st.sidebar.caption(
-        "診療画面では患者文脈と情報源を優先して表示します。生成・編集機能は下にまとめています。"
-    )
 
     with st.sidebar.expander("UI生成・編集ツール", expanded=False):
         _render_graph_editor(preview_container)
@@ -105,9 +101,7 @@ def _render_graph_editor(preview_container: Any) -> None:
     """Gemini生成とScenarioGraph JSON編集の操作を表示する。"""
 
     st.markdown("#### Geminiで画面構成を更新")
-    st.caption(
-        "合成データの表示コンテキストが設定済みのGemini接続先へ送信されます。"
-    )
+    st.caption("送信対象: 合成データのみ")
     with st.form("prompt_form", clear_on_submit=False):
         prompt = st.text_area(
             "変更内容",
@@ -121,7 +115,7 @@ def _render_graph_editor(preview_container: Any) -> None:
 
     st.divider()
     st.markdown("#### ScenarioGraph JSON")
-    st.caption("有効なJSONだけを診療画面へ反映します。表示値はJSONに含みません。")
+    st.caption("表示値はJSONに含みません。")
     button_columns = st.columns(2)
     with button_columns[0]:
         reset_clicked = st.button("デモへ戻す", use_container_width=True)
@@ -294,15 +288,12 @@ def _render_clinical_header(
     origin_label = GRAPH_ORIGIN_LABELS.get(origin, "不明")
     loaded_at = st.session_state.get(LOADED_AT_STATE_KEY, _now())
     loaded_at_text = loaded_at.strftime("%Y-%m-%d %H:%M")
-    description = graph.description or "診療タスクに必要な情報をまとめて表示します。"
-
     st.markdown(
         f"""
         <section class="clinical-header" aria-label="患者と診療場面">
             <div class="clinical-eyebrow">INTERACTIVE EHR</div>
             <h1>{escape(graph.title)}</h1>
             <div class="patient-context">{escape(patient_summary)}</div>
-            <p>{escape(description)}</p>
         </section>
         <section class="trust-strip" aria-label="データの状態">
             <span class="trust-badge">研究用・合成データ</span>
@@ -371,11 +362,6 @@ def _inject_clinical_styles() -> None:
             letter-spacing: -0.02em;
             line-height: 1.2;
             margin: 0;
-        }
-        .clinical-header p {
-            color: #56666e;
-            font-size: 0.9rem;
-            margin: 0.4rem 0 0;
         }
         .patient-context {
             color: #263b44;
@@ -450,14 +436,23 @@ def _inject_clinical_styles() -> None:
             border-radius: 10px;
         }
         section[data-testid="stMain"] [role="tablist"] {
-            gap: 0.25rem;
+            gap: 0.6rem;
+            overflow-x: auto;
+            padding: 0.15rem 0 0;
         }
         section[data-testid="stMain"] button[role="tab"] {
+            background: #e7edef;
+            border: 1px solid #d3dfe2;
+            border-radius: 8px 8px 0 0;
             color: #4b5f68;
             font-weight: 650;
             min-height: 2.75rem;
+            padding: 0.55rem 1rem;
+            white-space: nowrap;
         }
         section[data-testid="stMain"] button[role="tab"][aria-selected="true"] {
+            background: #ffffff;
+            border-color: #78aaa7;
             color: #087f7a;
         }
         section[data-testid="stMain"] h4 {
