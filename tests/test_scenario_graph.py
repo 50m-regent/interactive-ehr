@@ -10,7 +10,10 @@ import pytest
 from pydantic import ValidationError
 
 import interactive_ehr.scenario_graph as scenario_graph
-from interactive_ehr.sample_scenarios import get_chronic_disease_graph_scenario
+from interactive_ehr.sample_scenarios import (
+    get_anesthesia_preop_graph_scenario,
+    get_chronic_disease_graph_scenario,
+)
 from interactive_ehr.scenario_graph import (
     DataNode,
     DataNodeGenerationPlan,
@@ -30,7 +33,13 @@ from interactive_ehr.scenario_graph import (
     render_scenario_graph,
     update_scenario_graph_incrementally,
 )
-from interactive_ehr.widgets import LineChartSpec, MarkdownSpec, TableSpec, WidgetType
+from interactive_ehr.widgets import (
+    DataframeSpec,
+    LineChartSpec,
+    MarkdownSpec,
+    TableSpec,
+    WidgetType,
+)
 from tests.test_renderer import FakeContainer, FakeStreamlit
 
 
@@ -145,7 +154,7 @@ def test_render_scenario_graph_shows_chart_widget_title(
     render_widget_mock.assert_called_once()
 
 
-def test_render_scenario_graph_does_not_render_task_description(
+def test_render_scenario_graph_renders_task_description(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     fake = FakeStreamlit()
@@ -159,14 +168,15 @@ def test_render_scenario_graph_does_not_render_task_description(
             TaskNode(
                 id="task_1",
                 title="確認",
-                description="このタスクの説明文は電子カルテ画面には表示しない。",
+                description="このタスクで確認する内容を表示する。",
             )
         ],
     )
 
     render_scenario_graph(graph, {})
 
-    assert "caption" not in [call.name for call in fake.calls]
+    markdown_calls = [call.args[0] for call in fake.calls if call.name == "markdown"]
+    assert markdown_calls == ["このタスクで確認する内容を表示する。"]
 
 
 def test_render_scenario_graph_warns_for_missing_references(
@@ -247,7 +257,8 @@ def test_render_scenario_graph_can_suppress_missing_reference_warnings(
         show_missing_reference_warnings=False,
     )
 
-    assert [call.name for call in fake.calls] == ["tabs"]
+    assert "warning" not in [call.name for call in fake.calls]
+    assert "expander" in [call.name for call in fake.calls]
     render_widget_mock.assert_called_once()
 
 
@@ -265,6 +276,7 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
     validated = ScenarioGraph.model_validate(graph.model_dump(mode="json"))
 
     assert validated.id == "chronic_disease_outpatient"
+    assert validated.patient_context_key == "metric_patient_profile"
     assert [task.title for task in validated.tasks] == [
         "血圧・腎機能評価",
         "副作用・服薬確認",
@@ -274,6 +286,28 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
     assert "chart_bp_trend" in context
     assert "metric_latest_egfr" in context
     assert "metric_patient_material" in context
+
+
+def test_anesthesia_preop_scenario_has_patient_header_and_compact_tables(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """麻酔科デモが患者ヘッダーとスクロール可能な表を持つ。"""
+
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"値": ["sample"]})),
+    )
+
+    graph, context = get_anesthesia_preop_graph_scenario()
+
+    assert graph.patient_context_key == "header_patient_identity"
+    assert "header_patient_identity" in context
+    assert all(
+        isinstance(widget_node.widget, DataframeSpec)
+        for widget_node in graph.widget_nodes
+        if widget_node.id in {"widget_3", "widget_4", "widget_6", "widget_7", "widget_9"}
+    )
 
 
 def test_generate_scenario_graph_passes_schema_and_context_keys(

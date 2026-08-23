@@ -6,9 +6,11 @@
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
-現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
+現在は麻酔科術前外来と慢性疾患外来の合成サンプルをStreamlit上で切り替えて表示できます。初期表示は麻酔科術前外来です。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
 
-UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
+診療画面の上部には患者文脈、合成データであること、画面構成の作成元、画面更新時刻を表示します。各タスクには情報源と最終データ日時の要約があり、「情報源と取得条件」を開くと件数、欠損状態、参照テーブル、読み取り専用SQLを確認できます。表示値とGeminiが生成する画面構成を区別して確認できる設計です。
+
+UIは `ScenarioGraph` JSON から描画されます。サイドバーは初期状態で閉じています。サイドバーの「UI生成・編集ツール」を開くと、Geminiによる画面構成の更新とScenarioGraph JSONの編集ができます。有効なJSONだけを診療画面へ反映し、検証エラーがある場合は最後に有効だった画面を描画し続けます。
 
 折れ線グラフは、日付や数値を横軸の値に応じた間隔で表示します。線上には実測点を示すドットを重ね、マウスを合わせると日付、系列、値を確認できます。
 
@@ -38,7 +40,7 @@ uv run python scripts/audit_evaluation_case_manifest.py \
 
 ```bash
 uv sync
-uv run python scripts/build_dwh_database.py --overwrite
+uv run --with-editable . python scripts/build_dwh_database.py --overwrite
 ```
 
 ### Gemini API (Vertex AI) の認証設定
@@ -71,10 +73,10 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 ## 起動
 
 ```bash
-uv run streamlit run src/interactive_ehr/app.py
+uv run --with-editable . python -m streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
+サイドバーの「UI生成・編集ツール」では、入力した変更内容から `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
 
 ## Docker（インターネット非接続環境での実行）
 
@@ -123,9 +125,9 @@ docker exec -it interactive-ehr nano /app/src/interactive_ehr/app.py
 ## テスト
 
 ```bash
-uv run pytest tests/ -v
+uv run --with-editable . python -m pytest tests/ -v
 uv run ruff check .
-uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
+uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/provenance.py src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
 ```
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
@@ -153,7 +155,7 @@ uv run python scripts/generate_fake_csvs.py
 `data/dwh/*.csv` と慢性疾患外来用の合成サンプルを `data/dwh.sqlite` に読み込みます。アプリの表示データはこのDBへのSELECT SQLから取得します。
 
 ```bash
-uv run python scripts/build_dwh_database.py --overwrite
+uv run --with-editable . python scripts/build_dwh_database.py --overwrite
 ```
 
 DBファイルは生成物です。CSVを更新した場合は、上記コマンドでDBを再生成してください。
@@ -163,6 +165,7 @@ DBファイルは生成物です。CSVを更新した場合は、上記コマン
 ```
 src/interactive_ehr/
   app.py                  -- Streamlitエントリポイント
+  provenance.py           -- 情報源、データ時点、件数、欠損状態の表示用要約
   scenario_graph.py       -- タスクグラフモデル、JSONパース、Graphレンダラ、Gemini生成
   sample_scenarios.py     -- 固定サンプルデータ、ScenarioGraph、WidgetSpec互換API
   models/
@@ -191,6 +194,8 @@ src/interactive_ehr/
 data/evaluation/
   ito_clinical_tasks.v1.json -- 麻酔科術前外来T1〜T7のdraft基準モデル
   ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
+data/scenarios/
+  ito.json                -- 麻酔科術前外来の初期表示ScenarioGraph
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
