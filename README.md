@@ -108,6 +108,68 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
+## TraceBench-EHRの正式技術評価
+
+`data/evaluation/tracebench_ehr.v1.json` は、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を用いる正式技術評価v1.1の条件を固定します。実装は `src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は `src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は `scripts/run_tracebench_ehr.py` です。Geminiや外部モデルは使用しません。
+
+評価対象の不整合は次の8種類です。
+
+- 対象患者
+- 対象項目
+- 期間
+- 集約方法
+- 情報源
+- 結果とWidgetの表示方式
+- DataNodeとWidgetの接続
+- SQL更新後に古い実行結果が残る部分更新
+
+結果とWidgetの表示方式は、基準がMetricならDataframeへ、DataframeならTableへ変えます。SQL、実行結果、列、結果値は維持し、描画可能な表示方式と基準契約の対応だけを壊します。v1.0で予定していた列順の変異は、validationで成功したSQL結果がすべて1列だったため使いません。
+
+各候補へ次の4条件を適用します。
+
+- 局所検査
+- 成果物ごとの契約
+- 質問からWidgetまでの対応を持つグラフ契約
+- グラフと同じ契約内容を持つ平坦なサイドカー契約
+
+主要評価は、不整合の流出率と妥当な更新の受理率です。副次評価として、問題箇所の特定率、1回の契約ベース修復成功率、検証時間を測ります。条件間の対応差と95%信頼区間は、質問テンプレート単位のクラスターブートストラップ10,000回で求めます。
+
+2026年8月27日にvalidation全件でv1.1パイロットを実行しました。
+
+- 全1,163件のうち、正解SQLを持つ931件を対象にしました。
+- SQL実行と基準グラフ検証は924件で成功し、成功率は99.25%でした。
+- 758組、6,064回の候補検証を実行しました。
+- 各変異は34から133テンプレートあり、事前の下限である10テンプレートと30候補を満たしました。
+- オラクルと候補ラベルの不一致は0件でした。
+- グラフ契約とサイドカー契約の判定不一致は0件でした。
+- 質問文、SQL、患者ID、結果値を保存していないことを確認しました。
+
+このパイロットは評価コードを固定できるかを確認するための結果で、正式なtest結果ではありません。test分割は、評価コードと設定をcommitで固定した後に一度だけ実行します。
+
+validationパイロットの実行例は次のとおりです。
+
+```bash
+uv run python scripts/run_tracebench_ehr.py \
+  --split validation \
+  --annotated-data <EHRSQL-2024>/data/mimic_iv/valid/annotated.json \
+  --dataset-data <EHRSQL-2024>/data/mimic_iv/valid/data.json \
+  --database <EHRSQL-2024>/data/mimic_iv/mimic_iv.sqlite \
+  --config data/evaluation/tracebench_ehr.v1.json \
+  --code-commit <interactive-ehr commit SHA> \
+  --output-dir results/evaluation/tracebench_ehr_v1.1/validation
+```
+
+出力は次のとおりです。
+
+- `pair_manifest.jsonl` はケースID、変異種類、テンプレートと候補のチェックサムを記録します。
+- `candidate_results.jsonl` は候補と条件ごとの受理、特定、修復結果を記録します。
+- `build_summary.json` は基準実行、空結果、変異別の件数を記録します。
+- `summary.json` は主要評価、副次評価、変異別集計、95%信頼区間を記録します。
+- `report.md` はCHI原稿向けの短い結果要約です。
+- `run_manifest.json` は入力、コード、設定、出力のチェックサムを記録します。
+
+成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
+
 ## セットアップ
 
 ```bash

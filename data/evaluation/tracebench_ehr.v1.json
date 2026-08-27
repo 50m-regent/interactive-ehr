@@ -1,0 +1,48 @@
+{
+  "benchmark_id": "tracebench-ehr",
+  "benchmark_version": "1.1.0",
+  "dataset_commit": "f9e1aa02160d39e3f8df52bf5c69c5cf2e472499",
+  "dataset_repository": "https://github.com/glee4810/ehrsql-2024",
+  "dataset_version": "1.1.2",
+  "database_checksum": "a26a60261d7e3bbf1869ffd92efe1803abdbce3eb256a2883fc0439c63427796",
+  "input_checksums": {
+    "validation": {
+      "annotated.json": "9d6bd4d6cadb50975c1aabf0d1dfb9c183ed391dcf086d7c9958dec95ac46ccb",
+      "data.json": "eeccae3bd8ec96b1bf5ae7a1cb0e723c971a015a17ab57467bf9b027a24c3e62"
+    },
+    "test": {
+      "annotated.json": "f835acf43037d6857dd41a69e7716ed324ad899cd6abeb69be4743bd762d4f4d",
+      "data.json": "b141da1fd5fa7e7ba8179ce87528653daa8eaa68d5510662e7a65b51cc626b42"
+    }
+  },
+  "splits": {
+    "development": "train",
+    "pilot": "validation",
+    "main": "test"
+  },
+  "sample_seed": 20260827,
+  "bootstrap_iterations": 10000,
+  "query_timeout_seconds": 5.0,
+  "max_result_rows": 10000,
+  "minimum_baseline_success_rate": 0.95,
+  "minimum_templates_per_mutation": 10,
+  "minimum_candidates_per_mutation": 30,
+  "mutation_kinds": [
+    "patient",
+    "clinical_item",
+    "time_constraint",
+    "aggregation_operation",
+    "information_source",
+    "widget_mapping",
+    "data_widget_connection",
+    "stale_result"
+  ],
+  "validation_conditions": [
+    "local_checks",
+    "artifact_contracts",
+    "graph_contract",
+    "sidecar_contract"
+  ],
+  "interpretation_limit": "匿名化済みMIMIC-IV Demo上の決定的な技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価しない。",
+  "privacy_policy": "生データ、質問文、正解SQL、患者ID、患者単位の結果値を成果物へ保存しない。"
+}
