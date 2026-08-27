@@ -65,6 +65,36 @@ uv run --with-editable . python scripts/run_ui_update_benchmark.py
 
 現行v0.4は専門家確認前の合成更新要求と合成スキーマを使います。測定対象は構造的な依存関係保護です。臨床的安全性の評価、人を対象とした評価、Geminiを含むエンドツーエンド評価はまだ実施していません。
 
+## TraceBench-EHRの実行可能性確認
+
+CHI 2027向けのTraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行し、質問、SQL、実行結果、ScenarioGraph、Widgetを一つの追跡契約へ変換できるか確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
+
+`scripts/run_ehrsql_feasibility.py` は、train分割の回答可能ケースから異なる質問テンプレートを優先して50件を決定的に選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値をMetric、それ以外をDataframeへ割り当てた最小のScenarioGraphを検証します。Geminiは呼び出しません。
+
+外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のチェックサム、結果形状、実行成否、グラフ検証結果、実行マニフェストだけを保存します。
+
+実行例は次のとおりです。`--dataset-commit` と `--code-commit` には、実際に使用する完全なcommit SHAを指定します。
+
+```bash
+git clone --depth 1 https://github.com/glee4810/ehrsql-2024.git /private/tmp/ehrsql-2024
+uv run python scripts/run_ehrsql_feasibility.py \
+  --annotated-data /private/tmp/ehrsql-2024/data/mimic_iv/train/annotated.json \
+  --dataset-data /private/tmp/ehrsql-2024/data/mimic_iv/train/data.json \
+  --database /private/tmp/ehrsql-2024/data/mimic_iv/mimic_iv.sqlite \
+  --dataset-commit <EHRSQL-2024 commit SHA> \
+  --code-commit <interactive-ehr commit SHA>
+```
+
+結果は `results/evaluation/ehrsql_feasibility_v0.1/` に保存されます。
+
+- `selected_cases.json` は選定したケースIDと入力チェックサムを記録します。
+- `case_results.jsonl` は結果値を含まないケース別の実行成否と結果形状を記録します。
+- `summary.json` はSQL実行率、非空結果取得率、グラフ検証率を集計します。
+- `report.md` は実験結果の短い要約です。
+- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
+
+この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
+
 ## セットアップ
 
 ```bash
@@ -217,6 +247,7 @@ src/interactive_ehr/
   evaluation/
     benchmark_analysis.py -- UI更新ベンチマークの統計集計と成果物出力
     case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
+    ehrsql_feasibility.py -- EHRSQL-2024の選定、SQL実行、グラフ検証
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
     update_benchmark.py   -- 共通変更仕様、二方式の差分生成、検査、実行器
   pages/                  -- ページコンポーネント
@@ -232,6 +263,7 @@ scripts/
   build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
+  run_ehrsql_feasibility.py -- EHRSQL-2024の50件実行可能性確認
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
