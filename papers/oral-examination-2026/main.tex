@@ -1,0 +1,442 @@
+\documentclass[a4paper]{jsarticle}
+
+\usepackage[top=30truemm,bottom=27truemm,left=18truemm,right=18truemm,columnsep=7truemm]{geometry}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage[haranoaji]{pxchfon}
+\usepackage{newtxtext,newtxmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usepackage{url}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+
+\setlength{\columnsep}{7truemm}
+\setlength{\parindent}{1zw}
+\setlength{\parskip}{0pt}
+\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlist[itemize]{leftmargin=1.5zw,itemsep=0pt,topsep=2pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=2zw,itemsep=0pt,topsep=2pt,parsep=0pt}
+\pagestyle{empty}
+
+\makeatletter
+\renewcommand{\footnoterule}{}
+\renewcommand{\@makefntext}[1]{\noindent #1}
+\makeatother
+
+\titleformat{\section}
+  {\normalfont\fontsize{10.5pt}{16pt}\selectfont\bfseries}
+  {\thesection.}{0.6zw}{}
+\titlespacing*{\section}{0pt}{8pt plus 2pt minus 1pt}{2pt}
+\titleformat{\subsection}
+  {\normalfont\fontsize{10.5pt}{16pt}\selectfont\bfseries}
+  {\thesubsection}{0.6zw}{}
+\titlespacing*{\subsection}{0pt}{6pt plus 1pt minus 1pt}{1pt}
+
+\newcommand{\bodyfont}{\fontsize{10.5pt}{16pt}\selectfont}
+\newcommand{\titlefont}{\fontsize{12pt}{18pt}\selectfont}
+\newcommand{\authorfont}{\fontsize{10.5pt}{16pt}\selectfont}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\makeatletter
+\long\def\@makecaption#1#2{{\bodyfont
+  \advance\leftskip .0628\linewidth
+  \advance\rightskip .0628\linewidth
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{#1\hskip1zw\relax #2}%
+  \ifdim \wd\@tempboxa <\hsize \centering \fi
+  #1{\hskip1zw\relax}#2\par
+  \vskip\belowcaptionskip}}
+\makeatother
+
+\begin{document}
+\bodyfont
+
+\twocolumn[
+\begin{@twocolumnfalse}
+  \begin{center}
+    {\titlefont\bfseries 生成臨床UIの層間整合性を評価するTraceBench-EHR\par}
+    \vspace{2pt}
+    {\titlefont TraceBench-EHR: Evaluating Cross-Layer Integrity in Generated Clinical Interfaces\par}
+    \vspace{7pt}
+    {\authorfont 平田 蓮\par}
+    {\authorfont Ren Hirata\par}
+  \end{center}
+  \vspace{8pt}
+  \begin{center}
+  \begin{minipage}{160truemm}
+  \noindent\textbf{要旨}\quad
+  生成AIによる臨床ユーザーインターフェースの増分更新では、画面が描画でき、SQLが実行できても、臨床情報要求、SQL、実行結果、表示部品の対応が壊れる可能性がある。本研究は、EHRSQL-2024とMIMIC-IV Demoを基に、この層間不整合を決定的に生成・判定するTraceBench-EHRを構築する。8種類の不整合に対し、局所検査、成果物ごとの契約、グラフによる層間契約、同じ内容を持つ平坦な契約を比較し、検出、特定、修復の能力と限界を評価する。現在までに50件の実行可能性確認と予備的なUI更新評価を完了し、正式評価の比較条件と停止条件を定めた。\par
+  \end{minipage}
+  \end{center}
+  \vspace{11pt}
+\end{@twocolumnfalse}
+]
+
+\begingroup
+\renewcommand{\thefootnote}{}
+\footnotetext{\authorfont
+  医療情報学講座・医療情報学分野\par
+  （指導教員：黒田 知宏）}
+\endgroup
+
+\section{はじめに}
+
+電子カルテには、患者属性、入退院、検査、処方、処置など、診療で参照される情報が複数の表と画面に分かれて蓄積される。医療従事者が必要とする情報は診療場面と確認目的によって変わるため、同じ患者データであっても、表示すべき項目、期間、集約方法、提示形式は一意ではない。タスクに応じて画面を生成・更新する臨床ユーザーインターフェース（UI）は、この情報探索を支える一つの方法である。
+
+近年の生成UI研究では、自然言語からUIコードを直接作る方法に加え、タスクや意味を表す中間表現を介してUIを生成・編集する方法が提案されている。Jellyはタスク駆動データモデルを生成・更新し、そのモデルからUIを構成する\cite{cao2025jelly}。Bridging Gulfsは設計意図の意味表現を、人の入力と生成UIを結ぶ層として利用する\cite{park2026bridging}。SimStepは複数のグラフを用いて、生成結果の前提を人が段階的に確認・修正できるようにする\cite{kaputa2026simstep}。これらは、生成物の見た目だけでなく、意図と成果物の間に検査可能な表現を置く意義を示している。
+
+一方、臨床UIでは、画面がもっともらしく見えることだけでは十分でない。たとえば「対象患者の直近の腎機能を表示する」という要求に対し、SQLだけ別患者へ変わる、期間条件だけ外れる、SQL更新後に古い結果が残る、といった更新があり得る。各成果物を単独で見れば、SQLは読み取り専用で実行可能であり、結果は表形式で、Widgetも描画可能である。それでも、要求から表示までの対応は壊れている。このような誤りを本稿では\term{層間不整合}と呼ぶ。
+
+本研究は、生成された臨床UIの増分更新を対象に、臨床情報要求、SQL、実行結果、表示部品の対応を評価するTraceBench-EHRを構築する。EHRSQL-2024\cite{lee2024ehrsql}の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2\cite{johnson2023mimic}上で実行し、基準となる表示までを決定的に生成する。その上で、8種類の不整合を注入し、局所検査、成果物ごとの契約、グラフによる層間契約、同じ契約内容を持つ平坦なサイドカーを比較する。
+
+本稿の貢献は次の三点である。第一に、臨床情報要求から表示までを対象とする層間不整合の分類を定める。第二に、不整合を再現可能に生成し、実行可能な独立オラクルで採点するベンチマーク設計を示す。第三に、契約内容と保存形式を分けて比較し、検出だけでなく問題箇所の特定と一回の自動修復を評価する。臨床上の安全性、使いやすさ、認知負荷、臨床転帰は本評価の主張範囲に含めない。
+
+\section{関連研究}
+
+\subsection{生成・更新可能なUI}
+
+生成UIでは、利用者の要求から画面または実行可能なコードを作るだけでなく、生成後の変更をどう扱うかが課題となる。直接生成されたコードを局所的に変更すると、変更対象以外の状態、データ参照、表示規則が意図せず変わる可能性がある。Jellyは、利用者の情報タスクをデータモデルとして保持し、自然言語と直接操作をモデルの変更へ変換する\cite{cao2025jelly}。これにより、UIを作り直すたびにタスク構造が失われる問題へ対処する。
+
+意味中間表現を用いる研究では、利用者が生成モデルの解釈を確認しやすくすることが重視される。Bridging Gulfsは、製品、機能、デザインシステム、部品などの意味を階層的に構造化し、入力意図と出力UIの対応を提示する\cite{park2026bridging}。SimStepはConcept Graph、Scenario Graph、Learning Goal Graph、UI Graphを設け、人が各段階の仮定を修正する\cite{kaputa2026simstep}。本研究も中間表現を使うが、グラフを介すること自体を利点とみなさず、情報要求、データ取得、実行結果、表示の契約内容を評価対象にする。
+
+\subsection{EHRのText-to-SQL}
+
+EHRSQLは、医療従事者から収集した情報要求を基に、電子カルテを対象とする自然言語質問とSQLの組を提供する。EHRSQL-2024はMIMIC-IV Demoのスキーマに対応し、回答可能な質問と回答不能な質問を含む共有タスクとして整備された\cite{lee2024ehrsql}。Text-to-SQLの評価では、質問に対してSQLを正しく生成できるか、回答不能な質問で棄権できるかが中心となる。
+
+TraceBench-EHRはSQL生成モデルの性能を比較しない。正解SQLを基準として使用し、その実行結果をWidgetまで接続した後の増分更新を扱う。つまり、質問とSQLの一致に加えて、SQLと実行結果、実行結果と表示方式、更新後の各成果物の同期を検査する。EHRSQLを基盤にする理由は、質問テンプレート、SQL、公式のtrain・validation・test分割があり、更新候補と評価規則をtest結果を見る前に固定できるためである。
+
+\subsection{モデル変換と整合性検査}
+
+構造化データとビューの更新を対応付ける問題は、双方向変換でも扱われてきた。Lensの研究は、元データとビューの間の往復変換が満たすべき性質を定式化している\cite{foster2007lenses}。また、完全な正解出力を列挙しにくいモデル変換に対して、不変関係を用いるメタモルフィックテストが提案されている\cite{he2018metamorphic}。本研究では完成したJSONの完全一致を求めず、変更すべき内容と保持すべき内容を述語として表す。
+
+一般的なスキーマ検査や描画検査は必要であるが、これらは一つの成果物の妥当性を確認する。層間不整合の検出には、複数の成果物間で同じ患者、項目、期間、集約、接続が維持されたかを確認する必要がある。そこで本研究は、局所検査から層間契約までを同じ候補に適用し、検査範囲の違いを明示する。
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    node distance=4mm,
+    box/.style={draw,rounded corners=1.2mm,minimum width=18mm,minimum height=10mm,align=center,fill=gray!5},
+    arr/.style={-{Latex[length=2.2mm]},thick}
+  ]
+    \node[box] (q) {臨床情報\\要求};
+    \node[box,right=of q] (sql) {SQL};
+    \node[box,right=of sql] (res) {実行結果};
+    \node[box,right=of res] (wid) {Widget};
+    \draw[arr] (q) -- node[above]{対応} (sql);
+    \draw[arr] (sql) -- node[above]{実行} (res);
+    \draw[arr] (res) -- node[above]{列・値} (wid);
+    \node[draw,dashed,rounded corners,fit=(q)(sql)(res)(wid),inner sep=3mm,label=below:{層をまたぐ契約}] {};
+  \end{tikzpicture}}
+  \caption{TraceBench-EHRが検査する情報の流れ}
+  \label{fig:trace}
+\end{figure}
+
+\section{研究課題}
+
+本研究では、増分更新において最終画面や個別成果物の検査を通過する不整合を対象とする。研究質問を次のように定める。
+
+\begin{itemize}
+  \item RQ1：生成された臨床UIの増分更新では、局所検査を通過する層間不整合がどの種類で生じるか。
+  \item RQ2：局所検査、成果物ごとの契約、層間契約は、不正更新の検出、妥当更新の受理、問題箇所の特定でどのように異なるか。
+  \item RQ3：検証結果を用いた一回の自動修復は、どの不整合を回復でき、どの不整合で失敗または過剰拒否するか。
+\end{itemize}
+
+想定する仮説は、局所検査では対象患者や期間などの意味的な不整合が通過し、層間契約は不整合の流出を減らしつつ妥当な更新を受理する、というものである。ただし、グラフ契約と同じ情報を平坦なサイドカー契約にも持たせる。両者の差が、契約を持たない条件との差より小さければ、効果はグラフ形式ではなく契約内容に由来すると解釈する。
+
+\section{TraceBench-EHRの設計}
+
+\subsection{基準ケースの構築}
+
+入力はEHRSQL-2024の回答可能な質問と正解SQLである。回答不能ケースは、正解SQLから基準UIを構成できないため主評価から除外し、除外数を報告する。正解SQLは読み取り専用のSQLite接続でMIMIC-IV Demo v2.2へ実行する。SQLごとの実行上限は5秒とし、書き込みを含む文、複数文、許可しない構文は実行前に拒否する。
+
+実行結果が単一値の場合はMetric、表形式の場合はDataframeを割り当てる。基準ケースは、質問テンプレート、SQL、結果形状、DataNode、Widgetの対応を持つ。患者単位の値を契約へ埋め込まず、ケースID、入力チェックサム、結果形状、対応識別子を保存する。空結果は除外せず、列構造を持つDataframeとして扱う。
+
+同一の質問テンプレート内にあるケースを更新前後として組み合わせる。これにより、患者、項目、期間などの一部を変えた妥当な更新を作り、同じ基準から不整合候補を生成できる。複数の変異を独立標本として数えず、質問テンプレートを分析上のクラスタとする。
+
+\subsection{8種類の不整合}
+
+変異規則は表\ref{tab:mutations}の8種類である。各規則は一つの契約要素を壊し、それ以外の構造を保つ。複数の規則が同じ候補へ偶然混入しないよう、生成後に独立オラクルで検査する。
+
+\begin{table}[t]
+  \centering
+  \caption{TraceBench-EHRの不整合分類}
+  \label{tab:mutations}
+  \begin{tabular}{L{0.27\columnwidth}L{0.63\columnwidth}}
+    \toprule
+    種類 & 壊す対応 \\
+    \midrule
+    対象患者 & 要求とSQLが参照する患者 \\
+    対象項目 & 要求項目と取得列・集約対象 \\
+    期間 & 時点・期間条件とSQLの絞り込み \\
+    情報源 & 必要情報と参照表 \\
+    集約方法 & 件数、最大、最小、平均など \\
+    表示方式 & 結果形状とWidget種別 \\
+    接続 & DataNodeとWidgetの参照 \\
+    部分更新 & SQL更新後に残る古い結果 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+対象患者の変異では、要求側の患者を保ったままSQLの患者条件を別の候補へ変える。対象項目では、要求と異なる列または集約対象を取得する。期間では時間表現に対応するWHERE条件や並び順を壊す。情報源では同じような列名を持つ別表を参照させる。集約方法では、要求された最大値を件数へ変えるなど、SQLとして実行可能なまま意味を変える。
+
+表示方式の変異は、SQL、実行結果、列、値を保ち、MetricをDataframeへ、DataframeをTableへ変える。局所的には描画可能でも、基準契約が定めた結果形状と表示方式の対応が壊れる。接続の変異はWidgetが別のDataNodeを参照する。部分更新はSQLだけを新しい要求へ変更し、以前の実行結果を保持する。この変異により、各成果物が個別に妥当でも、更新の同期が失敗する状況を作る。
+
+\subsection{独立オラクル}
+
+候補生成と正解判定は別のコード経路にする。オラクルは、質問テンプレートから得た患者、項目、期間、情報源、集約と、SQLの解析結果、実行結果の形状、DataNodeとWidgetの参照を照合する。実行時検査の判定をそのまま正解ラベルとして使わない。候補の期待ラベルと独立オラクルが一致しない場合は、正式評価を停止する。
+
+完全なUI JSONの一致を正解としない理由は、意味を保った複数の表現を許容するためである。基準と異なる安定ID、表示文言、順序であっても、要求、データ、表示の意味条件を満たす候補は妥当とする。一方、見た目が同じでも別患者や古い結果を表示する候補は不整合とする。
+
+\subsection{候補と診断の例}
+
+基準ケースが「患者Aの直近24時間の検査Xを数値で表示する」である場合を考える。妥当な更新として患者Bへ対象を変更するなら、質問側の患者、SQLの患者条件、実行結果の世代、DataNodeとWidgetの参照を同じ更新として変更する必要がある。一つだけ古い状態に残れば、各成果物を単独では処理できても、更新全体として不整合になる。
+
+\begin{table}[t]
+  \centering
+  \setlength{\tabcolsep}{2.5pt}
+  \caption{候補更新と期待する診断の例}
+  \label{tab:diagnosis-examples}
+  \begin{tabular}{L{0.23\columnwidth}L{0.34\columnwidth}L{0.25\columnwidth}}
+    \toprule
+    候補 & 局所状態 & 層間診断 \\
+    \midrule
+    患者誤り & SQL実行可能 & 対象患者 \\
+    期間欠落 & SQL実行可能 & 期間 \\
+    結果残留 & 表示可能 & 更新世代 \\
+    参照誤り & 描画可能 & 接続 \\
+    表示変更 & 描画可能 & 表示方式 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+対象患者の候補では、SQL文自体が読み取り専用で、存在する患者を参照していれば局所検査を通過し得る。層間契約は、質問とSQLが指す患者の対応を検査し、対象患者の違反として特定する。期間の候補も同様に、時間条件を削除してもSQL構文と実行可能性は保たれるため、要求の時間表現との照合が必要になる。
+
+部分更新の候補では、更新後のSQLと更新前の実行結果がそれぞれ妥当な形式を持つ。そこで、SQLのチェックサムと実行結果へ付与した更新世代を対応させ、古い結果が残ったことを診断する。接続の候補では、参照先DataNodeが存在する限りWidgetを描画できる場合があるため、Taskから期待するDataNodeとWidgetの辺を検査する。
+
+これらの例では、問題箇所を単に「検証失敗」と返さず、対象患者、期間、更新世代、接続、表示方式のいずれが壊れたかを記録する。この診断単位を修復操作と対応させることで、検出できた候補のうち、期待値が一意に決まる不整合だけを一回の自動修復へ送る。
+
+\section{システム構成}
+
+提案システムはScenarioGraphを中心に、Scenario、Task、Data、Widgetのノードを持つ。Scenarioは診療場面、Taskは確認または判断準備、Dataは取得するEHR情報とSQL、Widgetは提示形式と配置を表す。基準ケースでは、EHRSQLの一つの質問を一つのTaskに対応させ、正解SQLを持つDataNodeと結果形状に対応するWidgetを接続する。
+
+候補更新を受け取ると、検査器はスキーマ、読み取り専用SQL、SQL実行、結果形状、描画可能性を確認する。層間契約を持つ条件では、さらに患者、項目、期間、情報源、集約、表示方式、接続、更新世代を照合する。違反がある場合は、候補を画面へ反映せず、層と契約項目を含む診断を返す。
+
+自動修復は、この診断を一回だけ利用する。患者条件、期間条件、Widget参照など、期待値が契約から一意に決まる場合は該当成果物を書き換える。意味が一意でない場合や、複数層にまたがる変更で安全な修復を決められない場合は拒否する。反復的に試行して正解へ近づける方法は採らず、一回の契約ベース修復として成功、失敗、誤修復を区別する。
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    node distance=5mm and 5mm,
+    box/.style={draw,rounded corners=1mm,minimum width=26mm,minimum height=9mm,align=center},
+    arr/.style={-{Latex[length=2.2mm]},thick}
+  ]
+    \node[box,fill=gray!8] (candidate) {更新候補};
+    \node[box,below=of candidate] (local) {局所検査};
+    \node[box,below=of local] (contract) {契約検査};
+    \node[box,below left=of contract,fill=gray!8] (accept) {受理・描画};
+    \node[box,below right=of contract,fill=gray!8] (reject) {拒否・診断};
+    \node[box,below=of reject] (repair) {一回の修復};
+    \draw[arr] (candidate) -- (local);
+    \draw[arr] (local) -- (contract);
+    \draw[arr] (contract) -- node[left]{適合} (accept);
+    \draw[arr] (contract) -- node[right]{違反} (reject);
+    \draw[arr] (reject) -- (repair);
+    \draw[arr] (repair.west) -| node[pos=0.25,below]{再検証} (contract.east);
+  \end{tikzpicture}}
+  \caption{候補検証と一回の契約ベース修復}
+  \label{fig:validation}
+\end{figure}
+
+\section{実装と再現性}
+
+TraceBench-EHRの評価処理は、基準ケースの構築、候補生成、条件別検証、独立オラクルによる採点、統計集計に分ける。基準ケースの構築では、EHRSQLの質問と正解SQLを読み込み、読み取り専用接続でSQLを実行する。候補生成では、同じ質問テンプレートに属するケースを組み合わせ、固定した変異規則を一つずつ適用する。ここまでの処理は乱数に依存させず、同じ入力と設定から同じ候補チェックサムを得る。
+
+条件別検証は、生成された同一候補を4条件へ適用する。各条件は候補を変更せず、利用する検査範囲だけを変える。検証結果は、受理・拒否、違反を特定した層、契約項目、修復操作、検証時間を記録する。独立オラクルは候補生成器と検査器の内部状態を参照せず、保存された候補と基準契約から期待ラベルを再計算する。これにより、候補を作った規則の誤りが、そのまま正解判定へ流れ込むことを避ける。
+
+正式評価はCPUだけで実行し、Geminiを含む外部モデルを呼ばない。seedは20260827、SQLごとの上限は5秒、ブートストラップは10,000回とする。実行時刻は計測値として保存するが、候補の同一性を表すチェックサムには含めない。入力データ、設定、コード、候補、集計のチェックサムを実行マニフェストへ記録し、別の出力先へ再実行した場合に候補と集計が一致するかを確認する。
+
+\begin{table}[t]
+  \centering
+  \caption{正式評価で保存する成果物}
+  \label{tab:artifacts}
+  \begin{tabular}{L{0.36\columnwidth}L{0.54\columnwidth}}
+    \toprule
+    成果物 & 保存内容 \\
+    \midrule
+    pair manifest & ケースID、変異種類、チェックサム \\
+    candidate results & 条件別の受理、特定、修復結果 \\
+    build summary & 基準実行、空結果、変異別件数 \\
+    summary & 主要・副次評価と95\%区間 \\
+    report & 原稿向けの集計と失敗例 \\
+    run manifest & 入力、設定、コード、出力の版 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+保存する成果物を表\ref{tab:artifacts}に示す。pair manifestには候補を再識別する最小情報を置き、candidate resultsには条件別の判定を一実行一行で記録する。summaryは質問テンプレート単位の集計から主要・副次評価を作り、reportは原稿で確認しやすい形へ要約する。run manifestはデータセットcommit、コードcommit、設定版、実行環境、出力チェックサムを結び付ける。
+
+テストでは、8種類の変異が意図した一つの契約だけを壊すこと、妥当候補が独立オラクルを満たすこと、グラフ契約と同じ内容のサイドカー契約が同じ判定を返すこと、修復後に再検証が行われることを確認する。さらに、質問文、SQL、患者ID、結果値を成果物へ書き出そうとした場合に停止する検査を設ける。機能テスト、lint、型チェックがすべて成功しない限り評価版を固定しない。
+
+再現性の対象は、許可された入力から候補、判定、集計を再生成できることまでである。MIMIC由来の生データや患者単位の結果をリポジトリへ含めないため、第三者が再実行する場合は、各データセットの利用条件に従って入力を取得する必要がある。公開可能な成果物と再配布できない入力を分け、どの版を使ったかをチェックサムで検証できる構成にする。
+
+\section{評価方法}
+
+\subsection{比較条件}
+
+同じ基準ケースと候補を表\ref{tab:conditions}の4条件へ適用する。条件間で候補生成、SQL実行環境、一般的なスキーマ検査をそろえる。
+
+\begin{table}[t]
+  \centering
+  \caption{比較する検査条件}
+  \label{tab:conditions}
+  \begin{tabular}{L{0.32\columnwidth}L{0.58\columnwidth}}
+    \toprule
+    条件 & 検査範囲 \\
+    \midrule
+    局所検査 & スキーマ、SQL安全性、実行、描画 \\
+    成果物契約 & 各成果物が持つ患者・項目など \\
+    グラフ契約 & 質問からWidgetまでの層間対応 \\
+    サイドカー契約 & グラフと同じ対応を平坦に保持 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+局所検査は、各成果物が単独で実行可能かを確認する。成果物ごとの契約は、SQL、実行結果、Widgetに期待する属性を個別に持つが、層をまたぐ識別関係を持たない。グラフ契約は、質問、DataNode、SQL、実行結果、Widgetを辺で結ぶ。サイドカー契約は同じ契約内容を、グラフ構造を使わない平坦な対応表として保持する。
+
+グラフ契約とサイドカー契約を比較に含めることで、契約内容の効果と保存形式の効果を分ける。両条件の性能が一致した場合、グラフの一般的な優位性は主張しない。グラフは影響範囲の可視化や編集単位として別の利点を持ち得るが、それは本技術評価だけでは確定しない。
+
+\subsection{評価指標}
+
+主要評価は\term{不整合の流出率}と\term{妥当な更新の受理率}である。不整合の流出率は、不整合候補のうち受理されてUIへ反映可能になった割合であり、低いほどよい。妥当な更新の受理率は、正しい候補のうちSQL実行と描画まで完了して受理された割合であり、高いほどよい。二つを一つの正解率にまとめないのは、安全な拒否を増やすだけで不整合の流出を下げる条件を区別するためである。
+
+副次評価は、問題箇所の特定率、一回の修復成功率、誤修復率、過剰拒否率、検証時間である。問題箇所は不整合の層と契約項目の組で採点する。修復成功は、修復後の候補が独立オラクルを満たし、SQL実行と描画まで完了することと定義する。拒否すべきケースを無理に修復した場合は誤修復として分ける。
+
+条件差と95\%信頼区間は、質問テンプレート単位のクラスターブートストラップ10,000回で求める。同じ質問から作った複数の変異を独立標本として扱わない。平均だけでなく、変異種類別の分布と代表的な失敗例を報告する。
+
+\subsection{分割と停止条件}
+
+EHRSQL-2024のtrainで実装とテストを作り、validationの回答可能931件でパイロットを行う。パイロット通過後に変異規則、独立オラクル、比較条件、分析コードをcommitで固定する。その後、testの回答可能934件を一度だけ実行する。test開始後に評価規則の変更が必要になった場合は実行を停止し、その結果を正式評価として使用しない。
+
+ほかの停止条件は、入力チェックサムの不一致、テスト・lint・型チェックの失敗、基準SQL実行またはグラフ検証成功率が95\%未満、各変異が10テンプレートまたは30候補未満、保存成果物への質問文・SQL・患者ID・結果値の混入である。停止条件を先に定めることで、評価結果を見た後の規則変更を抑える。
+
+\section{現在までの結果}
+
+\subsection{50件の実行可能性確認}
+
+2026年8月27日に、train分割の回答可能ケースから異なる質問テンプレートを優先して50件を選び、正解SQLの実行と最小ScenarioGraphへの変換を確認した。結果を表\ref{tab:feasibility}に示す。
+
+\begin{table}[t]
+  \centering
+  \caption{EHRSQL 50件の実行可能性確認}
+  \label{tab:feasibility}
+  \begin{tabular}{L{0.62\columnwidth}C{0.28\columnwidth}}
+    \toprule
+    確認項目 & 結果 \\
+    \midrule
+    正解SQLの実行成功 & 50/50 \\
+    非空結果 & 49/50 \\
+    ScenarioGraph検証成功 & 50/50 \\
+    Metricへの割当 & 40/50 \\
+    Dataframeへの割当 & 10/50 \\
+    タイムアウト・書込拒否・SQLエラー & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+全50件で正解SQLを実行でき、ScenarioGraphの検証に成功した。49件で非空結果を取得し、1件は列を持つ空結果だった。結果形状に基づき40件をMetric、10件をDataframeへ割り当てた。タイムアウト、SQLエラー、書き込み拒否、グラフ検証エラーはなかった。この結果は、選定した50テンプレートを現行実装へ機械的に変換できることを示す。全ケースへの適用可能性や表示方式の臨床的妥当性を示すものではない。
+
+初回の成果物では、SQLiteが返す列名にSQL断片が含まれるケースがあった。この出力を無効とし、列名を成果物へ保存しないよう修正して再実行した。最終成果物には質問文、SQL、患者ID、患者単位の結果値が含まれないことを確認した。この事例から、評価指標だけでなく、生成物への機微情報の混入を停止条件として機械的に検査する必要が分かった。
+
+\subsection{UI更新技術評価v0.4}
+
+TraceBench-EHRに先立つ予備評価として、合成した24ケースと120件の共通変更仕様を用い、同じ更新要求と安全要件を持つ直接差分方式と完全グラフ方式を比較した。各ケースは妥当候補1件、単一違反3件、複合違反1件を持つ。比較中に生成モデルを呼ばず、候補は決定的に作成した。
+
+直接差分方式と完全グラフ方式は、ともに違反候補96件をすべて拒否し、妥当候補24件をすべて受理した。違反流出率と妥当更新受理率の対応差は0.0で、95\%区間も0.0から0.0だった。グラフ方式から変更対象外の保護、安全条件、追跡検査を個別に外した条件では、対応する違反18件が通過した。
+
+この結果は、同じ契約内容を実装した範囲で、グラフ形式そのものが直接差分より高い検出性能を持つという仮説を支持しなかった。一方、各制御を外したときに対応する違反が通過したため、更新範囲、安全条件、追跡関係を明示的に検査する役割は確認できた。そこで正式評価では、グラフ方式に弱い基準だけを置かず、同じ契約内容を持つ平坦なサイドカーを強い比較条件にする。
+
+\subsection{validation初回パイロット}
+
+正式評価v1.0の初回パイロットでは、validation全1,163件のうち正解SQLを持つ931件を対象とした。SQL実行は924件で成功し、成功率は99.25\%だった。625組、5,000候補を評価したが、当初予定した列対応の変異は候補0件、テンプレート0件となった。validationで実行に成功したSQL結果がすべて1列であり、列順を変えて意味的な対応を壊す候補を構成できなかったためである。
+
+この結果は事前の最小件数を満たさないため、v1.0を固定せず、列対応を表示方式の対応へ置き換えたv1.1へ更新した。表示方式の変異は、SQL、実行結果、列、値を保ったままMetric、Dataframe、Tableの対応だけを変える。他の7種類の変異、4比較条件、主要・副次評価、分析方法、seed、データ管理、停止条件は維持する。v1.1でvalidationを再実行し、停止条件を通過した場合に限って固定し、testを一度だけ実行する。
+
+\section{考察}
+
+\subsection{局所妥当性と層間整合性}
+
+50件の実行可能性確認では、正解SQLをScenarioGraphとWidgetへ変換できた。一方、これは各層を正しく接続した基準ケースの確認であり、増分更新後に対応が保たれることを保証しない。SQLが実行できること、結果が表であること、Widgetが描画できることは、すべて必要条件である。しかし、患者、項目、期間、集約、表示の意味が一致しているかは別の検査を要する。
+
+層間不整合は、最終画面の見た目から判別しにくい場合がある。別患者の値でも数値カードとして自然に表示され、古い結果でも異常なく描画される可能性がある。したがって、画面のスクリーンショット比較やUIコードの構文検査だけで、情報要求に対する正しさを評価することは難しい。本研究の契約は、画面に至るまでの根拠を機械可読に保持し、どの対応が壊れたかを診断できるようにする。
+
+\subsection{契約内容とグラフ形式}
+
+予備評価v0.4で直接差分方式と完全グラフ方式に差がなかったことは、グラフを用いれば自動的に整合性が得られるわけではないことを示す。同じ要件を成果物側に実装できるなら、検出性能が同じになる可能性がある。そこでTraceBench-EHRは、グラフと同じ情報を持つサイドカー契約を比較する。
+
+グラフ形式が有用である可能性は、契約の再利用、影響範囲の表示、編集履歴、複数タスクで共有するデータの表現などに残る。ただし、これらは検出率だけでは測れない。検査の実装箇所、変更時に更新する箇所、契約の重複、人が問題箇所を理解するための時間などを別に評価する必要がある。本稿では、保存形式としてのJSON、関係表、グラフデータベースの一般的な優劣を主張しない。
+
+\subsection{自動修復の範囲}
+
+契約から期待値が一意に決まる不整合は、自動修復に適している。たとえばWidgetが参照すべきDataNode、SQL更新後に対応する結果世代、基準ケースで定めたWidget種別は、診断から修復操作を構成できる。一方、自然言語要求が複数の解釈を許す場合や、表示粒度と臨床的な意味の選択が必要な場合、技術的な契約だけで正解を決められない。
+
+そのため、修復率を高くすることだけを目的にしない。誤修復と過剰拒否を分け、安全に一意化できない場合は拒否する。将来、人による評価を行う場合は、成果物の差分だけを提示する条件と、グラフから得た影響範囲、根拠、保護条件を提示する条件を比較し、専門家が誤りを検出・修正できるかを検討する。
+
+\subsection{評価設計から得た知見}
+
+validation初回パイロットで列対応の変異を作れなかったことは、故障モデルを概念だけで固定せず、実データの結果形状で実行可能性を確認する必要性を示した。変異規則をtestで初めて試すと、正式評価の途中で規則変更が必要になる。trainで実装し、validationで停止条件を確認し、testを一度だけ実行する手順は、この事後変更を抑えるために重要である。
+
+また、質問テンプレート単位で集計する必要がある。同じテンプレートから患者や項目だけを変えたケースは、SQL構造と不整合生成規則を共有する。候補単位で独立に数えると、特定のテンプレートが結果へ過大に寄与する。クラスターブートストラップと変異種類別の報告により、評価単位の依存を明示する。
+
+\section{制約と倫理}
+
+本研究はMIMIC-IV Clinical Database Demo v2.2を用いる技術評価である。評価から、臨床上の安全性、診療判断の正確さ、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化を主張しない。正解SQLは技術的な基準であり、表示内容の医学的な妥当性を専門家が確認した基準ではない。
+
+人を対象とする評価は初回の主評価から外している。既存の専門家評価案は、倫理審査と実施許可の範囲、募集方法、データ保存、同意、撤回方法が確認されるまで実施しない。KLMによる予備的な操作数の確認も、読解、見落とし、判断、認知負荷を示す結果として扱わない。
+
+生データ、質問文、正解SQL、患者ID、患者単位の結果値はGitHubとNotionへ保存しない。Git管理外の一時領域だけで扱い、公開成果物にはケースID、入力と候補のチェックサム、変異種類、判定結果、集計、実行マニフェストを保存する。MIMIC由来の派生成果物に関する利用条件を確認し、データセットのライセンスと出典を明記する。
+
+\section{今後の予定}
+
+修士論文までの作業を表\ref{tab:schedule}に示す。直近ではv1.1のvalidation再実行を行い、停止条件、成果物への機微情報混入、再現性を確認する。通過後に設定、コード、分析をcommitで固定し、testの回答可能934件を一度だけ実行する。
+
+\begin{table}[t]
+  \centering
+  \caption{今後の作業}
+  \label{tab:schedule}
+  \begin{tabular}{L{0.24\columnwidth}L{0.66\columnwidth}}
+    \toprule
+    時期 & 作業 \\
+    \midrule
+    直近 & v1.1のvalidation再実行と停止条件確認 \\
+    固定後 & test 934件の一回実行と別経路集計 \\
+    評価後 & 結果、信頼区間、失敗例、修復例の整理 \\
+    原稿化 & 図表、再現条件、倫理・制約の確定 \\
+    修士論文 & 技術評価と将来の人対象評価を区別して統合 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+正式評価後は、変異種類ごとの流出率、受理率、特定率、修復率を整理する。グラフ契約とサイドカー契約が一致した場合は契約内容の効果として解釈し、不一致がある場合は実装差や表現上の差を調査する。評価規則を変更する必要が生じた場合は版を上げ、test結果を見た後の変更であることを明示する。
+
+修士論文では、プロトタイプのシステム設計、UI更新予備評価、TraceBench-EHRの設計と正式評価を一つの流れとして整理する。人対象評価は、技術評価で検出・特定・修復の範囲を確立した後の課題として分ける。臨床UIの利用効果を扱う場合は、専門家確認済みの症例と採点基準を用い、タスク成功率、成功試行の完了時間、操作数、NASA-TLX、SUSを別々に報告する。
+
+\section{まとめ}
+
+本研究は、生成臨床UIの増分更新で、臨床情報要求、SQL、実行結果、表示部品の対応が壊れる層間不整合を扱う。TraceBench-EHRはEHRSQL-2024とMIMIC-IV Demoを基に基準UIを構成し、8種類の不整合を決定的に注入する。局所検査、成果物ごとの契約、グラフ契約、同じ内容を持つサイドカー契約を同じ候補で比較し、検出、妥当更新の受理、問題箇所の特定、一回の修復を評価する。
+
+現在までに、異なる50テンプレートで正解SQLの実行とScenarioGraphへの変換を確認した。予備評価では、同じ契約内容を持つ直接差分方式とグラフ方式の検出性能に差がなく、グラフ形式だけでは優位性を説明できなかった。正式評価の初回パイロットでは列対応の変異を作れないことが分かり、test実行前に表示方式の変異へ改訂した。今後はvalidationでv1.1を固定し、testを一度だけ実行して、層間契約と自動修復の能力と限界を明らかにする。
+
+\bibliographystyle{junsrt}
+\bibliography{references}
+
+\end{document}

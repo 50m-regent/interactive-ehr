@@ -170,6 +170,17 @@ uv run python scripts/run_tracebench_ehr.py \
 
 成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
 
+## 口頭試問会原稿
+
+`papers/oral-examination-2026/`に、TraceBench-EHRの研究背景、設計、現在までの結果、今後の予定をまとめたLaTeX原稿があります。
+
+```bash
+cd papers/oral-examination-2026
+make
+```
+
+最終PDFは`papers/oral-examination-2026/output/pdf/Hirata_Ren.pdf`へ生成されます。
+
 ## セットアップ
 
 ```bash
@@ -352,4 +363,10 @@ results/evaluation/ehrsql_feasibility_v0.1/
   summary.json            -- SQL実行、非空結果、グラフ検証の集計
   report.md               -- 実行可能性確認の結果要約
   run_manifest.json       -- 入力、コード、出力の再現条件
+
+papers/oral-examination-2026/
+  main.tex                -- 口頭試問会原稿
+  references.bib          -- 原稿で参照する文献
+  latexmkrc               -- upLaTeXとdvipdfmxの設定
+  Makefile                -- PDF生成手順
 ```

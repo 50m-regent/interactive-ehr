@@ -1,0 +1,7 @@
+$latex = 'uplatex %O -interaction=nonstopmode -file-line-error %S';
+$bibtex = 'upbibtex %O %B';
+$dvipdf = 'dvipdfmx %O -o %D %S';
+$pdf_mode = 3;
+$out_dir = 'build';
+$aux_dir = 'build';
+$max_repeat = 5;
