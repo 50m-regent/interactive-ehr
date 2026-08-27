@@ -130,7 +130,8 @@ class EhrsqlCaseResult(BaseModel):
     template_checksum: str
     outcome: QueryOutcome
     execution_seconds: float = Field(ge=0.0)
-    column_names: list[str] = Field(default_factory=list)
+    column_count: int = Field(default=0, ge=0)
+    column_name_checksums: list[str] = Field(default_factory=list)
     observed_row_count: int | None = Field(default=None, ge=0)
     row_count_capped: bool = False
     non_empty_result: bool = False
@@ -544,7 +545,8 @@ def _run_case(
             template_checksum=record.template_checksum,
             outcome=QueryOutcome.GRAPH_ERROR,
             execution_seconds=time.monotonic() - started_at,
-            column_names=column_names,
+            column_count=len(column_names),
+            column_name_checksums=[sha256_text(name) for name in column_names],
             observed_row_count=len(observed_rows),
             row_count_capped=row_count_capped,
             non_empty_result=bool(observed_rows),
@@ -559,7 +561,8 @@ def _run_case(
         template_checksum=record.template_checksum,
         outcome=QueryOutcome.SUCCESS,
         execution_seconds=time.monotonic() - started_at,
-        column_names=column_names,
+        column_count=len(column_names),
+        column_name_checksums=[sha256_text(name) for name in column_names],
         observed_row_count=len(observed_rows),
         row_count_capped=row_count_capped,
         non_empty_result=bool(observed_rows),

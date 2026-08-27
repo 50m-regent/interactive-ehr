@@ -181,7 +181,10 @@ def test_outputs_exclude_questions_queries_and_values(tmp_path: Path) -> None:
         case_id="safe-case",
         split="train",
         question="Sensitive question text",
-        query="SELECT name, value FROM observations",
+        query=(
+            "SELECT (SELECT value FROM observations WHERE name = 'alpha') "
+            "> (SELECT value FROM observations WHERE name = 'beta')"
+        ),
         template="Sensitive template text",
     )
     results = run_ehrsql_feasibility([case], database_path=database_path)
@@ -215,6 +218,7 @@ def test_outputs_exclude_questions_queries_and_values(tmp_path: Path) -> None:
     )
     assert "Sensitive question text" not in combined_output
     assert "SELECT name, value" not in combined_output
+    assert "SELECT value FROM observations" not in combined_output
     assert "alpha" not in combined_output
     assert "beta" not in combined_output
 
