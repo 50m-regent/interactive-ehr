@@ -73,6 +73,8 @@ CHI 2027向けのTraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC
 
 外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のチェックサム、結果形状、実行成否、グラフ検証結果、実行マニフェストだけを保存します。
 
+EHRSQL-2024はCC BY 4.0で公開されています。MIMIC-IV Clinical Database Demo v2.2由来の情報を含み、同データはOpen Database License v1.0で利用できます。成果物を公開する場合は、[EHRSQL-2024](https://github.com/glee4810/ehrsql-2024)と[MIMIC-IV Clinical Database Demo v2.2](https://physionet.org/content/mimic-iv-demo/2.2/)を明記します。
+
 実行例は次のとおりです。`--dataset-commit` と `--code-commit` には、実際に使用する完全なcommit SHAを指定します。
 
 ```bash
@@ -92,6 +94,17 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - `summary.json` はSQL実行率、非空結果取得率、グラフ検証率を集計します。
 - `report.md` は実験結果の短い要約です。
 - `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
+
+2026年8月27日に、EHRSQL-2024のcommit `f9e1aa02160d39e3f8df52bf5c69c5cf2e472499` とinteractive-ehrのcommit `69313eac4a7f347dc611fd3ca55f14cac3cab395` を使ってv0.1を実行しました。
+
+- 異なる質問テンプレートから50件を選定しました。
+- 正解SQLは50件すべてで実行に成功しました。
+- 49件で非空結果を取得し、1件は列を持つ空結果でした。
+- 50件すべてでScenarioGraphの検証に成功しました。
+- Metricへ40件、Dataframeへ10件を割り当てました。
+- タイムアウト、SQLエラー、書き込みSQL、グラフ検証エラーはありませんでした。
+
+この結果は、選定したtrain分割50件を現行ScenarioGraphとWidgetへ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はまだ確認していません。次は空結果1件の扱いを決め、対象ケースの選定規則、変異規則、独立オラクル、開発・評価分割を固定します。
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
@@ -270,4 +283,11 @@ results/evaluation/ui_update_benchmark_v0.4/
   run_manifest.json       -- 再現条件とチェックサム
   report.md               -- 技術評価結果の要約
   summary.json            -- 統計集計と実装量
+
+results/evaluation/ehrsql_feasibility_v0.1/
+  selected_cases.json     -- 選定ケースIDと入力チェックサム
+  case_results.jsonl      -- 値を含まないケース別実行結果
+  summary.json            -- SQL実行、非空結果、グラフ検証の集計
+  report.md               -- 実行可能性確認の結果要約
+  run_manifest.json       -- 入力、コード、出力の再現条件
 ```

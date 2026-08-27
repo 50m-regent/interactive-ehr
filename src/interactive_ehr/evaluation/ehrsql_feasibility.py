@@ -708,4 +708,8 @@ def _build_report(summary: EhrsqlFeasibilitySummary) -> str:
         "## データ管理\n\n"
         "生データ、質問文、正解SQL、患者単位の結果値は成果物へ保存していません。"
         "ケースID、チェックサム、結果形状、実行成否だけを記録しています。\n"
+        "\n## データ出典と利用条件\n\n"
+        "EHRSQL-2024はCC BY 4.0で公開されています。"
+        "MIMIC-IV Clinical Database Demo v2.2由来の情報を含み、"
+        "同データはOpen Database License v1.0で利用できます。\n"
     )

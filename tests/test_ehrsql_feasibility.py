@@ -221,6 +221,7 @@ def test_outputs_exclude_questions_queries_and_values(tmp_path: Path) -> None:
     assert "SELECT value FROM observations" not in combined_output
     assert "alpha" not in combined_output
     assert "beta" not in combined_output
+    assert "Open Database License v1.0" in combined_output
 
     summary = summarize_feasibility([case], results)
     assert summary.execution_success_rate == 1.0
