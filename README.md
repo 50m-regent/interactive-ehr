@@ -34,19 +34,19 @@ uv run python scripts/audit_evaluation_case_manifest.py \
   data/evaluation/ito_clinical_tasks.v1.json
 ```
 
-## RQ1の技術評価
+## UI更新方法を小規模に比較する事前確認
 
-`data/evaluation/ui_update_benchmark.v0.4.json` は、成果物を直接変更する方式と、グラフを介して変更する方式を同じ更新要求と構造的安全要件で比較します。Geminiは呼び出しません。共通変更仕様から二方式の差分候補を決定的に生成し、独立した意味上のオラクルで正解を確認します。
+2026年7月22日に、成果物を直接変更する方式と、依存グラフを介して変更する方式を小規模に比較しました。実験ファイルは`data/evaluation/ui_update_benchmark.v0.4.json`です。Geminiは呼び出しません。共通の変更仕様から二方式の候補を同じ手順で生成し、候補生成とは別の処理で正解を確認します。
 
 固定した内容は次のとおりです。
 
-- 開発セットは単発8件と3手の系列2件です。
-- 評価セットは期間の絞り込み、必要情報の追加、表示形式、配置、タスク条件、タスクから取得と表示までをまたぐ変更を各4件、合計24件含みます。
-- 評価セットの各変更には妥当な候補1件、単一違反3件、複合違反1件があり、共通変更仕様は合計120件です。
-- 違反は更新範囲、安全条件、表示とデータ取得の追跡、SQL実行の4種類です。
+- 開発用のケースは、単発8件と3回続けて更新するケース2件です。
+- 評価用のケースは、期間の絞り込み、必要情報の追加、表示形式、配置、タスク条件、タスクから取得と表示までをまたぐ変更を各4件、合計24件含みます。
+- 評価用の各変更には正しい候補1件、単一の不整合3件、複数の不整合を含む候補1件があり、共通の変更仕様は合計120件です。
+- 不整合は、更新範囲、安全条件、表示とデータ取得の対応、SQL実行の4種類です。
 - 主比較では直接差分方式と完全なグラフ方式へ同じ要件を実装します。
 - グラフ方式では更新範囲、安全条件、追跡検査を個別に外した条件も測ります。
-- 95%区間はケース単位のクラスターブートストラップで求めます。除去比較のp値はケース単位の符号反転検定とHolm補正で求めます。
+- 95%信頼区間は、ケースを単位に繰り返し再抽出する統計手法で求めます。確認項目を外した条件のp値は、ケース単位の符号反転検定とHolm補正で求めます。
 
 評価を再実行するには、次を実行します。`--with-editable .` は、srcレイアウトの現在の作業ツリーを評価環境へ読み込むために指定しています。
 
@@ -56,22 +56,22 @@ uv run --with-editable . python scripts/run_ui_update_benchmark.py
 
 結果は `results/evaluation/ui_update_benchmark_v0.4/` に保存されます。
 
-- `paired_candidates.jsonl` は共通変更仕様、直接差分、グラフ差分、各チェックサムを1候補1行で記録します。
+- `paired_candidates.jsonl` は共通変更仕様、直接差分、グラフ差分、内容を識別するハッシュ値を1候補1行で記録します。
 - `candidate_results.jsonl` は各候補と比較条件の受理結果を1実行1行で記録します。
 - `sequence_results.jsonl` は逐次更新の受理結果と棄却時の状態保持を1手1行で記録します。
 - `summary.json` は主指標、対応差、95%区間、除去比較、要件ごとの実装量を記録します。
 - `report.md` は論文執筆向けの短い結果要約です。
-- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
+- `run_manifest.json` は入力、実装、出力のハッシュ値と実行条件を記録します。
 
-現行v0.4は専門家確認前の合成更新要求と合成スキーマを使います。測定対象は構造的な依存関係保護です。臨床的安全性の評価、人を対象とした評価、Geminiを含むエンドツーエンド評価はまだ実施していません。
+この事前確認は、実験ファイル上の版番号v0.4で、専門家確認前の合成した更新要求と表構造を使います。測定対象は成果物間の依存関係を保てるかどうかです。臨床的安全性の評価、人を対象とした評価、Geminiを含む生成から表示までの一連の評価はまだ実施していません。
 
-## TraceBench-EHRの実行可能性確認
+## EHRSQL 50件を使った最初の動作確認
 
-CHI 2027向けのTraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行し、質問、SQL、実行結果、ScenarioGraph、Widgetを一つの追跡契約へ変換できるか確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
+生成臨床UIの更新を検査する評価基盤TraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行します。質問、SQL、実行結果、依存グラフ、表示部品の対応を一つの基準へ変換できるかを確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
 
-`scripts/run_ehrsql_feasibility.py` は、train分割の回答可能ケースから異なる質問テンプレートを優先して50件を決定的に選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値をMetric、それ以外をDataframeへ割り当てた最小のScenarioGraphを検証します。Geminiは呼び出しません。
+`scripts/run_ehrsql_feasibility.py`は、開発用データから異なる質問形式を優先して50件を同じ手順で選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値を数値カード、複数行や複数列の結果を表へ割り当てた最小の依存グラフを検査します。実装上の名称はMetric、Dataframe、ScenarioGraphです。Geminiは呼び出しません。
 
-外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のチェックサム、結果形状、実行成否、グラフ検証結果、実行マニフェストだけを保存します。
+外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のハッシュ値、結果形状、実行成否、グラフ検査結果、実行記録だけを保存します。
 
 EHRSQL-2024はCC BY 4.0で公開されています。MIMIC-IV Clinical Database Demo v2.2由来の情報を含み、同データはOpen Database License v1.0で利用できます。成果物を公開する場合は、[EHRSQL-2024](https://github.com/glee4810/ehrsql-2024)と[MIMIC-IV Clinical Database Demo v2.2](https://physionet.org/content/mimic-iv-demo/2.2/)を明記します。
 
@@ -89,11 +89,11 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 結果は `results/evaluation/ehrsql_feasibility_v0.1/` に保存されます。
 
-- `selected_cases.json` は選定したケースIDと入力チェックサムを記録します。
+- `selected_cases.json` は選定したケースIDと入力のハッシュ値を記録します。
 - `case_results.jsonl` は結果値を含まないケース別の実行成否と結果形状を記録します。
 - `summary.json` はSQL実行率、非空結果取得率、グラフ検証率を集計します。
 - `report.md` は実験結果の短い要約です。
-- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
+- `run_manifest.json` は入力、実装、出力のハッシュ値と実行条件を記録します。
 
 2026年8月27日に、EHRSQL-2024のcommit `f9e1aa02160d39e3f8df52bf5c69c5cf2e472499` とinteractive-ehrのcommit `74dcc2f7f35072e78b69641bebd04e33ced00d87` を使ってv0.1を実行しました。
 
@@ -104,13 +104,13 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - Metricへ40件、Dataframeへ10件を割り当てました。
 - タイムアウト、SQLエラー、書き込みSQL、グラフ検証エラーはありませんでした。
 
-この結果は、選定したtrain分割50件を現行ScenarioGraphとWidgetへ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はまだ確認していません。次は空結果1件の扱いを決め、対象ケースの選定規則、変異規則、独立オラクル、開発・評価分割を固定します。
+この結果は、開発用データから選定した50件を現行の依存グラフと表示部品へ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はまだ確認していません。次は空結果1件の扱いを決め、対象ケースの選定規則、不整合を入れる規則、候補生成とは別の正解判定、データの使い分けを固定します。
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
-## TraceBench-EHRの正式技術評価
+## TraceBench-EHRの最終評価と事前確認
 
-`data/evaluation/tracebench_ehr.v1.json` は、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を用いる正式技術評価v1.1の条件を固定します。実装は `src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は `src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は `scripts/run_tracebench_ehr.py` です。Geminiや外部モデルは使用しません。
+最終評価では、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を使い、生成臨床UIの更新で生じる不整合を4種類の方法で検査します。条件を記録するファイルは`data/evaluation/tracebench_ehr.v1.json`で、修正版の実験記録はv1.1です。実装は`src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は`src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は`scripts/run_tracebench_ehr.py`です。Geminiや外部モデルは使用しません。
 
 評価対象の不整合は次の8種類です。
 
@@ -123,30 +123,30 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - DataNodeとWidgetの接続
 - SQL更新後に古い実行結果が残る部分更新
 
-結果とWidgetの表示方式は、基準がMetricならDataframeへ、DataframeならTableへ変えます。SQL、実行結果、列、結果値は維持し、描画可能な表示方式と基準契約の対応だけを壊します。v1.0で予定していた列順の変異は、validationで成功したSQL結果がすべて1列だったため使いません。
+結果と表示部品の不整合は、基準が数値カードなら表へ、データフレーム型の表なら別の表部品へ変えます。実装上の名称はMetric、Dataframe、Tableです。SQL、実行結果、列、結果値は維持し、結果形状と表示方式の対応だけを壊します。最初の評価設計v1.0で予定していた列順の不整合は、調整確認用データで成功したSQL結果がすべて1列だったため使いません。
 
 各候補へ次の4条件を適用します。
 
-- 局所検査
-- 成果物ごとの契約
-- 質問からWidgetまでの対応を持つグラフ契約
-- グラフと同じ契約内容を持つ平坦なサイドカー契約
+- SQLや表示部品を一つずつ調べる個別確認
+- 各成果物に必要な患者や項目を調べる成果物ごとの確認
+- 質問から表示部品までを依存グラフでまとめて照合する方法
+- 同じ対応内容を一枚の表で照合する方法
 
-主要評価は、不整合の流出率と妥当な更新の受理率です。副次評価として、問題箇所の特定率、1回の契約ベース修復成功率、検証時間を測ります。条件間の対応差と95%信頼区間は、質問テンプレート単位のクラスターブートストラップ10,000回で求めます。
+主要評価は、不整合の見逃し率と正しい更新の受理率です。副次評価として、問題箇所の特定率、1回の自動修正の成功率、検査時間を測ります。方法間の差と95%信頼区間は、質問形式を単位に繰り返し再抽出する統計手法を10,000回適用して求めます。
 
-2026年8月27日にvalidation全件でv1.1パイロットを実行しました。
+2026年8月27日に、修正版v1.1を使って、調整確認用データ全件で最終評価前の動作を確認しました。
 
 - 全1,163件のうち、正解SQLを持つ931件を対象にしました。
 - SQL実行と基準グラフ検証は924件で成功し、成功率は99.25%でした。
 - 758組、6,064回の候補検証を実行しました。
-- 各変異は34から133テンプレートあり、事前の下限である10テンプレートと30候補を満たしました。
-- オラクルと候補ラベルの不一致は0件でした。
-- グラフ契約とサイドカー契約の判定不一致は0件でした。
+- 各不整合は34から133種類の質問形式を含み、事前の下限である10種類の質問形式と30候補を満たしました。
+- 候補生成とは別の正解判定との不一致は0件でした。
+- 依存グラフと一枚の対応表による判定の不一致は0件でした。
 - 質問文、SQL、患者ID、結果値を保存していないことを確認しました。
 
-このパイロットは評価コードを固定できるかを確認するための結果で、正式なtest結果ではありません。test分割は、評価コードと設定をcommitで固定した後に一度だけ実行します。
+この動作確認は評価コードを固定できるかを判断するための結果で、最終評価の結果ではありません。最終評価用データは、評価コードと設定をGitの記録で固定した後に一度だけ実行します。
 
-validationパイロットの実行例は次のとおりです。
+調整確認用データを使った実行例は次のとおりです。コマンドでは公式の区分名`validation`を指定します。
 
 ```bash
 uv run python scripts/run_tracebench_ehr.py \
@@ -161,12 +161,12 @@ uv run python scripts/run_tracebench_ehr.py \
 
 出力は次のとおりです。
 
-- `pair_manifest.jsonl` はケースID、変異種類、テンプレートと候補のチェックサムを記録します。
+- `pair_manifest.jsonl` はケースID、不整合の種類、質問形式と候補のハッシュ値を記録します。
 - `candidate_results.jsonl` は候補と条件ごとの受理、特定、修復結果を記録します。
 - `build_summary.json` は基準実行、空結果、変異別の件数を記録します。
 - `summary.json` は主要評価、副次評価、変異別集計、95%信頼区間を記録します。
 - `report.md` はCHI原稿向けの短い結果要約です。
-- `run_manifest.json` は入力、コード、設定、出力のチェックサムを記録します。
+- `run_manifest.json` は入力、コード、設定、出力のハッシュ値を記録します。
 
 成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
 
@@ -353,12 +353,12 @@ scripts/
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
-  run_manifest.json       -- 再現条件とチェックサム
+  run_manifest.json       -- 再現条件とハッシュ値
   report.md               -- 技術評価結果の要約
   summary.json            -- 統計集計と実装量
 
 results/evaluation/ehrsql_feasibility_v0.1/
-  selected_cases.json     -- 選定ケースIDと入力チェックサム
+  selected_cases.json     -- 選定ケースIDと入力のハッシュ値
   case_results.jsonl      -- 値を含まないケース別実行結果
   summary.json            -- SQL実行、非空結果、グラフ検証の集計
   report.md               -- 実行可能性確認の結果要約
