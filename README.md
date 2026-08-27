@@ -104,7 +104,7 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - Metricへ40件、Dataframeへ10件を割り当てました。
 - タイムアウト、SQLエラー、書き込みSQL、グラフ検証エラーはありませんでした。
 
-この結果は、選定したtrain分割50件を現行ScenarioGraphとWidgetへ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はまだ確認していません。次は空結果1件の扱いを決め、対象ケースの選定規則、変異規則、独立オラクル、開発・評価分割を固定します。
+この結果は、選定したtrain分割50件を現行ScenarioGraphとWidgetへ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はこの確認だけでは判断できません。この確認を踏まえ、正式技術評価v1.1では空結果の扱い、対象ケース、変異規則、独立オラクル、開発・評価分割を固定しました。
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
@@ -144,7 +144,22 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - グラフ契約とサイドカー契約の判定不一致は0件でした。
 - 質問文、SQL、患者ID、結果値を保存していないことを確認しました。
 
-このパイロットは評価コードを固定できるかを確認するための結果で、正式なtest結果ではありません。test分割は、評価コードと設定をcommitで固定した後に一度だけ実行します。
+このパイロットで停止条件を通過した後、評価コードと設定をcommit `baa82075b6bfd3bad70b2ca2bc4ae4852db91beb` で固定しました。固定後のtest分割は一度だけ実行しました。
+
+- 全1,167件のうち、正解SQLを持つ934件を対象にし、回答不能233件を主評価から除外しました。
+- 934件すべてでSQL実行と基準成果物の構築に成功しました。
+- 134テンプレートから763組を作り、6,104回の候補検証を実行しました。
+- 局所検査は注入した不整合763件をすべて受理し、不整合流出率は100%でした。
+- 成果物ごとの契約は367件を受理し、不整合流出率は48.10%でした。
+- グラフ契約とサイドカー契約の不整合流出率は0%でした。
+- 全条件で妥当な更新763件をすべて受理し、妥当更新受理率は100%でした。
+- グラフ契約と局所検査の不整合流出率の差は-100.00ポイント、95%区間は[-100.00, -100.00]ポイントでした。
+- グラフ契約と成果物ごとの契約の差は-48.10ポイント、95%区間は[-49.56, -46.53]ポイントでした。
+- グラフ契約とサイドカー契約の差は0ポイントでした。
+- グラフ契約とサイドカー契約は、問題箇所の特定と1回の修復に763件すべて成功しました。
+- オラクルと候補ラベルの不一致、グラフ契約とサイドカー契約の判定不一致はいずれも0件でした。
+
+正式結果は `results/evaluation/tracebench_ehr_v1.1/test/`、パイロット結果は `results/evaluation/tracebench_ehr_v1.1/validation/` に保存しています。完全な変異別集計と実行時間は各 `summary.json` を参照してください。
 
 validationパイロットの実行例は次のとおりです。
 
@@ -323,6 +338,8 @@ src/interactive_ehr/
     benchmark_analysis.py -- UI更新ベンチマークの統計集計と成果物出力
     case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
     ehrsql_feasibility.py -- EHRSQL-2024の選定、SQL実行、グラフ検証
+    tracebench_analysis.py -- TraceBench-EHRの統計集計と成果物出力
+    tracebench_ehr.py     -- 正式評価の候補生成、契約検査、修復
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
     update_benchmark.py   -- 共通変更仕様、二方式の差分生成、検査、実行器
   pages/                  -- ページコンポーネント
@@ -339,6 +356,7 @@ scripts/
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
   run_ehrsql_feasibility.py -- EHRSQL-2024の50件実行可能性確認
+  run_tracebench_ehr.py   -- TraceBench-EHRのvalidationとtestの実行
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
@@ -352,4 +370,8 @@ results/evaluation/ehrsql_feasibility_v0.1/
   summary.json            -- SQL実行、非空結果、グラフ検証の集計
   report.md               -- 実行可能性確認の結果要約
   run_manifest.json       -- 入力、コード、出力の再現条件
+
+results/evaluation/tracebench_ehr_v1.1/
+  validation/             -- 評価規則を固定する前の全件パイロット
+  test/                   -- 固定commitで一度だけ実行した正式結果
 ```

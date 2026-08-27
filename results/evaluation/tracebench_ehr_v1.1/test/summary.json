@@ -1,0 +1,544 @@
+{
+  "benchmark_id": "tracebench-ehr",
+  "benchmark_version": "1.1.0",
+  "split": "test",
+  "interpretation_limit": "匿名化済みMIMIC-IV Demo上の決定的な技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価しない。",
+  "build_summary": {
+    "split": "test",
+    "total_case_count": 1167,
+    "answerable_case_count": 934,
+    "answerable_template_count": 134,
+    "baseline_success_count": 934,
+    "baseline_success_rate": 1.0,
+    "baseline_failure_count": 0,
+    "row_count_capped_count": 0,
+    "empty_result_count": 82,
+    "pair_count": 763,
+    "pair_counts_by_mutation": {
+      "patient": 52,
+      "clinical_item": 55,
+      "time_constraint": 106,
+      "aggregation_operation": 34,
+      "information_source": 134,
+      "widget_mapping": 134,
+      "data_widget_connection": 129,
+      "stale_result": 119
+    },
+    "template_counts_by_mutation": {
+      "patient": 52,
+      "clinical_item": 55,
+      "time_constraint": 106,
+      "aggregation_operation": 34,
+      "information_source": 134,
+      "widget_mapping": 134,
+      "data_widget_connection": 129,
+      "stale_result": 119
+    },
+    "construction_failure_counts": {
+      "patient": 1140,
+      "clinical_item": 1383,
+      "time_constraint": 576,
+      "aggregation_operation": 321,
+      "information_source": 0,
+      "widget_mapping": 0,
+      "data_widget_connection": 0,
+      "stale_result": 0
+    }
+  },
+  "condition_metrics": [
+    {
+      "condition": "local_checks",
+      "invalid_candidate_count": 763,
+      "unsafe_acceptance_count": 763,
+      "unsafe_acceptance_rate": 1.0,
+      "valid_candidate_count": 763,
+      "valid_acceptance_count": 763,
+      "valid_acceptance_rate": 1.0,
+      "localized_candidate_count": 763,
+      "localization_correct_count": 0,
+      "localization_accuracy": 0.0,
+      "repair_attempt_count": 0,
+      "repair_success_count": 0,
+      "repair_success_rate": 0.0,
+      "mean_validation_milliseconds": 2.152480594583434
+    },
+    {
+      "condition": "artifact_contracts",
+      "invalid_candidate_count": 763,
+      "unsafe_acceptance_count": 367,
+      "unsafe_acceptance_rate": 0.48099606815203144,
+      "valid_candidate_count": 763,
+      "valid_acceptance_count": 763,
+      "valid_acceptance_rate": 1.0,
+      "localized_candidate_count": 763,
+      "localization_correct_count": 387,
+      "localization_accuracy": 0.5072083879423329,
+      "repair_attempt_count": 396,
+      "repair_success_count": 387,
+      "repair_success_rate": 0.9772727272727273,
+      "mean_validation_milliseconds": 7.441162780097528
+    },
+    {
+      "condition": "graph_contract",
+      "invalid_candidate_count": 763,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "valid_candidate_count": 763,
+      "valid_acceptance_count": 763,
+      "valid_acceptance_rate": 1.0,
+      "localized_candidate_count": 763,
+      "localization_correct_count": 763,
+      "localization_accuracy": 1.0,
+      "repair_attempt_count": 763,
+      "repair_success_count": 763,
+      "repair_success_rate": 1.0,
+      "mean_validation_milliseconds": 9.33852157189186
+    },
+    {
+      "condition": "sidecar_contract",
+      "invalid_candidate_count": 763,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "valid_candidate_count": 763,
+      "valid_acceptance_count": 763,
+      "valid_acceptance_rate": 1.0,
+      "localized_candidate_count": 763,
+      "localization_correct_count": 763,
+      "localization_accuracy": 1.0,
+      "repair_attempt_count": 763,
+      "repair_success_count": 763,
+      "repair_success_rate": 1.0,
+      "mean_validation_milliseconds": 9.295839282049618
+    }
+  ],
+  "mutation_metrics": [
+    {
+      "mutation_kind": "patient",
+      "condition": "local_checks",
+      "candidate_count": 52,
+      "template_count": 52,
+      "unsafe_acceptance_count": 52,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "patient",
+      "condition": "artifact_contracts",
+      "candidate_count": 52,
+      "template_count": 52,
+      "unsafe_acceptance_count": 51,
+      "unsafe_acceptance_rate": 0.9807692307692307,
+      "safe_rejection_count": 1,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "patient",
+      "condition": "graph_contract",
+      "candidate_count": 52,
+      "template_count": 52,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 52,
+      "localization_correct_count": 52,
+      "repair_success_count": 52
+    },
+    {
+      "mutation_kind": "patient",
+      "condition": "sidecar_contract",
+      "candidate_count": 52,
+      "template_count": 52,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 52,
+      "localization_correct_count": 52,
+      "repair_success_count": 52
+    },
+    {
+      "mutation_kind": "clinical_item",
+      "condition": "local_checks",
+      "candidate_count": 55,
+      "template_count": 55,
+      "unsafe_acceptance_count": 55,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "clinical_item",
+      "condition": "artifact_contracts",
+      "candidate_count": 55,
+      "template_count": 55,
+      "unsafe_acceptance_count": 51,
+      "unsafe_acceptance_rate": 0.9272727272727272,
+      "safe_rejection_count": 4,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "clinical_item",
+      "condition": "graph_contract",
+      "candidate_count": 55,
+      "template_count": 55,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 55,
+      "localization_correct_count": 55,
+      "repair_success_count": 55
+    },
+    {
+      "mutation_kind": "clinical_item",
+      "condition": "sidecar_contract",
+      "candidate_count": 55,
+      "template_count": 55,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 55,
+      "localization_correct_count": 55,
+      "repair_success_count": 55
+    },
+    {
+      "mutation_kind": "time_constraint",
+      "condition": "local_checks",
+      "candidate_count": 106,
+      "template_count": 106,
+      "unsafe_acceptance_count": 106,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "time_constraint",
+      "condition": "artifact_contracts",
+      "candidate_count": 106,
+      "template_count": 106,
+      "unsafe_acceptance_count": 103,
+      "unsafe_acceptance_rate": 0.9716981132075472,
+      "safe_rejection_count": 3,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "time_constraint",
+      "condition": "graph_contract",
+      "candidate_count": 106,
+      "template_count": 106,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 106,
+      "localization_correct_count": 106,
+      "repair_success_count": 106
+    },
+    {
+      "mutation_kind": "time_constraint",
+      "condition": "sidecar_contract",
+      "candidate_count": 106,
+      "template_count": 106,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 106,
+      "localization_correct_count": 106,
+      "repair_success_count": 106
+    },
+    {
+      "mutation_kind": "aggregation_operation",
+      "condition": "local_checks",
+      "candidate_count": 34,
+      "template_count": 34,
+      "unsafe_acceptance_count": 34,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "aggregation_operation",
+      "condition": "artifact_contracts",
+      "candidate_count": 34,
+      "template_count": 34,
+      "unsafe_acceptance_count": 33,
+      "unsafe_acceptance_rate": 0.9705882352941176,
+      "safe_rejection_count": 1,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "aggregation_operation",
+      "condition": "graph_contract",
+      "candidate_count": 34,
+      "template_count": 34,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 34,
+      "localization_correct_count": 34,
+      "repair_success_count": 34
+    },
+    {
+      "mutation_kind": "aggregation_operation",
+      "condition": "sidecar_contract",
+      "candidate_count": 34,
+      "template_count": 34,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 34,
+      "localization_correct_count": 34,
+      "repair_success_count": 34
+    },
+    {
+      "mutation_kind": "information_source",
+      "condition": "local_checks",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 134,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "information_source",
+      "condition": "artifact_contracts",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "information_source",
+      "condition": "graph_contract",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "information_source",
+      "condition": "sidecar_contract",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "widget_mapping",
+      "condition": "local_checks",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 134,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "widget_mapping",
+      "condition": "artifact_contracts",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "widget_mapping",
+      "condition": "graph_contract",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "widget_mapping",
+      "condition": "sidecar_contract",
+      "candidate_count": 134,
+      "template_count": 134,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 134,
+      "localization_correct_count": 134,
+      "repair_success_count": 134
+    },
+    {
+      "mutation_kind": "data_widget_connection",
+      "condition": "local_checks",
+      "candidate_count": 129,
+      "template_count": 129,
+      "unsafe_acceptance_count": 129,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "data_widget_connection",
+      "condition": "artifact_contracts",
+      "candidate_count": 129,
+      "template_count": 129,
+      "unsafe_acceptance_count": 129,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "data_widget_connection",
+      "condition": "graph_contract",
+      "candidate_count": 129,
+      "template_count": 129,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 129,
+      "localization_correct_count": 129,
+      "repair_success_count": 129
+    },
+    {
+      "mutation_kind": "data_widget_connection",
+      "condition": "sidecar_contract",
+      "candidate_count": 129,
+      "template_count": 129,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 129,
+      "localization_correct_count": 129,
+      "repair_success_count": 129
+    },
+    {
+      "mutation_kind": "stale_result",
+      "condition": "local_checks",
+      "candidate_count": 119,
+      "template_count": 119,
+      "unsafe_acceptance_count": 119,
+      "unsafe_acceptance_rate": 1.0,
+      "safe_rejection_count": 0,
+      "localization_correct_count": 0,
+      "repair_success_count": 0
+    },
+    {
+      "mutation_kind": "stale_result",
+      "condition": "artifact_contracts",
+      "candidate_count": 119,
+      "template_count": 119,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 119,
+      "localization_correct_count": 119,
+      "repair_success_count": 119
+    },
+    {
+      "mutation_kind": "stale_result",
+      "condition": "graph_contract",
+      "candidate_count": 119,
+      "template_count": 119,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 119,
+      "localization_correct_count": 119,
+      "repair_success_count": 119
+    },
+    {
+      "mutation_kind": "stale_result",
+      "condition": "sidecar_contract",
+      "candidate_count": 119,
+      "template_count": 119,
+      "unsafe_acceptance_count": 0,
+      "unsafe_acceptance_rate": 0.0,
+      "safe_rejection_count": 119,
+      "localization_correct_count": 119,
+      "repair_success_count": 119
+    }
+  ],
+  "paired_differences": [
+    {
+      "metric": "unsafe_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "local_checks",
+      "difference": -1.0,
+      "confidence_interval_95": [
+        -1.0,
+        -1.0
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "valid_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "local_checks",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "unsafe_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "artifact_contracts",
+      "difference": -0.48099606815203144,
+      "confidence_interval_95": [
+        -0.4955640050697085,
+        -0.46530612244897956
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "valid_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "artifact_contracts",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "unsafe_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "sidecar_contract",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "valid_acceptance_rate",
+      "first_condition": "graph_contract",
+      "second_condition": "sidecar_contract",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "template_count": 134,
+      "bootstrap_iterations": 10000
+    }
+  ],
+  "label_mismatch_count": 0,
+  "graph_sidecar_decision_mismatch_count": 0
+}
