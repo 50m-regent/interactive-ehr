@@ -95,7 +95,7 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - `report.md` は実験結果の短い要約です。
 - `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
 
-2026年8月27日に、EHRSQL-2024のcommit `f9e1aa02160d39e3f8df52bf5c69c5cf2e472499` とinteractive-ehrのcommit `69313eac4a7f347dc611fd3ca55f14cac3cab395` を使ってv0.1を実行しました。
+2026年8月27日に、EHRSQL-2024のcommit `f9e1aa02160d39e3f8df52bf5c69c5cf2e472499` とinteractive-ehrのcommit `74dcc2f7f35072e78b69641bebd04e33ced00d87` を使ってv0.1を実行しました。
 
 - 異なる質問テンプレートから50件を選定しました。
 - 正解SQLは50件すべてで実行に成功しました。
