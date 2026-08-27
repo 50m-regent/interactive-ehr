@@ -233,7 +233,6 @@ def _valid_candidate() -> tuple[TraceCandidate, TraceContract]:
         row_count=1,
         row_count_capped=False,
         widget_mapping=WidgetMapping.METRIC,
-        execution_seconds=0.001,
     )
     data_node = DataArtifact(
         node_id="target-node",

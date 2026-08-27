@@ -192,7 +192,6 @@ class ResultSnapshot(BaseModel):
     row_count: int = Field(ge=0)
     row_count_capped: bool
     widget_mapping: WidgetMapping
-    execution_seconds: float = Field(ge=0.0)
 
 
 class DataArtifact(BaseModel):
@@ -528,7 +527,6 @@ def execute_query_snapshot(
         raise TraceBenchError("query limits must be positive")
     normalized_checksum = normalized_query_checksum(query)
     deadline = time.monotonic() + timeout_seconds
-    started_at = time.monotonic()
 
     def progress_handler() -> int:
         """実行期限を超えたSQLite処理を停止する。"""
@@ -561,7 +559,6 @@ def execute_query_snapshot(
         row_count=len(observed_rows),
         row_count_capped=capped,
         widget_mapping=mapping,
-        execution_seconds=time.monotonic() - started_at,
     )
 
 
