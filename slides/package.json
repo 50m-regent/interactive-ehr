@@ -1,7 +1,7 @@
 {
   "name": "research-slides",
   "private": true,
-  "version": "0.4.3",
+  "version": "0.5.0",
   "scripts": {
     "dev": "marp --server .",
     "preview": "marp --preview",

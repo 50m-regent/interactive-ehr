@@ -11,9 +11,9 @@ lang: "ja"
 
 # Research Theme
 
-###### コンポーネント一覧 · 2026-07-17
+## コンポーネント一覧 · 2026-07-17
 
-#### Markdownで編集できる研究スライド
+### Markdownで編集できる研究スライド
 
 ---
 
@@ -63,6 +63,39 @@ lang: "ja"
 
 ---
 
+<!-- _class: reference-rebuild summary inactive-labels -->
+
+# 非選択ラベル
+
+| 項目 | 内容 |
+| --- | --- |
+| *背景* | 前のページで説明した内容 |
+| 目的 | このページで説明する内容 |
+| *方法* | 次のページで説明する内容 |
+
+---
+
+<!-- _class: summary accent-labels wide-labels -->
+
+# 長いラベル
+
+| 項目 | 内容 |
+| --- | --- |
+| Potential Participants | 医療従事者へ協力を依頼する |
+| Evaluation Procedure | 固定条件で二つの画面を比較する |
+
+---
+
+<!-- _class: summary -->
+
+# 研究質問
+
+1. どの誤りが残るか
+2. どの確認方法が誤りを見つけるか
+3. どこまで自動で直せるか
+
+---
+
 <!-- _class: statement -->
 
 # 背景
@@ -94,6 +127,8 @@ lang: "ja"
 3. **UI**
 
    一覧表示または時系列表示
+
+**入力から表示までを同じ条件で確かめる**
 
 ---
 
@@ -242,7 +277,56 @@ lang: "ja"
 
 ![タスクに基づくUI生成の概念図](assets/diagram.svg)
 
+タスクとUIの関係を示す概念図
+
 > 出典: 著者名ほか, 論文誌名, 2026
+
+---
+
+<!-- _class: visual-pair -->
+
+# 画面比較
+
+![従来画面](assets/diagram.svg)
+
+従来画面
+
+![提案画面](assets/diagram.svg)
+
+提案画面
+
+同じ条件で操作を比較する
+
+---
+
+<!-- _class: relation citation -->
+
+# Widget generation
+
+| 入力 | 出力 |
+| --- | --- |
+| タスクとデータ | 生成されたWidget |
+
+入力に応じて表示を構成する
+
+> 出典: 著者名ほか, 論文誌名, 2026
+
+---
+
+<!-- _class: labeled-sections -->
+
+# ScenarioとTasks
+
+> 対象となる診療状況を示す
+
+## Scenario
+
+> 患者の状態を確認して対応を決める
+
+## Tasks
+
+- 必要な検査結果を確認する
+- 処方内容を確認する
 
 ---
 

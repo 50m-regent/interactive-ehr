@@ -1,15 +1,15 @@
 {
-  "template_version": "0.4.3",
+  "template_version": "0.5.0",
   "files": {
     ".gitignore": "b2c7815acfee27a95356c34635b0de43f878a2868a43af325e64d7c06b3f2846",
-    "EDITING.md": "828836632e86ae1a0d1c76c26190a26881c4a0d461e240c35f5352037a3955aa",
-    "check-markdown.mjs": "fdc3d6333dfdf2b252a4f0936d8460001e16a5e14ed7cff24bfb065f35794586",
+    "EDITING.md": "17b463a4f709b8e3d1196432925ee442e4436402eebe0232b0d24ff3a5d38dc2",
+    "check-markdown.mjs": "1ff8c616051feb428970fa64e54a28c4d3bc75ee7e1c0f8ad4e29c21c7a80cd0",
     "examples/assets/diagram.svg": "6535a9bdff87af1ed605debf716ed1fe91a515fcee63f1de26362b8adacab68c",
-    "examples/component-gallery.md": "5542563f5a170c44198ac74e618a415890e4f128c1ad65b54b50472008a631e6",
+    "examples/component-gallery.md": "af5ff67c3df54a1de2e7046bdd2b1616f9784bc504e816f423f805883840b8be",
     "marp.config.mjs": "1741e334b76a92c46c2efd5f7cadd7d92a3dded6e852080746409ae5172df3c7",
-    "package-lock.json": "f4db0e098c16e9b6602add746c4d54856fb1794f104e466fb75a58f98a4e06e0",
-    "package.json": "b7fc5d5c031f4d1918461eba65714d7cd30d986805bf5d2e12ac648e1555fd11",
-    "test-check-markdown.mjs": "3c4d215d270107a09e3456a83e1e15046e9747ae2296778b6733d40e7f0f4f2e",
-    "theme/research.css": "880760814206881cd19ea7faee5346d5c4177d13119dfd628bc326a575c4fd53"
+    "package-lock.json": "55273b790823d8f10765dca5e57a77f69ad7ff1455f3535646f76cffae70b38b",
+    "package.json": "5aa0bd95b75a506491faff5500dcf5896349dc311154cef331892772d050bf3e",
+    "test-check-markdown.mjs": "cdfe13b8199027000003c340b25c724a89367ca607654a462e09841c3ab1ee36",
+    "theme/research.css": "2de116b178fed15d9f3748713121ee0fea1e718215d83bcebc9609ee91792113"
   }
 }

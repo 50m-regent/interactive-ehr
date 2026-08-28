@@ -21,6 +21,18 @@ npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
 npm run render -- YYYY-MM-DD/slides.md -o .render/slides.png
 ```
 
+## 旧版からの更新
+
+テンプレート0.5.0では、参照PDFからの再構成用レイアウトと、frontmatter、画像、キャプションの検査が追加されます。スキル側から次のように更新します。
+
+```bash
+uv run python scripts/scaffold_project.py \
+  --project /path/to/project \
+  --upgrade-shared
+```
+
+管理対象の旧版と一致する共有ファイルだけを更新します。手編集したテーマ、検査スクリプト、ガイドは保持します。
+
 ## 1枚の基本構造
 
 スライドは`---`で区切ります。`_class`コメントでレイアウトを選びます。
@@ -53,6 +65,14 @@ author: "氏名"
 lang: "ja"
 ---
 ```
+
+ページ区切りMarkdownと参照PDFから派生デッキを作る場合は、元Markdownを別ファイルへ複製し、次のクラスも追加します。元Markdownは変更しません。
+
+```yaml
+class: reference-rebuild
+```
+
+このクラスでは、元Markdownの斜体を朱色、太字を濃紺で表示します。全ページへ内容に合う`_class`を付けます。
 
 ## 基本Markdown
 
@@ -136,9 +156,35 @@ lang: "ja"
 <!-- _class: summary accent-labels -->
 ```
 
+斜体にした非選択ラベルを青灰にする場合は`inactive-labels`、長いラベル用に左列を広げる場合は`wide-labels`を使います。
+
+```markdown
+<!-- _class: summary inactive-labels -->
+
+| 項目 | 内容 |
+| --- | --- |
+| *背景* | すでに説明した内容 |
+| 目的 | 今回説明する内容 |
+```
+
+```markdown
+<!-- _class: summary accent-labels wide-labels -->
+```
+
 3列以上の表は通常の表として表示されます。
 
 要約表は内容に応じた幅になり、見出しを除く表全体がスライドの縦横中央へ配置されます。
+
+ラベルが不要な近況や研究質問は、`summary`に短い箇条書きまたは番号付きリストを書きます。
+
+```markdown
+<!-- _class: summary -->
+
+# 研究質問
+
+1. どの誤りが残るか
+2. どこまで自動で直せるか
+```
 
 ## 主張と結論
 
@@ -179,10 +225,14 @@ lang: "ja"
 3. **UI**
 
    一覧表示または時系列表示
+
+**入力から表示までを同じ条件で確かめる**
 ```
 
 番号付きリストを3列から5列で使います。各項目の最初の太字が朱色のラベルになります。
+各項目は2pxの枠線で囲まれます。項目名が意図せず折り返す場合は、文字を小さくせず、項目名を短くするか項目数を減らします。
 本文ブロックはスライド中央へ配置されます。
+カードの下に結論を置く場合は、短い太字の段落にします。`citation`は出典を下部へ置く場合だけ使います。
 
 ## 縦方向の手順
 
@@ -362,10 +412,71 @@ lang: "ja"
 
 ![論文中の概念図](assets/paper-figure.png)
 
+論文中の概念図の説明
+
 > 出典: 著者名ほか, 雑誌名, 2026
 ```
 
 `citation`を併用すると、引用がスライド下部へ移動します。
+
+## 二つの画像
+
+```markdown
+<!-- _class: visual-pair -->
+
+# 画面比較
+
+![従来画面](assets/current.png)
+
+従来画面
+
+![提案画面](assets/proposed.png)
+
+提案画面
+
+同じ条件で操作を比較する
+```
+
+画像とキャプションを2組置きます。最後の通常段落は2画像に共通する結論になります。
+
+## 左右の関係
+
+```markdown
+<!-- _class: relation citation -->
+
+# Widget generation
+
+| 入力 | 出力 |
+| --- | --- |
+| タスクとデータ | 生成されたWidget |
+
+入力に応じて表示を構成する
+
+> 出典: 著者名ほか, 雑誌名, 2026
+```
+
+2列の表を矢印で結びます。出典がある場合は`citation`を併用します。
+
+## ScenarioとTasks
+
+```markdown
+<!-- _class: labeled-sections -->
+
+# ScenarioとTasks
+
+> 対象となる診療状況を示す
+
+## Scenario
+
+> 患者の状態を確認して対応を決める
+
+## Tasks
+
+- 必要な検査結果を確認する
+- 処方内容を確認する
+```
+
+導入の引用、`Scenario`、`Tasks`の順に書きます。
 
 ## 説明枠
 
@@ -390,5 +501,7 @@ lang: "ja"
 - 横方向の処理には`pipeline`、時系列の手順には`procedure`を使います。
 - 背景、目的、方法には`summary`を使います。
 - 複雑な図は画像として用意し、`visual`で配置します。
+- 画像の直後には通常段落でキャプションを書きます。
+- 二つの画像を比べる場合は`visual-pair`を使います。
 - raw HTML、インラインCSS、外部スクリプトは書きません。
 - PDF出力前にMarkdown検査、PNG出力、原寸確認を行います。

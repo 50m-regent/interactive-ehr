@@ -99,6 +99,15 @@ mark {
   background: transparent;
 }
 
+section.reference-rebuild em {
+  color: var(--research-accent);
+  font-style: normal;
+}
+
+section.reference-rebuild strong {
+  color: var(--research-navy);
+}
+
 s {
   color: var(--research-bluegray);
   text-decoration: none;
@@ -168,7 +177,7 @@ section.cover {
 section.cover h1 {
   position: absolute;
   right: 44px;
-  bottom: calc(40% - 29px);
+  bottom: 40%;
   left: 44px;
   margin: 0;
   color: var(--research-white);
@@ -195,7 +204,29 @@ section.cover h6 {
   line-height: 1.2;
 }
 
+section.cover h2 {
+  position: absolute;
+  top: 548px;
+  right: 44px;
+  left: 44px;
+  margin: 0;
+  color: var(--research-text);
+  font-size: var(--research-font-table);
+  line-height: 1.2;
+}
+
 section.cover h4 {
+  position: absolute;
+  top: 594px;
+  right: 44px;
+  left: 44px;
+  margin: 0;
+  color: var(--research-navy);
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+section.cover h3 {
   position: absolute;
   top: 594px;
   right: 44px;
@@ -254,6 +285,11 @@ section.section li strong {
   color: var(--research-white);
 }
 
+section.reference-rebuild.section h1 strong,
+section.reference-rebuild.section li strong {
+  color: var(--research-white);
+}
+
 section.summary table {
   width: max-content;
   max-width: 100%;
@@ -308,6 +344,22 @@ section.summary.focus tr:has(td:first-child strong) td:first-child {
 
 section.summary.accent-labels td:first-child {
   background: var(--research-highlight);
+}
+
+section.summary.inactive-labels tr:has(td:first-child em) td:first-child {
+  background: var(--research-bluegray);
+}
+
+section.summary.inactive-labels td:first-child em {
+  color: inherit;
+}
+
+section.summary.wide-labels table:not(:has(th:nth-child(3))) {
+  width: min(1120px, 100%);
+}
+
+section.summary.wide-labels table:not(:has(th:nth-child(3))) td:first-child {
+  width: 520px;
 }
 
 section.summary table:has(th:nth-child(3)) {
@@ -460,9 +512,15 @@ section.pipeline > ol > li {
   position: relative;
   display: flex;
   min-width: 0;
+  min-height: 176px;
+  box-sizing: border-box;
   flex-direction: column;
   justify-content: flex-start;
   margin: 0;
+  padding: 20px 14px;
+  border: var(--research-card-border-width) solid var(--research-border);
+  border-radius: var(--research-radius);
+  background: var(--research-white);
   text-align: center;
   counter-increment: pipeline;
 }
@@ -1018,15 +1076,18 @@ section.visual {
 section.visual > p:has(img) {
   display: flex;
   flex: 1;
+  min-height: 0;
   align-items: center;
   justify-content: center;
   margin: 0;
+  overflow: hidden;
 }
 
 section.visual img {
   display: block;
+  width: 100%;
+  height: 440px;
   max-width: 100%;
-  max-height: 520px;
   margin: 0 auto;
   object-fit: contain;
 }
@@ -1055,7 +1116,175 @@ section.citation blockquote {
 }
 
 section.visual.citation img {
-  max-height: 468px;
+  height: 370px;
+}
+
+section.visual.citation > p:not(:has(img)) {
+  margin-bottom: 30px;
+}
+
+section.visual-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: 8px 34px;
+  padding: 112px 44px 34px;
+}
+
+section.visual-pair > p {
+  margin: 0;
+}
+
+section.visual-pair > p:has(img) {
+  display: flex;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+section.visual-pair > p:has(img):first-of-type {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+section.visual-pair > p:has(img):nth-of-type(3) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+section.visual-pair img {
+  display: block;
+  max-width: 100%;
+  max-height: 430px;
+  object-fit: contain;
+}
+
+section.visual-pair > p:nth-of-type(2),
+section.visual-pair > p:nth-of-type(4) {
+  grid-row: 2;
+  color: var(--research-navy);
+  text-align: center;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+section.visual-pair > p:nth-of-type(2) {
+  grid-column: 1;
+}
+
+section.visual-pair > p:nth-of-type(4) {
+  grid-column: 2;
+}
+
+section.visual-pair > p:nth-of-type(5) {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  color: var(--research-accent);
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+section.relation {
+  justify-content: center;
+  padding: 80px 94px 54px;
+}
+
+section.relation > table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 72px 0;
+}
+
+section.relation > table thead {
+  display: none;
+}
+
+section.relation > table td {
+  position: relative;
+  padding: 24px;
+  border: 2px solid var(--research-navy);
+  border-radius: var(--research-radius);
+  background: var(--research-white);
+  text-align: center;
+  vertical-align: middle;
+}
+
+section.relation > table td:first-child::after {
+  content: "›";
+  position: absolute;
+  top: 50%;
+  right: -54px;
+  color: var(--research-navy);
+  font-size: 64px;
+  line-height: 1;
+  transform: translateY(-54%);
+}
+
+section.relation > p {
+  margin: 26px 0 0;
+  color: var(--research-accent);
+  text-align: center;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+section.relation.citation > p {
+  margin-bottom: 34px;
+}
+
+section.labeled-sections {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 22px 26px;
+  align-content: center;
+  padding: 106px 56px 46px;
+}
+
+section.labeled-sections > blockquote,
+section.labeled-sections > ul {
+  margin: 0;
+}
+
+section.labeled-sections > blockquote:first-of-type {
+  grid-column: 1 / -1;
+  padding: 18px 22px;
+  border: 2px solid var(--research-navy);
+  border-radius: var(--research-radius);
+  color: var(--research-text);
+}
+
+section.labeled-sections > h2 {
+  align-self: start;
+  padding: 12px 18px;
+  border-radius: var(--research-radius);
+  background: var(--research-highlight);
+  color: var(--research-white);
+  text-align: center;
+  font-size: var(--research-font-label);
+}
+
+section.labeled-sections > h2:first-of-type,
+section.labeled-sections > blockquote:nth-of-type(2) {
+  grid-row: 2;
+}
+
+section.labeled-sections > h2:nth-of-type(2),
+section.labeled-sections > ul {
+  grid-row: 3;
+}
+
+section.labeled-sections > blockquote:nth-of-type(2),
+section.labeled-sections > ul {
+  grid-column: 2;
+  padding: 12px 20px;
+  border: 0;
+}
+
+section.labeled-sections > ul {
+  margin-top: 0;
 }
 
 section.callout.citation > blockquote {
