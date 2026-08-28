@@ -3,14 +3,14 @@ marp: true
 theme: research
 paginate: false
 math: mathjax
-title: "TraceBench-EHRの技術評価：実験内容と主張できること"
+title: "提案手法の技術評価：実験内容と主張できること"
 author: "平田 蓮"
 lang: "ja"
 ---
 
 <!-- _class: cover -->
 
-# TraceBench-EHRの技術評価
+# 提案手法の技術評価
 
 ###### 実験内容と主張できること · 2026-08-28
 
@@ -227,4 +227,4 @@ lang: "ja"
 | 正しい組み合わせはすべて通した | 複数のずれや生成モデルでも同じか |
 | 問題の場所を特定し、1回で修正 | 医療現場で役立ち、安全か |
 
-> TraceBench-EHRは、質問から表示までの対応を同じ手順で確かめる仕組み
+> 提案手法は、質問から表示までの対応を同じ手順で確かめる仕組み
