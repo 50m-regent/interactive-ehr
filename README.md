@@ -161,6 +161,25 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 正式結果は `results/evaluation/tracebench_ehr_v1.1/test/`、パイロット結果は `results/evaluation/tracebench_ehr_v1.1/validation/` に保存しています。完全な変異別集計と実行時間は各 `summary.json` を参照してください。
 
+保存済みの正式結果を表計算ソフトで確認する場合は、元のJSONとJSON Linesを変更せずTSVへ変換します。この処理は正式評価を再実行しません。元成果物のチェックサム、候補単位から再計算した主要指標、95%信頼区間を照合してから出力します。
+
+```bash
+uv run python scripts/export_tracebench_tsv.py \
+  results/evaluation/tracebench_ehr_v1.1/test
+```
+
+結果は `results/evaluation/tracebench_ehr_v1.1/test/tsv/` に保存されます。
+
+- `build_summary.tsv` は対象件数、基準成果物の構築結果、変異別の生成数を1行にまとめます。
+- `condition_metrics.tsv` は4種類の検査方法の主要指標と副次指標を記録します。
+- `mutation_metrics.tsv` は8種類の不整合と4種類の検査方法の組み合わせを記録します。
+- `paired_differences.tsv` は条件間の対応差と95%信頼区間を記録します。
+- `pair_manifest.tsv` は763組のハッシュ化した識別子、変異種類、チェックサムを記録します。
+- `candidate_results.tsv` は6,104回の受理、特定、修復、検証時間を記録します。
+- `export_manifest.json` は変換コード、元成果物、TSVのチェックサム、行数、照合結果を記録します。
+
+TSVには質問文、SQL、患者ID、患者ごとの結果値を含めません。`mutation_kind`列の`patient`は対象患者を変える不整合の種類を表すラベルであり、患者IDではありません。
+
 validationパイロットの実行例は次のとおりです。
 
 ```bash
@@ -357,6 +376,7 @@ scripts/
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
   run_ehrsql_feasibility.py -- EHRSQL-2024の50件実行可能性確認
   run_tracebench_ehr.py   -- TraceBench-EHRのvalidationとtestの実行
+  export_tracebench_tsv.py -- 保存済みのTraceBench-EHR結果をTSVへ変換
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
