@@ -130,6 +130,21 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
+## 発表資料
+
+研究発表用のMarp資料は `slides/YYYY-MM-DD/` に置きます。Markdownを編集し、同じディレクトリへPDFを出力します。利用できるレイアウトと編集方法は `slides/EDITING.md` にまとめています。
+
+```bash
+cd slides
+npm ci
+npm test
+npm run check -- YYYY-MM-DD/slides.md
+npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
+npm run render -- YYYY-MM-DD/slides.md -o .render/slides.png
+```
+
+`node_modules/` と `.render/` はGitで管理しません。
+
 ## モデル生成
 
 DWHテーブル設計書（`data/dwh_table_design_2025-11-01.xlsx`）からPydanticモデルを自動生成:
@@ -198,4 +213,9 @@ scripts/
   build_dwh_database.py   -- DWH CSVをSQLite DBへ読み込み
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
+
+slides/
+  YYYY-MM-DD/slides.md    -- 日付別のMarpスライド
+  theme/research.css      -- 共有テーマ
+  EDITING.md              -- 編集方法とレイアウト一覧
 ```
