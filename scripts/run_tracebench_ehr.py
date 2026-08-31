@@ -28,7 +28,9 @@ def parse_args() -> argparse.Namespace:
     """コマンドライン引数を読む。"""
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--split", choices=[item.value for item in TraceSplit], required=True)
+    parser.add_argument(
+        "--split", choices=[item.value for item in TraceSplit], required=True
+    )
     parser.add_argument("--annotated-data", type=Path, required=True)
     parser.add_argument("--dataset-data", type=Path, required=True)
     parser.add_argument("--database", type=Path, required=True)

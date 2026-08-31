@@ -81,9 +81,7 @@ class TestProxyConfig:
         assert config.temperature == 0.2
         assert config.timeout_seconds == 300.0
 
-    def test_from_env_applies_overrides(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_from_env_applies_overrides(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("GEMINI_PROXY_URL", PROXY_URL)
         monkeypatch.setenv("GEMINI_MODEL", "gemini-3.1-pro")
         monkeypatch.setenv("GEMINI_PROXY_MAX_OUTPUT_TOKENS", "32768")

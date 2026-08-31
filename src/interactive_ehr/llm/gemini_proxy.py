@@ -71,12 +71,8 @@ class ProxyConfig:
             max_output_tokens=_int_env(
                 "GEMINI_PROXY_MAX_OUTPUT_TOKENS", DEFAULT_MAX_OUTPUT_TOKENS
             ),
-            temperature=_float_env(
-                "GEMINI_PROXY_TEMPERATURE", DEFAULT_TEMPERATURE
-            ),
-            timeout_seconds=_float_env(
-                "GEMINI_PROXY_TIMEOUT", DEFAULT_TIMEOUT_SECONDS
-            ),
+            temperature=_float_env("GEMINI_PROXY_TEMPERATURE", DEFAULT_TEMPERATURE),
+            timeout_seconds=_float_env("GEMINI_PROXY_TIMEOUT", DEFAULT_TIMEOUT_SECONDS),
         )
 
 
@@ -123,7 +119,9 @@ def generate_via_proxy(prompt: str, schema: type[T], config: ProxyConfig) -> T:
             "GEMINI_PROXY_URL とコンテナからの疎通を確認してください。"
         ) from exc
     except requests.RequestException as exc:
-        raise RuntimeError(f"Geminiプロキシへのリクエストに失敗しました: {exc}") from exc
+        raise RuntimeError(
+            f"Geminiプロキシへのリクエストに失敗しました: {exc}"
+        ) from exc
     response.encoding = "utf-8"
 
     if response.status_code != 200:

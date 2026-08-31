@@ -186,7 +186,9 @@ def audit_information_trace(
     for task in graph.tasks:
         has_widgets = bool(task.runtime_widget_ids)
         if known_widget_ids is not None:
-            has_widgets = has_widgets and set(task.runtime_widget_ids) <= known_widget_ids
+            has_widgets = (
+                has_widgets and set(task.runtime_widget_ids) <= known_widget_ids
+            )
         if not has_widgets:
             tasks_without_widgets.append(task.id)
     return InformationTraceAudit(

@@ -52,8 +52,7 @@ def _sanitize_json_schema_node(node: Any) -> Any:
     for key, value in node.items():
         if key in {"$defs", "properties"}:
             sanitized[key] = {
-                name: _sanitize_json_schema_node(child)
-                for name, child in value.items()
+                name: _sanitize_json_schema_node(child) for name, child in value.items()
             }
             continue
         if key == "const":
@@ -84,9 +83,7 @@ def _relax_recursive_layout_children(schema: dict[str, Any]) -> None:
     columns = defs.get("ColumnsSpec")
     if isinstance(columns, dict):
         columns_items = (
-            columns.get("properties", {})
-            .get("columns", {})
-            .get("items", {})
+            columns.get("properties", {}).get("columns", {}).get("items", {})
         )
         if isinstance(columns_items, dict):
             columns_items["items"] = generic_widget

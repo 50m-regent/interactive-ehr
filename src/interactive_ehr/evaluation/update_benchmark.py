@@ -124,7 +124,9 @@ class ArtifactState(BaseModel):
         _ensure_unique_ids(self.queries, "query")
         widget_ids = {widget.id for widget in self.widgets}
         query_ids = {query.id for query in self.queries}
-        task_widget_ids = [widget_id for task in self.tasks for widget_id in task.widget_ids]
+        task_widget_ids = [
+            widget_id for task in self.tasks for widget_id in task.widget_ids
+        ]
         if len(task_widget_ids) != len(set(task_widget_ids)):
             raise ValueError("a widget may belong to only one task")
         unknown_widgets = set(task_widget_ids) - widget_ids
@@ -205,7 +207,9 @@ class GraphState(BaseModel):
             raise ValueError(f"unknown task widget node IDs: {sorted(unknown_widgets)}")
         unassigned_widgets = widget_ids - set(owned_widget_ids)
         if unassigned_widgets:
-            raise ValueError(f"unassigned widget node IDs: {sorted(unassigned_widgets)}")
+            raise ValueError(
+                f"unassigned widget node IDs: {sorted(unassigned_widgets)}"
+            )
         unknown_data = {widget.data_node_id for widget in self.widget_nodes} - data_ids
         if unknown_data:
             raise ValueError(f"unknown widget data node IDs: {sorted(unknown_data)}")
@@ -259,7 +263,9 @@ class UpdateIntent(BaseModel):
         if self.change_kind is ChangeKind.CROSS_LAYER_UPDATE and (
             self.requested_title is None or self.requested_task_condition is None
         ):
-            raise ValueError("cross-layer update requires task, data, and widget values")
+            raise ValueError(
+                "cross-layer update requires task, data, and widget values"
+            )
         return self
 
 
@@ -349,7 +355,9 @@ class BenchmarkDefinition(BaseModel):
             raise ValueError("evaluation split must contain 24 one-shot cases")
         for change_kind in ChangeKind:
             matching = [
-                case for case in evaluation_cases if case.intent.change_kind is change_kind
+                case
+                for case in evaluation_cases
+                if case.intent.change_kind is change_kind
             ]
             if len(matching) != 4:
                 raise ValueError(
@@ -484,11 +492,15 @@ class BenchmarkDefinition(BaseModel):
             if (
                 intent.destination_task_id == intent.target_task_id
                 or intent.destination_task_id is None
-                or intent.target_widget_id in tasks[intent.destination_task_id].widget_ids
+                or intent.target_widget_id
+                in tasks[intent.destination_task_id].widget_ids
             ):
                 raise ValueError(f"display grouping does not change: {case.id}")
         elif intent.change_kind is ChangeKind.CHANGE_TASK_FLOW:
-            if intent.requested_task_condition == tasks[intent.target_task_id].condition:
+            if (
+                intent.requested_task_condition
+                == tasks[intent.target_task_id].condition
+            ):
                 raise ValueError(f"task flow does not change: {case.id}")
         elif intent.change_kind is ChangeKind.CROSS_LAYER_UPDATE:
             if (
@@ -635,7 +647,9 @@ def load_update_benchmark(path: Path) -> BenchmarkDefinition:
 def canonical_checksum(value: BaseModel | dict[str, Any] | list[Any]) -> str:
     """Return a stable SHA-256 checksum for JSON-compatible content."""
 
-    payload: Any = value.model_dump(mode="json") if isinstance(value, BaseModel) else value
+    payload: Any = (
+        value.model_dump(mode="json") if isinstance(value, BaseModel) else value
+    )
     encoded = json.dumps(
         payload,
         ensure_ascii=False,
@@ -996,7 +1010,9 @@ def _run_sequences(
                     },
                 )
                 paired = build_paired_candidate(benchmark, case, specification)
-                before_checksum = _committed_checksum(method, artifact_state, graph_state)
+                before_checksum = _committed_checksum(
+                    method, artifact_state, graph_state
+                )
                 record = evaluate_candidate(
                     benchmark,
                     case,
@@ -1015,7 +1031,9 @@ def _run_sequences(
                     else:
                         graph_state = apply_graph_patch(graph_state, paired.graph_patch)
                         artifact_state = compile_graph_artifact(graph_state)
-                after_checksum = _committed_checksum(method, artifact_state, graph_state)
+                after_checksum = _committed_checksum(
+                    method, artifact_state, graph_state
+                )
                 records.append(
                     SequenceRunRecord(
                         sequence_id=sequence.id,
@@ -1482,7 +1500,8 @@ def _validate_artifact_trace(candidate: ArtifactState) -> ValidationResult:
     gaps = sorted(
         f"{widget.id}.{field}"
         for widget in candidate.widgets
-        for field in set(widget.displayed_fields) - set(queries[widget.query_id].selected_fields)
+        for field in set(widget.displayed_fields)
+        - set(queries[widget.query_id].selected_fields)
     )
     return ValidationResult(
         check_id="traceability",
@@ -1671,11 +1690,15 @@ def _changed_entity_keys(
 ) -> set[str]:
     """Return artifact entities whose serialized values changed."""
 
-    return _changed_keys(before.tasks, candidate.tasks, "task") | _changed_keys(
-        before.widgets,
-        candidate.widgets,
-        "widget",
-    ) | _changed_keys(before.queries, candidate.queries, "query")
+    return (
+        _changed_keys(before.tasks, candidate.tasks, "task")
+        | _changed_keys(
+            before.widgets,
+            candidate.widgets,
+            "widget",
+        )
+        | _changed_keys(before.queries, candidate.queries, "query")
+    )
 
 
 def _changed_graph_entity_keys(
@@ -1684,15 +1707,19 @@ def _changed_graph_entity_keys(
 ) -> set[str]:
     """Return graph nodes whose serialized values changed."""
 
-    return _changed_keys(
-        before.task_nodes,
-        candidate.task_nodes,
-        "task_node",
-    ) | _changed_keys(
-        before.widget_nodes,
-        candidate.widget_nodes,
-        "widget_node",
-    ) | _changed_keys(before.data_nodes, candidate.data_nodes, "data_node")
+    return (
+        _changed_keys(
+            before.task_nodes,
+            candidate.task_nodes,
+            "task_node",
+        )
+        | _changed_keys(
+            before.widget_nodes,
+            candidate.widget_nodes,
+            "widget_node",
+        )
+        | _changed_keys(before.data_nodes, candidate.data_nodes, "data_node")
+    )
 
 
 def _changed_keys(
