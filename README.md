@@ -178,6 +178,8 @@ uv run python scripts/export_tracebench_tsv.py \
 - `candidate_results.tsv` は6,104回の受理、特定、修復、検証時間を記録します。
 - `export_manifest.json` は変換コード、元成果物、TSVのチェックサム、行数、照合結果を記録します。
 
+各TSVの用途、全カラム、値の読み方は `results/evaluation/tracebench_ehr_v1.1/test/tsv/README.md` にまとめています。
+
 TSVには質問文、SQL、患者ID、患者ごとの結果値を含めません。`mutation_kind`列の`patient`は対象患者を変える不整合の種類を表すラベルであり、患者IDではありません。
 
 validationパイロットの実行例は次のとおりです。
