@@ -124,7 +124,9 @@ def source_overview(
         for summary in summaries
         if summary.latest_recorded_at is not None
     ]
-    latest_text = format_timestamp(max(recorded_times)) if recorded_times else "確認できません"
+    latest_text = (
+        format_timestamp(max(recorded_times)) if recorded_times else "確認できません"
+    )
     return source_text, latest_text
 
 

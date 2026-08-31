@@ -20,6 +20,10 @@ Claude Code 向けの `CLAUDE.md` と同じ意図の指示を Codex 向けにま
 ## 作業ルール
 
 - 実装を行う場合は、作業用ブランチを切り、実装、コミット、push、PR作成まで行います。
+- 作業場所はこの`interactive-ehr/`だけとし、追加のcloneやworktreeを作りません。
+- 複数のチャットで同時に変更せず、作業用ブランチを順番に切り替えます。
+- CodexのチャットはLocalで開始し、worktreeで始めたチャットはLocalへHandoffしてから続けます。
+- 未コミット変更がある場合はブランチを切り替えず、変更内容と担当中の作業を確認します。
 - 機能追加や構成変更をした場合は、必要に応じて `README.md` を更新します。
 - 既存の実装・テスト・ディレクトリ構成に合わせて、変更範囲を必要最小限に保ちます。
 - Python コードを変更した場合は、関連テストを実行します。
@@ -27,8 +31,8 @@ Claude Code 向けの `CLAUDE.md` と同じ意図の指示を Codex 向けにま
 
 ## よく使うコマンド
 
-- アプリ起動: `uv run --with-editable . python -m streamlit run src/interactive_ehr/app.py`
-- テスト実行: `uv run --with-editable . python -m pytest tests/ -v`
+- アプリ起動: `uv run streamlit run src/interactive_ehr/app.py`
+- テスト実行: `uv run pytest tests/ -v`
 - 型チェック: `uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/provenance.py src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py`
 - パッケージ追加: `uv add <package>`
 - 開発用パッケージ追加: `uv add --dev <package>`

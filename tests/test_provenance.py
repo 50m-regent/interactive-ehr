@@ -23,8 +23,7 @@ def test_summarize_data_nodes_reports_source_date_count_and_missingness() -> Non
         data_type="dataframe",
         description="検査値推移",
         sql=(
-            'SELECT "検査日", MAX("値") AS "値" FROM "検体検査結果" '
-            'GROUP BY "検査日"'
+            'SELECT "検査日", MAX("値") AS "値" FROM "検体検査結果" GROUP BY "検査日"'
         ),
     )
     context = {

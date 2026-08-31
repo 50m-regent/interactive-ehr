@@ -1,0 +1,36 @@
+{
+  "benchmark_id": "tracebench-ehr",
+  "benchmark_version": "1.1.0",
+  "executed_at": "2026-08-27T12:34:33.937719+00:00",
+  "split": "test",
+  "dataset_repository": "https://github.com/glee4810/ehrsql-2024",
+  "dataset_commit": "f9e1aa02160d39e3f8df52bf5c69c5cf2e472499",
+  "dataset_version": "test_v1.1.2",
+  "code_commit": "baa82075b6bfd3bad70b2ca2bc4ae4852db91beb",
+  "random_seed": 20260827,
+  "bootstrap_iterations": 10000,
+  "query_timeout_seconds": 5.0,
+  "max_result_rows": 10000,
+  "python_version": "3.12.9",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "pair_count": 763,
+  "candidate_run_count": 6104,
+  "input_checksums": {
+    "annotated.json": "f835acf43037d6857dd41a69e7716ed324ad899cd6abeb69be4743bd762d4f4d",
+    "data.json": "b141da1fd5fa7e7ba8179ce87528653daa8eaa68d5510662e7a65b51cc626b42",
+    "mimic_iv.sqlite": "a26a60261d7e3bbf1869ffd92efe1803abdbce3eb256a2883fc0439c63427796",
+    "tracebench_ehr.v1.json": "d56d086a31246dd36a8ce5342dd215cc383728b99f712378a47ecdea96412e96"
+  },
+  "implementation_checksums": {
+    "tracebench_ehr.py": "dd70e0a38172cb625ac8f99d1b94fbe6ed817bb52187455a00dd996c517b1b3a",
+    "tracebench_analysis.py": "b9c614659699b85e153994a6f206d1928be470c9ad3b6e5b1c7b2750c1cee21f",
+    "run_tracebench_ehr.py": "df23c27ac726cf244c55e56a08dcac39f1dce29f3607d3ff4a843fc748bf554c"
+  },
+  "output_checksums": {
+    "pair_manifest.jsonl": "368d79fc568fd9898c2676475d521a66602e3902f2886e355e745eb033e50334",
+    "candidate_results.jsonl": "964caec65564641f4543a91af64c6ff9c9a27c0d14fa8171968146711e9fa4a3",
+    "build_summary.json": "4f754749412cc375e8138a0cf6f5632293a8a2d6267729d63bc9dd6af0835149",
+    "summary.json": "6424e3f1d594ed57fb3c6b7d4f77e568568fa88c8f5c5f4146e2556b3d154be3",
+    "report.md": "f882a8dc7d9fee945c5e0f33706049e0faa4930f3f6dc0b95dd62b4521e20e7a"
+  }
+}

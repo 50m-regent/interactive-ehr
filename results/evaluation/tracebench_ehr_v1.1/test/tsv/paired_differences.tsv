@@ -1,0 +1,7 @@
+metric	first_condition	second_condition	difference	confidence_interval_95_lower	confidence_interval_95_upper	template_count	bootstrap_iterations
+unsafe_acceptance_rate	graph_contract	local_checks	-1.0	-1.0	-1.0	134	10000
+valid_acceptance_rate	graph_contract	local_checks	0.0	0.0	0.0	134	10000
+unsafe_acceptance_rate	graph_contract	artifact_contracts	-0.48099606815203144	-0.4955640050697085	-0.46530612244897956	134	10000
+valid_acceptance_rate	graph_contract	artifact_contracts	0.0	0.0	0.0	134	10000
+unsafe_acceptance_rate	graph_contract	sidecar_contract	0.0	0.0	0.0	134	10000
+valid_acceptance_rate	graph_contract	sidecar_contract	0.0	0.0	0.0	134	10000

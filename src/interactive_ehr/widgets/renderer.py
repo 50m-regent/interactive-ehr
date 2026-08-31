@@ -182,8 +182,7 @@ def _looks_like_date_axis(column_name: str) -> bool:
 
     normalized = column_name.lower()
     return any(
-        marker in normalized
-        for marker in ("date", "time", "日", "月", "年", "時")
+        marker in normalized for marker in ("date", "time", "日", "月", "年", "時")
     )
 
 

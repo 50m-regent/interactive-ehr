@@ -128,7 +128,11 @@ class FakeStreamlit:
     def columns(self, *args: Any, **kwargs: Any) -> list[FakeContainer]:
         self._record("columns", *args, **kwargs)
         count_or_widths = args[0]
-        count = count_or_widths if isinstance(count_or_widths, int) else len(count_or_widths)
+        count = (
+            count_or_widths
+            if isinstance(count_or_widths, int)
+            else len(count_or_widths)
+        )
         return [FakeContainer() for _ in range(count)]
 
     def tabs(self, *args: Any, **kwargs: Any) -> list[FakeContainer]:
@@ -199,7 +203,9 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
         LineChartSpec(data_key="trend", x="日付", y=["A"]),
         BarChartSpec(data_key="bars", x="分類", y="件数", horizontal=True),
         SelectboxSpec(label="患者", options_key="patients"),
-        MultiselectSpec(label="カテゴリ", options_key="categories", default_keys=["検査"]),
+        MultiselectSpec(
+            label="カテゴリ", options_key="categories", default_keys=["検査"]
+        ),
         DateInputSpec(label="基準日"),
         TimeInputSpec(label="服薬時刻", default_value=time(9, 0), step_seconds=1800),
         TextInputSpec(label="検索", placeholder="keyword"),
@@ -342,9 +348,7 @@ def test_line_chart_uses_quantitative_x_for_numeric_strings(
 
     chart_spec = fake.calls[0].args[0].to_dict()
     assert chart_spec["layer"][0]["encoding"]["x"]["type"] == "quantitative"
-    assert chart_spec["layer"][0]["encoding"]["color"]["legend"] == {
-        "title": None
-    }
+    assert chart_spec["layer"][0]["encoding"]["color"]["legend"] == {"title": None}
 
 
 def test_line_chart_warns_and_preserves_invalid_date_values(
@@ -373,7 +377,9 @@ def test_line_chart_warns_and_preserves_invalid_date_values(
     assert {row["検査日"] for row in dataset} == {"2026-01-01", "日付不明"}
 
 
-def test_dataframe_missing_column_order_warns_without_exception(monkeypatch: Any) -> None:
+def test_dataframe_missing_column_order_warns_without_exception(
+    monkeypatch: Any,
+) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(renderer, "st", fake)
 
@@ -461,7 +467,9 @@ def test_chronic_disease_scenario_builds_valid_widgets(monkeypatch: Any) -> None
     assert "metric_latest_egfr" in context
     assert "metric_patient_material" in context
     flattened = _flatten_widgets(validated)
-    assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
+    assert all(
+        not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened
+    )
     assert all(not isinstance(widget, MarkdownSpec) for widget in flattened)
 
 
@@ -493,8 +501,18 @@ def _sample_sql_result(sql: str) -> Any:
     if "慢性疾患外来_血圧推移" in sql:
         return pd.DataFrame(
             [
-                {"測定日": "2026-01-20", "外来収縮期": 146, "外来拡張期": 82, "家庭収縮期": 140},
-                {"測定日": "2026-04-21", "外来収縮期": 148, "外来拡張期": 84, "家庭収縮期": 142},
+                {
+                    "測定日": "2026-01-20",
+                    "外来収縮期": 146,
+                    "外来拡張期": 82,
+                    "家庭収縮期": 140,
+                },
+                {
+                    "測定日": "2026-04-21",
+                    "外来収縮期": 148,
+                    "外来拡張期": 84,
+                    "家庭収縮期": 142,
+                },
             ]
         )
     if "慢性疾患外来_処方" in sql:
