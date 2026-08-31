@@ -88,7 +88,9 @@ class ScenarioGraph(BaseModel):
 
     @property
     def data_nodes(self) -> list[DataNode]:
-        return [data_node for widget in self.widget_nodes for data_node in widget.data_nodes]
+        return [
+            data_node for widget in self.widget_nodes for data_node in widget.data_nodes
+        ]
 
 
 class TaskNodeGenerationPlan(BaseModel):
@@ -100,7 +102,9 @@ class TaskNodeGenerationPlan(BaseModel):
     title: str = Field(description="タブに表示するタスク名")
     description: str | None = Field(None, description="タスクの説明")
     order: int = Field(0, description="表示順")
-    widget_ids: list[str] = Field(default_factory=list, description="関連 widget node ID")
+    widget_ids: list[str] = Field(
+        default_factory=list, description="関連 widget node ID"
+    )
 
 
 class DataNodeGenerationPlan(BaseModel):
@@ -113,7 +117,9 @@ class DataNodeGenerationPlan(BaseModel):
     context_key: str | None = Field(None, description="DWH fake context のキー")
     data_type: str = Field(description="データ種別")
     description: str = Field(description="データ内容の説明")
-    primary_fields: list[str] = Field(default_factory=list, description="主要フィールド")
+    primary_fields: list[str] = Field(
+        default_factory=list, description="主要フィールド"
+    )
 
 
 class WidgetNodeGenerationPlan(BaseModel):
@@ -125,7 +131,9 @@ class WidgetNodeGenerationPlan(BaseModel):
     task_id: str = Field(description="この widget を表示する task node ID")
     title: str | None = Field(None, description="ウィジェットの表示上の説明")
     widget_type: WidgetType = Field(description="生成する WidgetSpec の widget_type")
-    data_node_ids: list[str] = Field(default_factory=list, description="参照する data node ID")
+    data_node_ids: list[str] = Field(
+        default_factory=list, description="参照する data node ID"
+    )
 
 
 class WidgetNodeSqlGeneration(BaseModel):
@@ -355,7 +363,10 @@ def generate_scenario_graph_incrementally(
     if plan.widget_nodes:
         max_workers = min(len(plan.widget_nodes), _WIDGET_PARALLEL_MAX_WORKERS)
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_plan: dict[concurrent.futures.Future[WidgetNodeSqlGeneration], WidgetNodeGenerationPlan] = {
+            future_to_plan: dict[
+                concurrent.futures.Future[WidgetNodeSqlGeneration],
+                WidgetNodeGenerationPlan,
+            ] = {
                 executor.submit(
                     _generate_widget_sql,
                     prompt,
@@ -378,7 +389,9 @@ def generate_scenario_graph_incrementally(
                     )
                     context_key = _context_key_for_widget_node(widget_node)
                     if context_key is not None:
-                        widget_node = _bind_widget_to_data_context(widget_node, context_key)
+                        widget_node = _bind_widget_to_data_context(
+                            widget_node, context_key
+                        )
                     graph = _append_widget_node(graph, widget_node, plan)
                     graph, generated_context = _attach_widget_sql_result(
                         graph,
@@ -476,7 +489,9 @@ def _generate_widget_sql(
 
     client = _ScenarioGraphGenerator()
     return client.generate(
-        _build_widget_node_prompt(user_prompt, context, plan, widget_plan, graph_snapshot),
+        _build_widget_node_prompt(
+            user_prompt, context, plan, widget_plan, graph_snapshot
+        ),
         WidgetNodeSqlGeneration,
     )
 
@@ -496,7 +511,10 @@ def _warn_for_data_references(
 def _render_widget_title(widget_node: WidgetNode) -> None:
     if widget_node.title is None:
         return
-    if widget_node.widget.widget_type not in {WidgetType.LINE_CHART, WidgetType.BAR_CHART}:
+    if widget_node.widget.widget_type not in {
+        WidgetType.LINE_CHART,
+        WidgetType.BAR_CHART,
+    }:
         return
     st.markdown(f"#### {widget_node.title}")
 
@@ -542,7 +560,9 @@ def _update_task_subtrees(
         client = _ScenarioGraphGenerator()
         try:
             task_plan = client.generate(
-                _build_task_subtree_plan_prompt(user_prompt, context, working_graph, task),
+                _build_task_subtree_plan_prompt(
+                    user_prompt, context, working_graph, task
+                ),
                 _TaskSubtreePlan,
             )
         except Exception as exc:
@@ -556,7 +576,9 @@ def _update_task_subtrees(
             return
 
         old_context_keys = {
-            data_node.context_key for widget in task.widgets for data_node in widget.data_nodes
+            data_node.context_key
+            for widget in task.widgets
+            for data_node in widget.data_nodes
         }
         working_context = {
             k: v for k, v in working_context.items() if k not in old_context_keys
@@ -599,7 +621,9 @@ def _update_task_subtrees(
 
         if task_plan.widget_nodes:
             max_workers = min(len(task_plan.widget_nodes), _WIDGET_PARALLEL_MAX_WORKERS)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max_workers
+            ) as executor:
                 future_to_plan: dict[
                     concurrent.futures.Future[WidgetNodeSqlGeneration],
                     WidgetNodeGenerationPlan,
@@ -626,10 +650,17 @@ def _update_task_subtrees(
                         )
                         context_key = _context_key_for_widget_node(widget_node)
                         if context_key is not None:
-                            widget_node = _bind_widget_to_data_context(widget_node, context_key)
-                        working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
+                            widget_node = _bind_widget_to_data_context(
+                                widget_node, context_key
+                            )
+                        working_graph = _append_widget_node(
+                            working_graph, widget_node, compat_plan
+                        )
                         working_graph, working_context = _attach_widget_sql_result(
-                            working_graph, widget_node.id, widget_sql.sql, working_context
+                            working_graph,
+                            widget_node.id,
+                            widget_sql.sql,
+                            working_context,
                         )
                     except Exception as exc:
                         for pending in future_to_plan:
@@ -688,7 +719,11 @@ def _update_widgets(
         WidgetNodeGenerationPlan(
             id=w.id,
             task_id=next(
-                (t.id for t in graph.tasks if any(widget.id == w.id for widget in t.widgets)),
+                (
+                    t.id
+                    for t in graph.tasks
+                    if any(widget.id == w.id for widget in t.widgets)
+                ),
                 graph.tasks[0].id if graph.tasks else "",
             ),
             title=w.title,
@@ -748,11 +783,15 @@ def _update_widgets(
             try:
                 widget_sql = future.result()
                 widget_node = widget_sql.widget_node
-                widget_node = _normalize_widget_node(widget_node, widget_plan, existing_data_nodes)
+                widget_node = _normalize_widget_node(
+                    widget_node, widget_plan, existing_data_nodes
+                )
                 context_key = _context_key_for_widget_node(widget_node)
                 if context_key is not None:
                     widget_node = _bind_widget_to_data_context(widget_node, context_key)
-                working_graph = _append_widget_node(working_graph, widget_node, compat_plan)
+                working_graph = _append_widget_node(
+                    working_graph, widget_node, compat_plan
+                )
                 working_graph, working_context = _attach_widget_sql_result(
                     working_graph, widget_node.id, widget_sql.sql, working_context
                 )
@@ -800,7 +839,9 @@ def _update_data_nodes(
     )
 
     for data_id in target_data_ids:
-        data_node = next((dn for dn in working_graph.data_nodes if dn.id == data_id), None)
+        data_node = next(
+            (dn for dn in working_graph.data_nodes if dn.id == data_id), None
+        )
         if data_node is None:
             yield ScenarioGraphGenerationEvent(
                 status="failed",
@@ -920,7 +961,9 @@ def _subtree_plan_to_compat(plan: _TaskSubtreePlan) -> ScenarioGraphGenerationPl
 def _build_update_scope_prompt(user_prompt: str, graph: ScenarioGraph) -> str:
     graph_summary = graph.model_dump_json(indent=2)
     task_list = "\n".join(f"- id={t.id}, title={t.title}" for t in graph.tasks)
-    widget_list = "\n".join(f"- id={w.id}, type={w.widget.widget_type}" for w in graph.widget_nodes)
+    widget_list = "\n".join(
+        f"- id={w.id}, type={w.widget.widget_type}" for w in graph.widget_nodes
+    )
     data_list = "\n".join(
         f"- id={dn.id}, context_key={dn.context_key}" for dn in graph.data_nodes
     )
@@ -1146,7 +1189,7 @@ def _build_node_prompt(
     output_contract = (
         "- WidgetNode 生成では WidgetNodeSqlGeneration JSON を出力してください。\n"
         "- WidgetNodeSqlGeneration.sql は widget 専用 data node のための単一SELECT文にしてください。\n"
-        "- SQLではテーブル名と列名をダブルクォートしてください。例: SELECT \"匿名ID\" FROM \"患者基本\" LIMIT 20\n"
+        '- SQLではテーブル名と列名をダブルクォートしてください。例: SELECT "匿名ID" FROM "患者基本" LIMIT 20\n'
         "- SQLは読み取り専用のSELECTだけにしてください。INSERT/UPDATE/DELETE/DDLは使わないでください。"
         if node_type == "WidgetNode"
         else "- 指定された node type のJSONだけを出力してください。"
@@ -1231,9 +1274,7 @@ def _select_prompt_field_names(
     selected = preferred[:max_fields]
     if len(selected) < max_fields:
         selected.extend(
-            field_name
-            for field_name in field_names
-            if field_name not in selected
+            field_name for field_name in field_names if field_name not in selected
         )
     return selected[:max_fields]
 
@@ -1321,7 +1362,9 @@ def _normalize_task_node(
     return TaskNode(
         id=plan.id,
         title=task.title or plan.title,
-        description=task.description if task.description is not None else plan.description,
+        description=task.description
+        if task.description is not None
+        else plan.description,
         order=plan.order,
         widgets=[],
     )
@@ -1348,7 +1391,9 @@ def _context_key_for_widget_node(widget_node: WidgetNode) -> str | None:
     return widget_node.data_nodes[0].context_key
 
 
-def _bind_widget_to_data_context(widget_node: WidgetNode, context_key: str) -> WidgetNode:
+def _bind_widget_to_data_context(
+    widget_node: WidgetNode, context_key: str
+) -> WidgetNode:
     widget_dump = widget_node.widget.model_dump(mode="json")
     _replace_data_keys(widget_dump, context_key)
     return WidgetNode.model_validate(
@@ -1356,7 +1401,10 @@ def _bind_widget_to_data_context(widget_node: WidgetNode, context_key: str) -> W
             "id": widget_node.id,
             "title": widget_node.title,
             "widget": widget_dump,
-            "data_nodes": [data_node.model_dump(mode="json") for data_node in widget_node.data_nodes],
+            "data_nodes": [
+                data_node.model_dump(mode="json")
+                for data_node in widget_node.data_nodes
+            ],
         }
     )
 
@@ -1388,8 +1436,7 @@ def _attach_widget_sql_result(
     target_node = widget_node.data_nodes[0]
     if target_node is None:
         raise ValueError(
-            f"widget node '{widget_node.id}' が存在しない data node "
-            "を参照しています。"
+            f"widget node '{widget_node.id}' が存在しない data node を参照しています。"
         )
 
     dataframe = execute_read_sql(sql)
@@ -1438,7 +1485,11 @@ def _append_widget_node(
     plan: ScenarioGraphGenerationPlan,
 ) -> ScenarioGraph:
     widget_plan = next(
-        (candidate for candidate in plan.widget_nodes if candidate.id == widget_node.id),
+        (
+            candidate
+            for candidate in plan.widget_nodes
+            if candidate.id == widget_node.id
+        ),
         None,
     )
     if widget_plan is None:
@@ -1448,7 +1499,9 @@ def _append_widget_node(
         if task.id != widget_plan.task_id:
             tasks.append(task)
             continue
-        widgets = [existing for existing in task.widgets if existing.id != widget_node.id]
+        widgets = [
+            existing for existing in task.widgets if existing.id != widget_node.id
+        ]
         widgets.append(widget_node)
         widgets = _sort_widget_nodes_by_plan(widgets, plan)
         tasks.append(task.model_copy(update={"widgets": widgets}))
@@ -1463,7 +1516,9 @@ def _sort_widget_nodes_by_plan(
 ) -> list[WidgetNode]:
     """Order widget nodes by plan position so partial graphs render stably."""
 
-    plan_order = {widget_plan.id: index for index, widget_plan in enumerate(plan.widget_nodes)}
+    plan_order = {
+        widget_plan.id: index for index, widget_plan in enumerate(plan.widget_nodes)
+    }
     fallback = len(plan_order)
     return sorted(
         widget_nodes,
@@ -1472,7 +1527,9 @@ def _sort_widget_nodes_by_plan(
 
 
 def _find_widget_node(graph: ScenarioGraph, widget_id: str) -> WidgetNode | None:
-    return next((widget for widget in graph.widget_nodes if widget.id == widget_id), None)
+    return next(
+        (widget for widget in graph.widget_nodes if widget.id == widget_id), None
+    )
 
 
 def _replace_data_node(graph: ScenarioGraph, updated_node: DataNode) -> ScenarioGraph:

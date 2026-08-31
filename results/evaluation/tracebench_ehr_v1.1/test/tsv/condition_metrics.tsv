@@ -1,0 +1,5 @@
+condition	invalid_candidate_count	unsafe_acceptance_count	unsafe_acceptance_rate	valid_candidate_count	valid_acceptance_count	valid_acceptance_rate	localized_candidate_count	localization_correct_count	localization_accuracy	repair_attempt_count	repair_success_count	repair_success_rate	mean_validation_milliseconds
+local_checks	763	763	1.0	763	763	1.0	763	0	0.0	0	0	0.0	2.152480594583434
+artifact_contracts	763	367	0.48099606815203144	763	763	1.0	763	387	0.5072083879423329	396	387	0.9772727272727273	7.441162780097528
+graph_contract	763	0	0.0	763	763	1.0	763	763	1.0	763	763	1.0	9.33852157189186
+sidecar_contract	763	0	0.0	763	763	1.0	763	763	1.0	763	763	1.0	9.295839282049618

@@ -293,7 +293,9 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -341,7 +343,9 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -384,7 +388,9 @@ def test_generate_scenario_graph_incrementally_builds_context_from_widget_sql(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -393,7 +399,13 @@ def test_generate_scenario_graph_incrementally_builds_context_from_widget_sql(
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
-    assert [event.status for event in events] == ["started", "task", "data", "widget", "completed"]
+    assert [event.status for event in events] == [
+        "started",
+        "task",
+        "data",
+        "widget",
+        "completed",
+    ]
     assert events[-1].context["sql_data_1"] is not None
 
 
@@ -417,7 +429,9 @@ def test_generate_scenario_graph_incrementally_fails_unknown_dwh_model(
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {}))
 
@@ -455,7 +469,9 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -465,7 +481,9 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
     final_graph = events[-1].graph
-    assert [data_node.id for data_node in final_graph.widget_nodes[0].data_nodes] == ["data_1"]
+    assert [data_node.id for data_node in final_graph.widget_nodes[0].data_nodes] == [
+        "data_1"
+    ]
 
 
 def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
@@ -492,7 +510,9 @@ def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
 
     client = MagicMock()
     client.generate.side_effect = fake_generate
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -503,7 +523,11 @@ def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
 
     widget_events = [event for event in events if event.status == "widget"]
     assert len(widget_events) == 3
-    assert {event.node_id for event in widget_events} == {"widget_a", "widget_b", "widget_c"}
+    assert {event.node_id for event in widget_events} == {
+        "widget_a",
+        "widget_b",
+        "widget_c",
+    }
 
     final_graph = events[-1].graph
     assert [widget.id for widget in final_graph.widget_nodes] == [
@@ -540,7 +564,9 @@ def test_generate_scenario_graph_incrementally_widget_failure_stops(
 
     client = MagicMock()
     client.generate.side_effect = fake_generate
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -576,7 +602,13 @@ def test_build_sql_context_for_graph_executes_data_node_sql(
             TaskNode(
                 id="task_1",
                 title="確認",
-                widgets=[WidgetNode(id="widget_1", widget=TableSpec(data_key="sql_data_1"), data_nodes=[data_node])],
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=TableSpec(data_key="sql_data_1"),
+                        data_nodes=[data_node],
+                    )
+                ],
             )
         ],
     )
@@ -596,11 +628,13 @@ def _widget_plan_for_prompt(
     plan: ScenarioGraphGenerationPlan, prompt: str
 ) -> WidgetNodeGenerationPlan:
     marker = "生成する node_plan:"
-    node_plan_section = prompt[prompt.index(marker):]
+    node_plan_section = prompt[prompt.index(marker) :]
     for widget_plan in plan.widget_nodes:
         if f'"id": "{widget_plan.id}"' in node_plan_section:
             return widget_plan
-    raise AssertionError(f"widget_plan not found in prompt section: {node_plan_section[:200]}")
+    raise AssertionError(
+        f"widget_plan not found in prompt section: {node_plan_section[:200]}"
+    )
 
 
 def _multi_widget_generation_plan() -> ScenarioGraphGenerationPlan:
@@ -702,7 +736,9 @@ def test_update_incremental_scope_scenario_delegates_to_full_generation(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -710,7 +746,9 @@ def test_update_incremental_scope_scenario_delegates_to_full_generation(
     )
 
     events = list(
-        update_scenario_graph_incrementally("全体作り直し", _minimal_graph(), {"rows": []})
+        update_scenario_graph_incrementally(
+            "全体作り直し", _minimal_graph(), {"rows": []}
+        )
     )
 
     assert events[-1].status == "completed"
@@ -741,7 +779,9 @@ def test_update_incremental_scope_widget_regenerates_target_widgets(
     )
     client = MagicMock()
     client.generate.return_value = new_widget_sql
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -803,7 +843,9 @@ def test_update_incremental_scope_data_regenerates_sql_only(
     client.generate.return_value = _DataSqlOnly(
         sql='SELECT "匿名ID" FROM "患者基本" WHERE "性別" = \'M\' LIMIT 10'
     )
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -852,7 +894,9 @@ def test_update_incremental_scope_widget_missing_target_yields_failed(
         MagicMock(return_value=decision),
     )
 
-    events = list(update_scenario_graph_incrementally("存在しないwidget", _minimal_graph(), {}))
+    events = list(
+        update_scenario_graph_incrementally("存在しないwidget", _minimal_graph(), {})
+    )
 
     statuses = [e.status for e in events]
     assert "failed" in statuses

@@ -133,13 +133,19 @@ def build_dwh_context_for_model_names(
     """Build Streamlit context entries for DWH models."""
 
     return {
-        dwh_context_key(model_name): load_dwh_dataframe(model_name, n=n, csv_dir=csv_dir)
+        dwh_context_key(model_name): load_dwh_dataframe(
+            model_name, n=n, csv_dir=csv_dir
+        )
         for model_name in dict.fromkeys(model_names)
     }
 
 
 def _is_dwh_model(value: object) -> bool:
-    return isinstance(value, type) and issubclass(value, DwhBaseModel) and value is not DwhBaseModel
+    return (
+        isinstance(value, type)
+        and issubclass(value, DwhBaseModel)
+        and value is not DwhBaseModel
+    )
 
 
 def _field_display_name(field_name: str, field_info: Any) -> str:

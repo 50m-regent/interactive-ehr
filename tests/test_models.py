@@ -143,11 +143,7 @@ class TestModelCount:
     def test_total_model_count(self) -> None:
         from interactive_ehr import models
 
-        model_classes = [
-            name
-            for name in models.__all__
-            if name != "DwhBaseModel"
-        ]
+        model_classes = [name for name in models.__all__ if name != "DwhBaseModel"]
         # 136テーブル分のモデルが生成されていること
         assert len(model_classes) >= 130
 

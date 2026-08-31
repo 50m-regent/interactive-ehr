@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from datetime import timedelta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -34,6 +35,8 @@ from interactive_ehr.widgets.layout import ColumnsSpec, ExpanderSpec, TabsSpec
 
 if TYPE_CHECKING:
     from interactive_ehr.widgets import AnyWidget
+
+LineChartAxisType = Literal["quantitative", "ordinal", "temporal", "nominal"]
 
 
 def _missing_key(kind: str, key: str) -> None:
@@ -141,6 +144,133 @@ def _dataframe_column_order(
     return valid_columns or None
 
 
+def _line_chart_dataframe(data: Any, x: str | None) -> tuple[pd.DataFrame, str]:
+    """折れ線グラフ用のDataFrameと横軸カラム名を返す."""
+
+    dataframe = data.copy() if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
+    if x is not None:
+        return dataframe, x
+
+    index_name = str(dataframe.index.name or "index")
+    while index_name in dataframe.columns:
+        index_name = f"_{index_name}"
+    dataframe = dataframe.reset_index(names=index_name)
+    return dataframe, index_name
+
+
+def _line_chart_y_columns(
+    dataframe: pd.DataFrame,
+    y: str | list[str] | None,
+    *,
+    x: str,
+) -> list[str]:
+    """折れ線グラフに描画する縦軸カラムを選ぶ."""
+
+    if isinstance(y, str):
+        return [y]
+    if isinstance(y, list):
+        return y
+    return [
+        str(column)
+        for column in dataframe.select_dtypes(include="number").columns
+        if str(column) != x
+    ]
+
+
+def _looks_like_date_axis(column_name: str) -> bool:
+    """カラム名から日付・時刻の横軸かを判定する."""
+
+    normalized = column_name.lower()
+    return any(
+        marker in normalized for marker in ("date", "time", "日", "月", "年", "時")
+    )
+
+
+def _coerce_line_chart_x(
+    dataframe: pd.DataFrame,
+    x: str,
+    *,
+    data_key: str,
+) -> tuple[pd.DataFrame, LineChartAxisType]:
+    """横軸を数値または日時へ変換し、Altairの型を返す."""
+
+    converted = dataframe.copy()
+    values = converted[x]
+    non_null = values.dropna()
+    if pd.api.types.is_datetime64_any_dtype(values):
+        return converted.sort_values(x, kind="stable"), "temporal"
+    if pd.api.types.is_numeric_dtype(values):
+        return converted.sort_values(x, kind="stable"), "quantitative"
+    if non_null.empty:
+        return converted, "nominal"
+
+    numeric = pd.to_numeric(non_null, errors="coerce")
+    if numeric.notna().all():
+        converted[x] = pd.to_numeric(values, errors="coerce")
+        return converted.sort_values(x, kind="stable"), "quantitative"
+
+    parsed_dates = pd.to_datetime(non_null, errors="coerce", format="mixed")
+    if parsed_dates.notna().all():
+        converted[x] = pd.to_datetime(values, errors="coerce", format="mixed")
+        return converted.sort_values(x, kind="stable"), "temporal"
+
+    if _looks_like_date_axis(x):
+        st.warning(
+            f"data_key '{data_key}' の横軸 '{x}' に日付へ変換できない値があるため、"
+            "カテゴリ軸で表示します。"
+        )
+    return converted, "nominal"
+
+
+def _build_line_chart(
+    data: Any,
+    *,
+    data_key: str,
+    x: str | None,
+    y: str | list[str] | None,
+    x_label: str | None,
+    y_label: str | None,
+    height: int | None,
+) -> alt.LayerChart | None:
+    """実測点付きの折れ線グラフを構築する."""
+
+    dataframe, chart_x = _line_chart_dataframe(data, x)
+    if chart_x not in dataframe.columns:
+        return None
+    y_columns = _line_chart_y_columns(dataframe, y, x=chart_x)
+    if not y_columns:
+        st.warning(f"data_key '{data_key}' に描画できる数値カラムがありません。")
+        return None
+
+    dataframe, x_type = _coerce_line_chart_x(
+        dataframe,
+        chart_x,
+        data_key=data_key,
+    )
+    long_data = dataframe.melt(
+        id_vars=[chart_x],
+        value_vars=y_columns,
+        var_name="系列",
+        value_name="値",
+    )
+    base = alt.Chart(long_data).encode(
+        x=alt.X(chart_x, type=x_type, title=x_label),
+        y=alt.Y("値", type="quantitative", title=y_label),
+        color=alt.Color(
+            "系列",
+            type="nominal",
+            legend=None if len(y_columns) == 1 else alt.Legend(title=None),
+        ),
+        tooltip=[
+            alt.Tooltip(chart_x, type=x_type, title=x_label or chart_x),
+            alt.Tooltip("系列", type="nominal"),
+            alt.Tooltip("値", type="quantitative", title=y_label or "値"),
+        ],
+    )
+    chart = base.mark_line() + base.mark_point(filled=True, size=55)
+    return chart if height is None else chart.properties(height=height)
+
+
 def render_widgets(
     widgets: Sequence[AnyWidget],
     context: Mapping[str, Any],
@@ -240,16 +370,16 @@ def render_widget(
             x=widget.x,
             y=widget.y,
         )
-        return st.line_chart(
+        chart = _build_line_chart(
             data,
+            data_key=widget.data_key,
             x=chart_x,
             y=chart_y,
-            **_without_none(
-                x_label=widget.x_label,
-                y_label=widget.y_label,
-                height=widget.height,
-            ),
+            x_label=widget.x_label,
+            y_label=widget.y_label,
+            height=widget.height,
         )
+        return None if chart is None else st.altair_chart(chart, width="stretch")
 
     if isinstance(widget, BarChartSpec):
         data = _resolve_context_value(context, widget.data_key, "data_key")

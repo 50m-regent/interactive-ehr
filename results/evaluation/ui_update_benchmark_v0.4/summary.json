@@ -1,0 +1,309 @@
+{
+  "benchmark_id": "ui-update-benchmark",
+  "benchmark_version": "0.4.0",
+  "interpretation_limit": "専門家確認前の合成更新要求と合成スキーマを用いるため、結果は構造的な依存関係保護として解釈し、臨床的安全性を示す根拠には用いない。",
+  "evaluation_case_count": 24,
+  "evaluation_candidate_spec_count": 120,
+  "method_metrics": [
+    {
+      "method": "direct",
+      "invalid_candidate_count": 96,
+      "violation_escape_count": 0,
+      "violation_escape_rate": 0.0,
+      "valid_candidate_count": 24,
+      "valid_acceptance_count": 24,
+      "valid_acceptance_rate": 1.0,
+      "safe_rejection_count": 96,
+      "unsafe_acceptance_count": 0,
+      "runtime_failure_count": 24
+    },
+    {
+      "method": "graph_full",
+      "invalid_candidate_count": 96,
+      "violation_escape_count": 0,
+      "violation_escape_rate": 0.0,
+      "valid_candidate_count": 24,
+      "valid_acceptance_count": 24,
+      "valid_acceptance_rate": 1.0,
+      "safe_rejection_count": 96,
+      "unsafe_acceptance_count": 0,
+      "runtime_failure_count": 24
+    },
+    {
+      "method": "graph_no_scope",
+      "invalid_candidate_count": 96,
+      "violation_escape_count": 18,
+      "violation_escape_rate": 0.1875,
+      "valid_candidate_count": 24,
+      "valid_acceptance_count": 24,
+      "valid_acceptance_rate": 1.0,
+      "safe_rejection_count": 78,
+      "unsafe_acceptance_count": 18,
+      "runtime_failure_count": 24
+    },
+    {
+      "method": "graph_no_safety",
+      "invalid_candidate_count": 96,
+      "violation_escape_count": 18,
+      "violation_escape_rate": 0.1875,
+      "valid_candidate_count": 24,
+      "valid_acceptance_count": 24,
+      "valid_acceptance_rate": 1.0,
+      "safe_rejection_count": 78,
+      "unsafe_acceptance_count": 18,
+      "runtime_failure_count": 24
+    },
+    {
+      "method": "graph_no_traceability",
+      "invalid_candidate_count": 96,
+      "violation_escape_count": 18,
+      "violation_escape_rate": 0.1875,
+      "valid_candidate_count": 24,
+      "valid_acceptance_count": 24,
+      "valid_acceptance_rate": 1.0,
+      "safe_rejection_count": 78,
+      "unsafe_acceptance_count": 18,
+      "runtime_failure_count": 24
+    }
+  ],
+  "main_comparisons": [
+    {
+      "metric": "violation_escape_rate",
+      "first_method": "graph_full",
+      "second_method": "direct",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "cluster_count": 24,
+      "bootstrap_iterations": 10000
+    },
+    {
+      "metric": "valid_acceptance_rate",
+      "first_method": "graph_full",
+      "second_method": "direct",
+      "difference": 0.0,
+      "confidence_interval_95": [
+        0.0,
+        0.0
+      ],
+      "cluster_count": 24,
+      "bootstrap_iterations": 10000
+    }
+  ],
+  "ablation_comparisons": [
+    {
+      "ablation_method": "graph_no_scope",
+      "violation_escape_difference": -0.1875,
+      "raw_p_value": 0.00009999000099990002,
+      "holm_adjusted_p_value": 0.00029997000299970003
+    },
+    {
+      "ablation_method": "graph_no_safety",
+      "violation_escape_difference": -0.1875,
+      "raw_p_value": 0.00009999000099990002,
+      "holm_adjusted_p_value": 0.00029997000299970003
+    },
+    {
+      "ablation_method": "graph_no_traceability",
+      "violation_escape_difference": -0.1875,
+      "raw_p_value": 0.00009999000099990002,
+      "holm_adjusted_p_value": 0.00029997000299970003
+    }
+  ],
+  "sequence_metrics": [
+    {
+      "method": "direct",
+      "step_count": 18,
+      "valid_step_count": 12,
+      "valid_acceptance_count": 12,
+      "invalid_step_count": 6,
+      "violation_escape_count": 0,
+      "rejected_step_count": 6,
+      "preserved_rejection_count": 6
+    },
+    {
+      "method": "graph_full",
+      "step_count": 18,
+      "valid_step_count": 12,
+      "valid_acceptance_count": 12,
+      "invalid_step_count": 6,
+      "violation_escape_count": 0,
+      "rejected_step_count": 6,
+      "preserved_rejection_count": 6
+    },
+    {
+      "method": "graph_no_scope",
+      "step_count": 18,
+      "valid_step_count": 12,
+      "valid_acceptance_count": 12,
+      "invalid_step_count": 6,
+      "violation_escape_count": 2,
+      "rejected_step_count": 4,
+      "preserved_rejection_count": 4
+    },
+    {
+      "method": "graph_no_safety",
+      "step_count": 18,
+      "valid_step_count": 12,
+      "valid_acceptance_count": 12,
+      "invalid_step_count": 6,
+      "violation_escape_count": 2,
+      "rejected_step_count": 4,
+      "preserved_rejection_count": 4
+    },
+    {
+      "method": "graph_no_traceability",
+      "step_count": 18,
+      "valid_step_count": 12,
+      "valid_acceptance_count": 12,
+      "invalid_step_count": 6,
+      "violation_escape_count": 1,
+      "rejected_step_count": 5,
+      "preserved_rejection_count": 5
+    }
+  ],
+  "requirement_inventory": [
+    {
+      "id": "R1_update_scope",
+      "runtime_comparable": true,
+      "direct_expression": "変更前後の成果物ID単位の差分を許可対象と照合する。",
+      "graph_expression": "変更前後のノードID単位の差分を許可対象と照合する。",
+      "direct_implementation": [
+        "_validate_direct_scope"
+      ],
+      "graph_implementation": [
+        "_validate_graph_scope"
+      ],
+      "direct_lines_of_code": 15,
+      "graph_lines_of_code": 15,
+      "referenced_artifacts": [
+        "UpdateCase.intent",
+        "ArtifactState",
+        "GraphState"
+      ],
+      "maintenance_touchpoints": [
+        "許可対象の定義",
+        "直接差分検査",
+        "グラフ差分検査"
+      ],
+      "test_count": 1
+    },
+    {
+      "id": "R2_structural_safety",
+      "runtime_comparable": true,
+      "direct_expression": "成果物の表示項目とクエリ元を共通ポリシーへ照合する。",
+      "graph_expression": "グラフからコンパイルした成果物を同じ共通ポリシーへ照合する。",
+      "direct_implementation": [
+        "_validate_artifact_safety"
+      ],
+      "graph_implementation": [
+        "_validate_artifact_safety"
+      ],
+      "direct_lines_of_code": 25,
+      "graph_lines_of_code": 25,
+      "referenced_artifacts": [
+        "SafetyPolicy",
+        "WidgetArtifact",
+        "QueryArtifact"
+      ],
+      "maintenance_touchpoints": [
+        "安全ポリシー",
+        "共通安全検査"
+      ],
+      "test_count": 1
+    },
+    {
+      "id": "R3_display_data_trace",
+      "runtime_comparable": true,
+      "direct_expression": "Widgetのquery_idと選択列を突き合わせる。",
+      "graph_expression": "WidgetNodeからDataNodeへの辺と選択列をたどる。",
+      "direct_implementation": [
+        "_validate_artifact_trace"
+      ],
+      "graph_implementation": [
+        "_validate_graph_trace"
+      ],
+      "direct_lines_of_code": 14,
+      "graph_lines_of_code": 15,
+      "referenced_artifacts": [
+        "WidgetArtifact.query_id",
+        "GraphWidgetNode.data_node_id"
+      ],
+      "maintenance_touchpoints": [
+        "直接成果物の参照検査",
+        "グラフの辺検査"
+      ],
+      "test_count": 1
+    },
+    {
+      "id": "R4_query_execution",
+      "runtime_comparable": true,
+      "direct_expression": "構造化クエリをSQLiteへコンパイルして実行する。",
+      "graph_expression": "DataNodeを同じ構造化クエリへコンパイルして実行する。",
+      "direct_implementation": [
+        "_validate_queries_execute"
+      ],
+      "graph_implementation": [
+        "_validate_queries_execute"
+      ],
+      "direct_lines_of_code": 12,
+      "graph_lines_of_code": 12,
+      "referenced_artifacts": [
+        "QueryArtifact",
+        "available_fields",
+        "source_tables"
+      ],
+      "maintenance_touchpoints": [
+        "合成スキーマ",
+        "SQLコンパイラ",
+        "実行検査"
+      ],
+      "test_count": 1
+    },
+    {
+      "id": "E1_task_information_provenance",
+      "runtime_comparable": false,
+      "direct_expression": "直接成果物だけでは保持できず、外部メタデータが必要になる。",
+      "graph_expression": "DataNodeのinformation_idsとして表現する。",
+      "direct_implementation": [],
+      "graph_implementation": [
+        "_validate_graph_provenance"
+      ],
+      "direct_lines_of_code": null,
+      "graph_lines_of_code": 13,
+      "referenced_artifacts": [
+        "GraphDataNode.information_ids"
+      ],
+      "maintenance_touchpoints": [
+        "情報要件ID",
+        "DataNode",
+        "由来検査"
+      ],
+      "test_count": 1
+    },
+    {
+      "id": "E2_evidence_review_state",
+      "runtime_comparable": false,
+      "direct_expression": "成果物の外にある文書または台帳が必要になる。",
+      "graph_expression": "更新仕様と制約メタデータをグラフ関連資産から参照できる。",
+      "direct_implementation": [],
+      "graph_implementation": [],
+      "direct_lines_of_code": null,
+      "graph_lines_of_code": null,
+      "referenced_artifacts": [
+        "UpdateCase.source_reference",
+        "SafetyPolicy.review_status"
+      ],
+      "maintenance_touchpoints": [
+        "臨床タスクモデル",
+        "専門家確認状態",
+        "更新要求"
+      ],
+      "test_count": 1
+    }
+  ],
+  "label_mismatch_count": 0,
+  "representation_mismatch_count": 0
+}
