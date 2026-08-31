@@ -321,6 +321,15 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
+## 口頭試問原稿
+
+`papers/oral-examination-2026/`には、2026年8月27日時点の研究状態を記録したLaTeX原稿とPDFがあります。原稿中では正式評価用データを未実行として扱っています。現在の正式評価結果は、このREADMEの「TraceBench-EHRの正式技術評価」と保存済み成果物を参照してください。
+
+```bash
+cd papers/oral-examination-2026
+make
+```
+
 ## 研究スライド
 
 定期ゼミ用のMarpスライドは `slides/YYYY-MM-DD/` で管理します。初回のみ依存関係を導入し、ブラウザでプレビューできます。
@@ -448,4 +457,9 @@ results/evaluation/ehrsql_feasibility_v0.1/
 results/evaluation/tracebench_ehr_v1.1/
   validation/             -- 評価規則を固定する前の全件パイロット
   test/                   -- 固定commitで一度だけ実行した正式結果
+
+papers/oral-examination-2026/
+  main.tex                -- 2026年8月27日時点の口頭試問原稿
+  references.bib          -- 原稿で参照する文献
+  output/pdf/Hirata_Ren.pdf -- 検証済みPDF
 ```
