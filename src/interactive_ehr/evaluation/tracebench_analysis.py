@@ -339,7 +339,9 @@ def _condition_metrics(
         ),
         valid_candidate_count=len(valid),
         valid_acceptance_count=sum(record.accepted for record in valid),
-        valid_acceptance_rate=_rate(sum(record.accepted for record in valid), len(valid)),
+        valid_acceptance_rate=_rate(
+            sum(record.accepted for record in valid), len(valid)
+        ),
         localized_candidate_count=len(localized),
         localization_correct_count=sum(
             record.localization_correct is True for record in localized
@@ -427,11 +429,12 @@ def _paired_difference(
         }
         for condition in (first, second)
     }
-    candidate_ids = sorted(
-        by_condition[first].keys() & by_condition[second].keys()
-    )
+    candidate_ids = sorted(by_condition[first].keys() & by_condition[second].keys())
     templates = sorted(
-        {by_condition[first][candidate_id].template_checksum for candidate_id in candidate_ids}
+        {
+            by_condition[first][candidate_id].template_checksum
+            for candidate_id in candidate_ids
+        }
     )
     observed = _rate_difference_for_candidates(
         candidate_ids,

@@ -68,38 +68,39 @@ def test_benchmark_has_frozen_case_and_sequence_shape(
     """Keep the development and held-out evaluation sizes fixed."""
 
     development_cases = [
-        case
-        for case in benchmark.cases
-        if case.split is BenchmarkSplit.DEVELOPMENT
+        case for case in benchmark.cases if case.split is BenchmarkSplit.DEVELOPMENT
     ]
     evaluation_cases = [
-        case
-        for case in benchmark.cases
-        if case.split is BenchmarkSplit.EVALUATION
+        case for case in benchmark.cases if case.split is BenchmarkSplit.EVALUATION
     ]
     assert len(development_cases) == 8
     assert len(evaluation_cases) == 24
-    assert len(
-        [
-            sequence
-            for sequence in benchmark.sequences
-            if sequence.split is BenchmarkSplit.DEVELOPMENT
-        ]
-    ) == 2
-    assert len(
-        [
-            sequence
-            for sequence in benchmark.sequences
-            if sequence.split is BenchmarkSplit.EVALUATION
-        ]
-    ) == 6
+    assert (
+        len(
+            [
+                sequence
+                for sequence in benchmark.sequences
+                if sequence.split is BenchmarkSplit.DEVELOPMENT
+            ]
+        )
+        == 2
+    )
+    assert (
+        len(
+            [
+                sequence
+                for sequence in benchmark.sequences
+                if sequence.split is BenchmarkSplit.EVALUATION
+            ]
+        )
+        == 6
+    )
     for change_kind in ChangeKind:
-        assert sum(
-            case.intent.change_kind is change_kind for case in evaluation_cases
-        ) == 4
-    assert {
-        canonical_checksum(case.intent) for case in development_cases
-    }.isdisjoint(
+        assert (
+            sum(case.intent.change_kind is change_kind for case in evaluation_cases)
+            == 4
+        )
+    assert {canonical_checksum(case.intent) for case in development_cases}.isdisjoint(
         canonical_checksum(case.intent) for case in evaluation_cases
     )
 
@@ -110,9 +111,7 @@ def test_candidate_specs_have_one_valid_three_single_and_one_compound(
     """Expand every evaluation case into the pre-registered five candidates."""
 
     evaluation_cases = [
-        case
-        for case in benchmark.cases
-        if case.split is BenchmarkSplit.EVALUATION
+        case for case in benchmark.cases if case.split is BenchmarkSplit.EVALUATION
     ]
     specifications = [
         specification
@@ -184,9 +183,7 @@ def test_each_single_fault_is_caught_by_its_control(
 
     cases_by_id = {case.id: case for case in benchmark.cases}
     specification = next(
-        spec
-        for spec in build_candidate_specs(benchmark)
-        if spec.faults == [fault]
+        spec for spec in build_candidate_specs(benchmark) if spec.faults == [fault]
     )
     case = cases_by_id[specification.case_id]
     paired = build_paired_candidate(benchmark, case, specification)
@@ -286,8 +283,7 @@ def test_full_run_matches_oracle_and_registered_counts(
         for record in benchmark_run.candidate_records
     )
     assert all(
-        record.representation_equivalent
-        for record in benchmark_run.candidate_records
+        record.representation_equivalent for record in benchmark_run.candidate_records
     )
 
 
@@ -296,9 +292,7 @@ def test_main_comparison_is_fair_and_ablation_effects_are_reported(
 ) -> None:
     """Verify the main comparison tie and isolated graph-control effects."""
 
-    metrics = {
-        metric.method: metric for metric in benchmark_summary.method_metrics
-    }
+    metrics = {metric.method: metric for metric in benchmark_summary.method_metrics}
     assert metrics[UpdateMethod.DIRECT].violation_escape_rate == 0.0
     assert metrics[UpdateMethod.GRAPH_FULL].violation_escape_rate == 0.0
     assert metrics[UpdateMethod.DIRECT].valid_acceptance_rate == 1.0

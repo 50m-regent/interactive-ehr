@@ -173,9 +173,7 @@ class TestInputWidgets:
         assert spec.default_value is True
 
     def test_radio_spec(self) -> None:
-        spec = RadioSpec(
-            label="ソート順", options_key="ソート選択肢", horizontal=True
-        )
+        spec = RadioSpec(label="ソート順", options_key="ソート選択肢", horizontal=True)
         assert spec.horizontal is True
 
     def test_slider_spec(self) -> None:
@@ -284,9 +282,7 @@ class TestValidation:
 
     def test_slider_range_default_out_of_range(self) -> None:
         with pytest.raises(ValidationError, match="range default"):
-            SliderSpec(
-                label="x", min_value=0, max_value=10, default_value=(5, 20)
-            )
+            SliderSpec(label="x", min_value=0, max_value=10, default_value=(5, 20))
 
     def test_date_input_min_gt_max(self) -> None:
         with pytest.raises(ValidationError, match="min_value"):
@@ -313,9 +309,7 @@ class TestValidation:
             DataframeSpec(data_key="x", height=-100)
 
     def test_key_field_on_all_widgets(self) -> None:
-        spec = SelectboxSpec(
-            label="x", options_key="k", key="unique_selectbox_1"
-        )
+        spec = SelectboxSpec(label="x", options_key="k", key="unique_selectbox_1")
         assert spec.key == "unique_selectbox_1"
 
 
@@ -381,8 +375,6 @@ class TestFrozen:
             spec.data_key = "modified"  # type: ignore[misc]
 
     def test_nested_widget_is_frozen(self) -> None:
-        spec = ColumnsSpec(
-            columns=[[MetricSpec(label="a", value_key="b")]]
-        )
+        spec = ColumnsSpec(columns=[[MetricSpec(label="a", value_key="b")]])
         with pytest.raises(ValidationError):
             spec.columns = []  # type: ignore[misc]

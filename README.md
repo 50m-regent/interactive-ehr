@@ -2,13 +2,19 @@
 
 タスクのグラフ構造化を用いたインタラクティブな電子カルテシステム
 
+## 作業場所
+
+ローカル作業はこの`interactive-ehr/`だけで行います。追加のcloneやworktreeは作らず、作業用ブランチを順番に切り替えます。複数のチャットから同時に変更しないでください。
+
 ## 概要
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
-現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
+現在は麻酔科術前外来と慢性疾患外来の合成サンプルをStreamlit上で切り替えて表示できます。初期表示は麻酔科術前外来です。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
 
-UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
+診療画面の上部には患者文脈、合成データであること、画面構成の作成元、画面更新時刻を表示します。各タスクには情報源と最終データ日時の要約があり、「情報源と取得条件」を開くと件数、欠損状態、参照テーブル、読み取り専用SQLを確認できます。表示値とGeminiが生成する画面構成を区別して確認できます。
+
+UIは `ScenarioGraph` JSON から描画されます。サイドバーは初期状態で閉じています。「UI生成・編集ツール」を開くと、Geminiによる画面構成の更新とScenarioGraph JSONの編集ができます。有効なJSONだけを診療画面へ反映し、検証エラーがある場合は最後に有効だった画面を描画し続けます。
 
 折れ線グラフは、日付や数値を横軸の値に応じた間隔で表示します。線上には実測点を示すドットを重ね、マウスを合わせると日付、系列、値を確認できます。
 
@@ -34,19 +40,19 @@ uv run python scripts/audit_evaluation_case_manifest.py \
   data/evaluation/ito_clinical_tasks.v1.json
 ```
 
-## UI更新方法を小規模に比較する事前確認
+## RQ1の技術評価
 
-2026年7月22日に、成果物を直接変更する方式と、依存グラフを介して変更する方式を小規模に比較しました。実験ファイルは`data/evaluation/ui_update_benchmark.v0.4.json`です。Geminiは呼び出しません。共通の変更仕様から二方式の候補を同じ手順で生成し、候補生成とは別の処理で正解を確認します。
+`data/evaluation/ui_update_benchmark.v0.4.json` は、成果物を直接変更する方式と、グラフを介して変更する方式を同じ更新要求と構造的安全要件で比較します。Geminiは呼び出しません。共通変更仕様から二方式の差分候補を決定的に生成し、独立した意味上のオラクルで正解を確認します。
 
 固定した内容は次のとおりです。
 
-- 開発用のケースは、単発8件と3回続けて更新するケース2件です。
-- 評価用のケースは、期間の絞り込み、必要情報の追加、表示形式、配置、タスク条件、タスクから取得と表示までをまたぐ変更を各4件、合計24件含みます。
-- 評価用の各変更には正しい候補1件、単一の不整合3件、複数の不整合を含む候補1件があり、共通の変更仕様は合計120件です。
-- 不整合は、更新範囲、安全条件、表示とデータ取得の対応、SQL実行の4種類です。
+- 開発セットは単発8件と3手の系列2件です。
+- 評価セットは期間の絞り込み、必要情報の追加、表示形式、配置、タスク条件、タスクから取得と表示までをまたぐ変更を各4件、合計24件含みます。
+- 評価セットの各変更には妥当な候補1件、単一違反3件、複合違反1件があり、共通変更仕様は合計120件です。
+- 違反は更新範囲、安全条件、表示とデータ取得の追跡、SQL実行の4種類です。
 - 主比較では直接差分方式と完全なグラフ方式へ同じ要件を実装します。
 - グラフ方式では更新範囲、安全条件、追跡検査を個別に外した条件も測ります。
-- 95%信頼区間は、ケースを単位に繰り返し再抽出する統計手法で求めます。確認項目を外した条件のp値は、ケース単位の符号反転検定とHolm補正で求めます。
+- 95%区間はケース単位のクラスターブートストラップで求めます。除去比較のp値はケース単位の符号反転検定とHolm補正で求めます。
 
 評価を再実行するには、次を実行します。`--with-editable .` は、srcレイアウトの現在の作業ツリーを評価環境へ読み込むために指定しています。
 
@@ -56,22 +62,22 @@ uv run --with-editable . python scripts/run_ui_update_benchmark.py
 
 結果は `results/evaluation/ui_update_benchmark_v0.4/` に保存されます。
 
-- `paired_candidates.jsonl` は共通変更仕様、直接差分、グラフ差分、内容を識別するハッシュ値を1候補1行で記録します。
+- `paired_candidates.jsonl` は共通変更仕様、直接差分、グラフ差分、各チェックサムを1候補1行で記録します。
 - `candidate_results.jsonl` は各候補と比較条件の受理結果を1実行1行で記録します。
 - `sequence_results.jsonl` は逐次更新の受理結果と棄却時の状態保持を1手1行で記録します。
 - `summary.json` は主指標、対応差、95%区間、除去比較、要件ごとの実装量を記録します。
 - `report.md` は論文執筆向けの短い結果要約です。
-- `run_manifest.json` は入力、実装、出力のハッシュ値と実行条件を記録します。
+- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
 
-この事前確認は、実験ファイル上の版番号v0.4で、専門家確認前の合成した更新要求と表構造を使います。測定対象は成果物間の依存関係を保てるかどうかです。臨床的安全性の評価、人を対象とした評価、Geminiを含む生成から表示までの一連の評価はまだ実施していません。
+現行v0.4は専門家確認前の合成更新要求と合成スキーマを使います。測定対象は構造的な依存関係保護です。臨床的安全性の評価、人を対象とした評価、Geminiを含むエンドツーエンド評価はまだ実施していません。
 
-## EHRSQL 50件を使った最初の動作確認
+## TraceBench-EHRの実行可能性確認
 
-生成臨床UIの更新を検査する評価基盤TraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行します。質問、SQL、実行結果、依存グラフ、表示部品の対応を一つの基準へ変換できるかを確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
+CHI 2027向けのTraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行し、質問、SQL、実行結果、ScenarioGraph、Widgetを一つの追跡契約へ変換できるか確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
 
-`scripts/run_ehrsql_feasibility.py`は、開発用データから異なる質問形式を優先して50件を同じ手順で選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値を数値カード、複数行や複数列の結果を表へ割り当てた最小の依存グラフを検査します。実装上の名称はMetric、Dataframe、ScenarioGraphです。Geminiは呼び出しません。
+`scripts/run_ehrsql_feasibility.py` は、train分割の回答可能ケースから異なる質問テンプレートを優先して50件を決定的に選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値をMetric、それ以外をDataframeへ割り当てた最小のScenarioGraphを検証します。Geminiは呼び出しません。
 
-外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のハッシュ値、結果形状、実行成否、グラフ検査結果、実行記録だけを保存します。
+外部データはGit管理外の一時ディレクトリへ置きます。生データ、質問文、正解SQL、患者単位の結果値は、このリポジトリの成果物へ保存しません。ケースID、入力のチェックサム、結果形状、実行成否、グラフ検証結果、実行マニフェストだけを保存します。
 
 EHRSQL-2024はCC BY 4.0で公開されています。MIMIC-IV Clinical Database Demo v2.2由来の情報を含み、同データはOpen Database License v1.0で利用できます。成果物を公開する場合は、[EHRSQL-2024](https://github.com/glee4810/ehrsql-2024)と[MIMIC-IV Clinical Database Demo v2.2](https://physionet.org/content/mimic-iv-demo/2.2/)を明記します。
 
@@ -89,11 +95,11 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 結果は `results/evaluation/ehrsql_feasibility_v0.1/` に保存されます。
 
-- `selected_cases.json` は選定したケースIDと入力のハッシュ値を記録します。
+- `selected_cases.json` は選定したケースIDと入力チェックサムを記録します。
 - `case_results.jsonl` は結果値を含まないケース別の実行成否と結果形状を記録します。
 - `summary.json` はSQL実行率、非空結果取得率、グラフ検証率を集計します。
 - `report.md` は実験結果の短い要約です。
-- `run_manifest.json` は入力、実装、出力のハッシュ値と実行条件を記録します。
+- `run_manifest.json` は入力、実装、出力のチェックサムと実行条件を記録します。
 
 2026年8月27日に、EHRSQL-2024のcommit `f9e1aa02160d39e3f8df52bf5c69c5cf2e472499` とinteractive-ehrのcommit `74dcc2f7f35072e78b69641bebd04e33ced00d87` を使ってv0.1を実行しました。
 
@@ -104,13 +110,13 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - Metricへ40件、Dataframeへ10件を割り当てました。
 - タイムアウト、SQLエラー、書き込みSQL、グラフ検証エラーはありませんでした。
 
-この結果は、開発用データから選定した50件を現行の依存グラフと表示部品へ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はまだ確認していません。次は空結果1件の扱いを決め、対象ケースの選定規則、不整合を入れる規則、候補生成とは別の正解判定、データの使い分けを固定します。
+この結果は、選定したtrain分割50件を現行ScenarioGraphとWidgetへ機械的に変換できることを示します。全ケースへの適用可能性や、表示方法の臨床的な妥当性はこの確認だけでは判断できません。この確認を踏まえ、正式技術評価v1.1では空結果の扱い、対象ケース、変異規則、独立オラクル、開発・評価分割を固定しました。
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
-## TraceBench-EHRの最終評価と事前確認
+## TraceBench-EHRの正式技術評価
 
-最終評価では、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を使い、生成臨床UIの更新で生じる不整合を4種類の方法で検査します。条件を記録するファイルは`data/evaluation/tracebench_ehr.v1.json`で、修正版の実験記録はv1.1です。実装は`src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は`src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は`scripts/run_tracebench_ehr.py`です。Geminiや外部モデルは使用しません。
+`data/evaluation/tracebench_ehr.v1.json` は、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を用いる正式技術評価v1.1の条件を固定します。実装は `src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は `src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は `scripts/run_tracebench_ehr.py` です。Geminiや外部モデルは使用しません。
 
 評価対象の不整合は次の8種類です。
 
@@ -123,30 +129,66 @@ uv run python scripts/run_ehrsql_feasibility.py \
 - DataNodeとWidgetの接続
 - SQL更新後に古い実行結果が残る部分更新
 
-結果と表示部品の不整合は、基準が数値カードなら表へ、データフレーム型の表なら別の表部品へ変えます。実装上の名称はMetric、Dataframe、Tableです。SQL、実行結果、列、結果値は維持し、結果形状と表示方式の対応だけを壊します。最初の評価設計v1.0で予定していた列順の不整合は、調整確認用データで成功したSQL結果がすべて1列だったため使いません。
+結果とWidgetの表示方式は、基準がMetricならDataframeへ、DataframeならTableへ変えます。SQL、実行結果、列、結果値は維持し、描画可能な表示方式と基準契約の対応だけを壊します。v1.0で予定していた列順の変異は、validationで成功したSQL結果がすべて1列だったため使いません。
 
 各候補へ次の4条件を適用します。
 
-- SQLや表示部品を一つずつ調べる個別確認
-- 各成果物に必要な患者や項目を調べる成果物ごとの確認
-- 質問から表示部品までを依存グラフでまとめて照合する方法
-- 同じ対応内容を一枚の表で照合する方法
+- 局所検査
+- 成果物ごとの契約
+- 質問からWidgetまでの対応を持つグラフ契約
+- グラフと同じ契約内容を持つ平坦なサイドカー契約
 
-主要評価は、不整合の見逃し率と正しい更新の受理率です。副次評価として、問題箇所の特定率、1回の自動修正の成功率、検査時間を測ります。方法間の差と95%信頼区間は、質問形式を単位に繰り返し再抽出する統計手法を10,000回適用して求めます。
+主要評価は、不整合の流出率と妥当な更新の受理率です。副次評価として、問題箇所の特定率、1回の契約ベース修復成功率、検証時間を測ります。条件間の対応差と95%信頼区間は、質問テンプレート単位のクラスターブートストラップ10,000回で求めます。
 
-2026年8月27日に、修正版v1.1を使って、調整確認用データ全件で最終評価前の動作を確認しました。
+2026年8月27日にvalidation全件でv1.1パイロットを実行しました。
 
 - 全1,163件のうち、正解SQLを持つ931件を対象にしました。
 - SQL実行と基準グラフ検証は924件で成功し、成功率は99.25%でした。
 - 758組、6,064回の候補検証を実行しました。
-- 各不整合は34から133種類の質問形式を含み、事前の下限である10種類の質問形式と30候補を満たしました。
-- 候補生成とは別の正解判定との不一致は0件でした。
-- 依存グラフと一枚の対応表による判定の不一致は0件でした。
+- 各変異は34から133テンプレートあり、事前の下限である10テンプレートと30候補を満たしました。
+- オラクルと候補ラベルの不一致は0件でした。
+- グラフ契約とサイドカー契約の判定不一致は0件でした。
 - 質問文、SQL、患者ID、結果値を保存していないことを確認しました。
 
-この動作確認は評価コードを固定できるかを判断するための結果で、最終評価の結果ではありません。最終評価用データは、評価コードと設定をGitの記録で固定した後に一度だけ実行します。
+このパイロットで停止条件を通過した後、評価コードと設定をcommit `baa82075b6bfd3bad70b2ca2bc4ae4852db91beb` で固定しました。固定後のtest分割は一度だけ実行しました。
 
-調整確認用データを使った実行例は次のとおりです。コマンドでは公式の区分名`validation`を指定します。
+- 全1,167件のうち、正解SQLを持つ934件を対象にし、回答不能233件を主評価から除外しました。
+- 934件すべてでSQL実行と基準成果物の構築に成功しました。
+- 134テンプレートから763組を作り、6,104回の候補検証を実行しました。
+- 局所検査は注入した不整合763件をすべて受理し、不整合流出率は100%でした。
+- 成果物ごとの契約は367件を受理し、不整合流出率は48.10%でした。
+- グラフ契約とサイドカー契約の不整合流出率は0%でした。
+- 全条件で妥当な更新763件をすべて受理し、妥当更新受理率は100%でした。
+- グラフ契約と局所検査の不整合流出率の差は-100.00ポイント、95%区間は[-100.00, -100.00]ポイントでした。
+- グラフ契約と成果物ごとの契約の差は-48.10ポイント、95%区間は[-49.56, -46.53]ポイントでした。
+- グラフ契約とサイドカー契約の差は0ポイントでした。
+- グラフ契約とサイドカー契約は、問題箇所の特定と1回の修復に763件すべて成功しました。
+- オラクルと候補ラベルの不一致、グラフ契約とサイドカー契約の判定不一致はいずれも0件でした。
+
+正式結果は `results/evaluation/tracebench_ehr_v1.1/test/`、パイロット結果は `results/evaluation/tracebench_ehr_v1.1/validation/` に保存しています。完全な変異別集計と実行時間は各 `summary.json` を参照してください。
+
+保存済みの正式結果を表計算ソフトで確認する場合は、元のJSONとJSON Linesを変更せずTSVへ変換します。この処理は正式評価を再実行しません。元成果物のチェックサム、候補単位から再計算した主要指標、95%信頼区間を照合してから出力します。
+
+```bash
+uv run python scripts/export_tracebench_tsv.py \
+  results/evaluation/tracebench_ehr_v1.1/test
+```
+
+結果は `results/evaluation/tracebench_ehr_v1.1/test/tsv/` に保存されます。
+
+- `build_summary.tsv` は対象件数、基準成果物の構築結果、変異別の生成数を1行にまとめます。
+- `condition_metrics.tsv` は4種類の検査方法の主要指標と副次指標を記録します。
+- `mutation_metrics.tsv` は8種類の不整合と4種類の検査方法の組み合わせを記録します。
+- `paired_differences.tsv` は条件間の対応差と95%信頼区間を記録します。
+- `pair_manifest.tsv` は763組のハッシュ化した識別子、変異種類、チェックサムを記録します。
+- `candidate_results.tsv` は6,104回の受理、特定、修復、検証時間を記録します。
+- `export_manifest.json` は変換コード、元成果物、TSVのチェックサム、行数、照合結果を記録します。
+
+各TSVの用途、全カラム、値の読み方は `results/evaluation/tracebench_ehr_v1.1/test/tsv/README.md` にまとめています。
+
+TSVには質問文、SQL、患者ID、患者ごとの結果値を含めません。`mutation_kind`列の`patient`は対象患者を変える不整合の種類を表すラベルであり、患者IDではありません。
+
+validationパイロットの実行例は次のとおりです。
 
 ```bash
 uv run python scripts/run_tracebench_ehr.py \
@@ -161,25 +203,14 @@ uv run python scripts/run_tracebench_ehr.py \
 
 出力は次のとおりです。
 
-- `pair_manifest.jsonl` はケースID、不整合の種類、質問形式と候補のハッシュ値を記録します。
+- `pair_manifest.jsonl` はケースID、変異種類、テンプレートと候補のチェックサムを記録します。
 - `candidate_results.jsonl` は候補と条件ごとの受理、特定、修復結果を記録します。
 - `build_summary.json` は基準実行、空結果、変異別の件数を記録します。
 - `summary.json` は主要評価、副次評価、変異別集計、95%信頼区間を記録します。
 - `report.md` はCHI原稿向けの短い結果要約です。
-- `run_manifest.json` は入力、コード、設定、出力のハッシュ値を記録します。
+- `run_manifest.json` は入力、コード、設定、出力のチェックサムを記録します。
 
 成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
-
-## 口頭試問会原稿
-
-`papers/oral-examination-2026/`に、TraceBench-EHRの研究背景、設計、現在までの結果、今後の予定をまとめたLaTeX原稿があります。
-
-```bash
-cd papers/oral-examination-2026
-make
-```
-
-最終PDFは`papers/oral-examination-2026/output/pdf/Hirata_Ren.pdf`へ生成されます。
 
 ## セットアップ
 
@@ -209,7 +240,7 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 未設定なら従来どおり Vertex AI を使用）。プロキシには JSON Schema 構造化出力の
 機能がないため、スキーマをプロンプトに埋め込み、返却 JSON を Pydantic で検証します。
 
-- `GEMINI_PROXY_URL`: プロキシURL（例: `http://192.168.197.130:3000/api/gemini`）
+- `GEMINI_PROXY_URL`: プロキシURL（例: `http://gemini-proxy.example:3000/api/gemini`）
 - `GEMINI_MODEL` (プロキシモードのデフォルト: `gemini-2.5-flash-lite`)
 - `GEMINI_PROXY_MAX_OUTPUT_TOKENS` (デフォルト: `8192`)
 - `GEMINI_PROXY_TEMPERATURE` (デフォルト: `0.2`)
@@ -221,29 +252,42 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
+サイドバーの「UI生成・編集ツール」では、入力した変更内容から `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
 
 ## Docker（インターネット非接続環境での実行）
 
 依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。閉域内に Gemini プロキシがある場合は `-e GEMINI_PROXY_URL=...` を付けて起動するとタスクグラフ生成も利用できます（上記「閉域ネットワーク向けプロキシモード」参照）。
 
-### 1. ビルド（ネット接続のある環境で）
+### 1. Linux AMD64イメージをビルド（ネット接続のある環境で）
 
 ```bash
-docker build -t interactive-ehr:latest .
+docker buildx build \
+  --platform linux/amd64 \
+  --load \
+  -t interactive-ehr:2026-08-24-ui \
+  -t interactive-ehr:latest \
+  .
 ```
 
-ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。
+ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。イメージに入るのは合成データだけです。院内DWHは院内環境でバックアップと整合性確認を行ってから反映します。
 
 ### 2. オフライン環境へ転送
 
 ```bash
-# ネット接続環境でイメージをtarに保存
-docker save interactive-ehr:latest -o interactive-ehr-image.tar
+# ネット接続環境で圧縮イメージとチェックサムを作成
+mkdir -p dist
+docker save interactive-ehr:2026-08-24-ui interactive-ehr:latest \
+  | gzip -n > dist/interactive-ehr-amd64-20260824.tar.gz
+cd dist
+shasum -a 256 interactive-ehr-amd64-20260824.tar.gz \
+  > interactive-ehr-amd64-20260824.tar.gz.sha256
 
-# 非接続環境へtarを持ち込み、ロード
-docker load -i interactive-ehr-image.tar
+# 非接続環境へ2ファイルを持ち込み、検証してロード
+sha256sum -c interactive-ehr-amd64-20260824.tar.gz.sha256
+docker load -i interactive-ehr-amd64-20260824.tar.gz
 ```
+
+稼働中の院内DWHを保持したままUIだけを更新する手順は `DEPLOY.md` にあります。
 
 ### 3. 起動
 
@@ -272,10 +316,42 @@ docker exec -it interactive-ehr nano /app/src/interactive_ehr/app.py
 ```bash
 uv run pytest tests/ -v
 uv run ruff check .
-uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
+uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/provenance.py src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
 ```
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
+
+## 口頭試問原稿
+
+`papers/oral-examination-2026/`には、2026年8月27日時点の研究状態を記録したLaTeX原稿とPDFがあります。原稿中では正式評価用データを未実行として扱っています。現在の正式評価結果は、このREADMEの「TraceBench-EHRの正式技術評価」と保存済み成果物を参照してください。
+
+```bash
+cd papers/oral-examination-2026
+make
+```
+
+## 研究スライド
+
+定期ゼミ用のMarpスライドは `slides/YYYY-MM-DD/` で管理します。初回のみ依存関係を導入し、ブラウザでプレビューできます。
+
+```bash
+cd slides
+npm ci
+npm run dev
+```
+
+PDFを更新する場合:
+
+```bash
+npm run check -- YYYY-MM-DD/slides.md
+npm test
+npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
+```
+
+共有テーマは `slides/theme/research.css` です。Markdown、テーマ、使用画像、最終PDFをGitで管理します。
+2026年8月24日のResearch Meeting資料は日本語版と英語版があり、患者文脈、情報源、データ時点、読み取り専用SQLの確認方法と院内配布手順を説明します。
+2026年8月14日の資料は、再整理した研究質問、CHI採択研究6件を参考にした評価案、月末の矢部先生との相談、9月10日のCHI提出目標を説明します。
+2026年8月28日の資料は、EHRSQL-2024とMIMIC-IV Demo v2.2を使った提案手法の技術評価について、実験方法、結果、主張できる範囲を説明します。
 
 ## モデル生成
 
@@ -310,6 +386,7 @@ DBファイルは生成物です。CSVを更新した場合は、上記コマン
 ```
 src/interactive_ehr/
   app.py                  -- Streamlitエントリポイント
+  provenance.py           -- 情報源、データ時点、件数、欠損状態の表示用要約
   scenario_graph.py       -- タスクグラフモデル、JSONパース、Graphレンダラ、Gemini生成
   sample_scenarios.py     -- 固定サンプルデータ、ScenarioGraph、WidgetSpec互換API
   models/
@@ -334,6 +411,8 @@ src/interactive_ehr/
     benchmark_analysis.py -- UI更新ベンチマークの統計集計と成果物出力
     case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
     ehrsql_feasibility.py -- EHRSQL-2024の選定、SQL実行、グラフ検証
+    tracebench_analysis.py -- TraceBench-EHRの統計集計と成果物出力
+    tracebench_ehr.py     -- 正式評価の候補生成、契約検査、修復
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
     update_benchmark.py   -- 共通変更仕様、二方式の差分生成、検査、実行器
   pages/                  -- ページコンポーネント
@@ -343,6 +422,15 @@ data/evaluation/
   ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
   ui_update_benchmark.v0.4.json -- RQ1技術評価の固定入力
 
+data/scenarios/
+  ito.json                -- 麻酔科術前外来の初期表示ScenarioGraph
+
+slides/
+  2026-08-24/             -- Research Meeting資料と画面画像
+  theme/                  -- Marp共通テーマ
+
+dist/                     -- Git管理しないDocker配布物
+
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
   generate_fake_csvs.py   -- DWHモデルごとのfake CSVを生成
@@ -350,23 +438,28 @@ scripts/
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
   run_ehrsql_feasibility.py -- EHRSQL-2024の50件実行可能性確認
+  run_tracebench_ehr.py   -- TraceBench-EHRのvalidationとtestの実行
+  export_tracebench_tsv.py -- 保存済みのTraceBench-EHR結果をTSVへ変換
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
-  run_manifest.json       -- 再現条件とハッシュ値
+  run_manifest.json       -- 再現条件とチェックサム
   report.md               -- 技術評価結果の要約
   summary.json            -- 統計集計と実装量
 
 results/evaluation/ehrsql_feasibility_v0.1/
-  selected_cases.json     -- 選定ケースIDと入力のハッシュ値
+  selected_cases.json     -- 選定ケースIDと入力チェックサム
   case_results.jsonl      -- 値を含まないケース別実行結果
   summary.json            -- SQL実行、非空結果、グラフ検証の集計
   report.md               -- 実行可能性確認の結果要約
   run_manifest.json       -- 入力、コード、出力の再現条件
 
+results/evaluation/tracebench_ehr_v1.1/
+  validation/             -- 評価規則を固定する前の全件パイロット
+  test/                   -- 固定commitで一度だけ実行した正式結果
+
 papers/oral-examination-2026/
-  main.tex                -- 口頭試問会原稿
+  main.tex                -- 2026年8月27日時点の口頭試問原稿
   references.bib          -- 原稿で参照する文献
-  latexmkrc               -- upLaTeXとdvipdfmxの設定
-  Makefile                -- PDF生成手順
+  output/pdf/Hirata_Ren.pdf -- 検証済みPDF
 ```

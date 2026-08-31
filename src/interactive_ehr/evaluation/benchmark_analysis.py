@@ -220,8 +220,7 @@ def analyze_benchmark_run(
             for record in run.candidate_records
         ),
         representation_mismatch_count=sum(
-            not record.representation_equivalent
-            for record in run.candidate_records
+            not record.representation_equivalent for record in run.candidate_records
         ),
     )
 
@@ -408,7 +407,9 @@ def _method_metrics(
     invalid = [record for record in matching if not record.oracle_valid]
     valid = [record for record in matching if record.oracle_valid]
     violation_escapes = sum(record.accepted for record in invalid)
-    valid_acceptances = sum(record.accepted and not record.runtime_failure for record in valid)
+    valid_acceptances = sum(
+        record.accepted and not record.runtime_failure for record in valid
+    )
     return MethodMetrics(
         method=method,
         invalid_candidate_count=len(invalid),
@@ -518,8 +519,7 @@ def _ablation_comparisons(
             case_ids,
         )
         differences = [
-            full_rates[case_id] - ablation_rates[case_id]
-            for case_id in case_ids
+            full_rates[case_id] - ablation_rates[case_id] for case_id in case_ids
         ]
         difference = sum(differences) / len(differences)
         raw_p_value = _paired_sign_flip_p_value(
@@ -555,8 +555,7 @@ def _paired_sign_flip_p_value(
     as_extreme = 0
     for _ in range(iterations):
         randomized = [
-            difference * random_generator.choice((-1, 1))
-            for difference in differences
+            difference * random_generator.choice((-1, 1)) for difference in differences
         ]
         if abs(sum(randomized) / len(randomized)) >= observed - 1e-12:
             as_extreme += 1
@@ -642,9 +641,7 @@ def _implementation_checksum() -> str:
         Path(benchmark_module.__file__ or ""),
         Path(__file__),
     ]
-    payload = {
-        path.name: path.read_text(encoding="utf-8") for path in module_paths
-    }
+    payload = {path.name: path.read_text(encoding="utf-8") for path in module_paths}
     return canonical_checksum(payload)
 
 

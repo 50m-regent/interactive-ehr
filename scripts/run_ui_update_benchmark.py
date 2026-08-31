@@ -18,9 +18,7 @@ from interactive_ehr.evaluation.update_benchmark import (
 
 
 LOGGER = logging.getLogger(__name__)
-DEFAULT_BENCHMARK_PATH = Path(
-    "data/evaluation/ui_update_benchmark.v0.4.json"
-)
+DEFAULT_BENCHMARK_PATH = Path("data/evaluation/ui_update_benchmark.v0.4.json")
 DEFAULT_OUTPUT_DIR = Path("results/evaluation/ui_update_benchmark_v0.4")
 
 

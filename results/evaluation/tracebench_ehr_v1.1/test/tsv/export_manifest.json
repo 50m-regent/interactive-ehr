@@ -1,0 +1,35 @@
+{
+  "export_version": "1.0.0",
+  "implementation_files": {
+    "tracebench_tsv.py": "f66ec9bc5e6a34018a414ad821ff2f752a7a17fa98ca17abd5ab5dd17245eb25"
+  },
+  "source_files": {
+    "run_manifest.json": "36eff78c18f84e08a2419c65b5bf17d169feb69ac030c5d41179482ff1c88922",
+    "build_summary.json": "4f754749412cc375e8138a0cf6f5632293a8a2d6267729d63bc9dd6af0835149",
+    "summary.json": "6424e3f1d594ed57fb3c6b7d4f77e568568fa88c8f5c5f4146e2556b3d154be3",
+    "pair_manifest.jsonl": "368d79fc568fd9898c2676475d521a66602e3902f2886e355e745eb033e50334",
+    "candidate_results.jsonl": "964caec65564641f4543a91af64c6ff9c9a27c0d14fa8171968146711e9fa4a3"
+  },
+  "output_files": {
+    "build_summary.tsv": "ab984d44af07e3559dd3112d0b0fc3077b44003577addcfb70242f485d18e024",
+    "condition_metrics.tsv": "af1a05bc96d6d2f46c1f92518df93a62e4b1936d51dedbaf148b1f76ff84c13a",
+    "mutation_metrics.tsv": "707bf0a7d4fbbde342e72e42eccf6d93528a96ada311c93d45e97247604d7d94",
+    "paired_differences.tsv": "140bf565410b0a07fe8a727591ad62e1bb7d494e706c859adb9a186bfe23e652",
+    "pair_manifest.tsv": "cf3cad0d540e60e426649796663921e92f740a1166f8160bd326b5d7afcbb637",
+    "candidate_results.tsv": "ac37b265ae03c5d59dbd27c05c6ed25f21cbb53f7598bbb3ce141892e7076ea5"
+  },
+  "row_counts": {
+    "build_summary.tsv": 1,
+    "condition_metrics.tsv": 4,
+    "mutation_metrics.tsv": 32,
+    "paired_differences.tsv": 6,
+    "pair_manifest.tsv": 763,
+    "candidate_results.tsv": 6104
+  },
+  "verification": {
+    "source_checksums_match_run_manifest": true,
+    "summary_matches_candidate_results": true,
+    "paired_confidence_intervals_recomputed": true,
+    "export_fields_are_allowlisted": true
+  }
+}
