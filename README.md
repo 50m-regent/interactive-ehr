@@ -306,6 +306,28 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
 
+## 研究スライド
+
+定期ゼミ用のMarpスライドは `slides/YYYY-MM-DD/` で管理します。初回のみ依存関係を導入し、ブラウザでプレビューできます。
+
+```bash
+cd slides
+npm ci
+npm run dev
+```
+
+PDFを更新する場合:
+
+```bash
+npm run check -- YYYY-MM-DD/slides.md
+npm test
+npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
+```
+
+共有テーマは `slides/theme/research.css` です。Markdown、テーマ、使用画像、最終PDFをGitで管理します。
+2026年8月14日の資料は、再整理した研究質問、CHI採択研究6件を参考にした評価案、月末の矢部先生との相談、9月10日のCHI提出目標を説明します。
+2026年8月28日の資料は、EHRSQL-2024とMIMIC-IV Demo v2.2を使った提案手法の技術評価について、実験方法、結果、主張できる範囲を説明します。
+
 ## モデル生成
 
 DWHテーブル設計書（`data/dwh_table_design_2025-11-01.xlsx`）からPydanticモデルを自動生成:
