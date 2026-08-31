@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 
 from interactive_ehr.scenario_graph import (
@@ -10,6 +12,7 @@ from interactive_ehr.scenario_graph import (
     TaskNode,
     WidgetNode,
     build_sql_context_for_graph,
+    parse_scenario_graph_json,
 )
 from interactive_ehr.widgets import (
     AnyWidget,
@@ -19,6 +22,9 @@ from interactive_ehr.widgets import (
     MetricSpec,
     TabsSpec,
 )
+
+
+_SCENARIO_DIR = Path(__file__).resolve().parents[2] / "data" / "scenarios"
 
 
 SAMPLE_DATA_NODE_SPECS = [
@@ -235,17 +241,32 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
     data_nodes = [_data_node_from_spec(spec) for spec in SAMPLE_DATA_NODE_SPECS]
     data_node_by_id = {data_node.id: data_node for data_node in data_nodes}
     widgets = _chronic_disease_widgets()
+    widget_titles = [
+        None,
+        None,
+        None,
+        None,
+        "処方カテゴリ別の薬剤数",
+        None,
+        None,
+        None,
+        "生活習慣の実施状況",
+        None,
+    ]
     widget_nodes = [
         WidgetNode(
             id=f"widget_{index}",
-            title=type(widget).__name__,
+            title=title,
             widget=widget,
             data_nodes=[
                 data_node_by_id[data_node_id]
                 for data_node_id in _referenced_data_node_ids(widget, data_nodes)
             ],
         )
-        for index, widget in enumerate(widgets, start=1)
+        for index, (widget, title) in enumerate(
+            zip(widgets, widget_titles, strict=True),
+            start=1,
+        )
     ]
     widget_node_by_id = {widget_node.id: widget_node for widget_node in widget_nodes}
     tasks = [
@@ -296,10 +317,19 @@ def get_chronic_disease_graph_scenario() -> tuple[ScenarioGraph, dict[str, objec
         id="chronic_disease_outpatient",
         title="複数の慢性疾患を持つ高齢患者の外来診察",
         description="Notionのタスク仮定例に基づく、血圧・腎機能・処方・生活指導のサンプル。",
+        patient_context_key="metric_patient_profile",
         tasks=tasks,
     )
     context = build_sql_context_for_graph(graph)
     return graph, context
+
+
+def get_anesthesia_preop_graph_scenario() -> tuple[ScenarioGraph, dict[str, object]]:
+    """麻酔科術前外来のScenarioGraphとSQL実行結果を返す。"""
+
+    scenario_path = _SCENARIO_DIR / "ito.json"
+    graph = parse_scenario_graph_json(scenario_path.read_text(encoding="utf-8"))
+    return graph, build_sql_context_for_graph(graph)
 
 
 def get_chronic_disease_scenario() -> tuple[list[AnyWidget], dict[str, object]]:

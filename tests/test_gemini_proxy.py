@@ -18,7 +18,7 @@ from interactive_ehr.llm.gemini_proxy import (
 )
 from interactive_ehr.llm.schema_utils import to_gemini_response_json_schema
 
-PROXY_URL = "http://192.168.197.130:3000/api/gemini"
+PROXY_URL = "http://gemini-proxy.example:3000/api/gemini"
 
 
 class SampleResponse(BaseModel):

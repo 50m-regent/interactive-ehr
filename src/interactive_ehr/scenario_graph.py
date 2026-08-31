@@ -22,6 +22,11 @@ from interactive_ehr.models.registry import (
     has_dwh_model,
     iter_dwh_model_info,
 )
+from interactive_ehr.provenance import (
+    DataProvenanceSummary,
+    source_overview,
+    summarize_data_nodes,
+)
 from interactive_ehr.widgets import AnyWidget, WidgetType
 from interactive_ehr.widgets.renderer import render_widget
 
@@ -80,6 +85,10 @@ class ScenarioGraph(BaseModel):
     id: str = Field(description="シナリオID")
     title: str = Field(description="シナリオ名")
     description: str | None = Field(None, description="シナリオ説明")
+    patient_context_key: str | None = Field(
+        None,
+        description="患者識別情報を取得する表示コンテキストのキー",
+    )
     tasks: list[TaskNode] = Field(default_factory=list)
 
     @property
@@ -213,11 +222,21 @@ def render_scenario_graph(
     tab_handles = st.tabs([task.title for task in tasks])
     for tab, task in zip(tab_handles, tasks, strict=True):
         with tab:
+            summaries = summarize_data_nodes(
+                (
+                    data_node
+                    for widget_node in task.widgets
+                    for data_node in widget_node.data_nodes
+                ),
+                context,
+            )
+            _render_task_source_summary(summaries)
             for widget_node in task.widgets:
                 if show_missing_reference_warnings:
                     _warn_for_data_references(widget_node, context)
                 _render_widget_title(widget_node)
                 render_widget(widget_node.widget, context)
+            _render_provenance_panel(summaries)
 
 
 def build_dwh_context_for_graph(
@@ -500,6 +519,8 @@ def _warn_for_data_references(
     widget_node: WidgetNode,
     context: Mapping[str, object],
 ) -> None:
+    """表示コンテキストに存在しない参照を警告する。"""
+
     for data_node in widget_node.data_nodes:
         if data_node.context_key not in context:
             st.warning(
@@ -509,14 +530,50 @@ def _warn_for_data_references(
 
 
 def _render_widget_title(widget_node: WidgetNode) -> None:
+    """表やグラフの内容を示す見出しを表示する。"""
+
     if widget_node.title is None:
         return
     if widget_node.widget.widget_type not in {
+        WidgetType.DATAFRAME,
+        WidgetType.TABLE,
+        WidgetType.JSON,
         WidgetType.LINE_CHART,
         WidgetType.BAR_CHART,
     }:
         return
     st.markdown(f"#### {widget_node.title}")
+
+
+def _render_task_source_summary(
+    summaries: list[DataProvenanceSummary],
+) -> None:
+    """主要な情報源と最終データ日時をタブ上部へ表示する。"""
+
+    if not summaries:
+        return
+    source_text, latest_text = source_overview(summaries)
+    st.caption(f"情報源: {source_text} ｜ 最終データ日時: {latest_text}")
+
+
+def _render_provenance_panel(summaries: list[DataProvenanceSummary]) -> None:
+    """情報源、データ時点、取得条件を折りたたみ表示する。"""
+
+    if not summaries:
+        return
+    with st.expander("情報源と取得条件", expanded=False):
+        st.dataframe(
+            [summary.as_row() for summary in summaries],
+            hide_index=True,
+            width="stretch",
+        )
+        sql_summaries = [summary for summary in summaries if summary.sql is not None]
+        if not sql_summaries:
+            return
+        st.markdown("##### 取得SQL")
+        for summary in sql_summaries:
+            st.markdown(f"{summary.description}")
+            st.code(summary.sql, language="sql", wrap_lines=True)
 
 
 def _decide_update_scope(

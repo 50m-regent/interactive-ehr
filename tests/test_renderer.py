@@ -77,6 +77,12 @@ class FakeStreamlit:
     def text(self, *args: Any, **kwargs: Any) -> str:
         return self._record("text", *args, **kwargs)
 
+    def caption(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("caption", *args, **kwargs)
+
+    def code(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("code", *args, **kwargs)
+
     def line_chart(self, *args: Any, **kwargs: Any) -> str:
         return self._record("line_chart", *args, **kwargs)
 

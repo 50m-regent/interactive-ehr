@@ -6,6 +6,7 @@ __pycache__/
 key.json
 data/*.sqlite
 data/*.sqlite-*
+dist/
 .DS_Store
 /interactive-ehr-*.tar
 /interactive-ehr-*.tar.gz

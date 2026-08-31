@@ -33,7 +33,7 @@ Claude Code 向けの `CLAUDE.md` と同じ意図の指示を Codex 向けにま
 
 - アプリ起動: `uv run streamlit run src/interactive_ehr/app.py`
 - テスト実行: `uv run pytest tests/ -v`
-- 型チェック: `uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py`
+- 型チェック: `uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/provenance.py src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py`
 - パッケージ追加: `uv add <package>`
 - 開発用パッケージ追加: `uv add --dev <package>`
 

@@ -10,9 +10,11 @@
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
-現在は初回のUI実行経路として、固定の慢性疾患外来サンプルをStreamlit上で表示できます。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
+現在は麻酔科術前外来と慢性疾患外来の合成サンプルをStreamlit上で切り替えて表示できます。初期表示は麻酔科術前外来です。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
 
-UIは `ScenarioGraph` JSON から描画されます。画面右側の「タスクグラフ JSON」を編集すると、valid な JSON の場合だけ左側の「UI プレビュー」に即時反映されます。不正な JSON やスキーマ検証エラーがある場合、最後に valid だったタスクグラフを描画し続けます。
+診療画面の上部には患者文脈、合成データであること、画面構成の作成元、画面更新時刻を表示します。各タスクには情報源と最終データ日時の要約があり、「情報源と取得条件」を開くと件数、欠損状態、参照テーブル、読み取り専用SQLを確認できます。表示値とGeminiが生成する画面構成を区別して確認できます。
+
+UIは `ScenarioGraph` JSON から描画されます。サイドバーは初期状態で閉じています。「UI生成・編集ツール」を開くと、Geminiによる画面構成の更新とScenarioGraph JSONの編集ができます。有効なJSONだけを診療画面へ反映し、検証エラーがある場合は最後に有効だった画面を描画し続けます。
 
 折れ線グラフは、日付や数値を横軸の値に応じた間隔で表示します。線上には実測点を示すドットを重ね、マウスを合わせると日付、系列、値を確認できます。
 
@@ -238,7 +240,7 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 未設定なら従来どおり Vertex AI を使用）。プロキシには JSON Schema 構造化出力の
 機能がないため、スキーマをプロンプトに埋め込み、返却 JSON を Pydantic で検証します。
 
-- `GEMINI_PROXY_URL`: プロキシURL（例: `http://192.168.197.130:3000/api/gemini`）
+- `GEMINI_PROXY_URL`: プロキシURL（例: `http://gemini-proxy.example:3000/api/gemini`）
 - `GEMINI_MODEL` (プロキシモードのデフォルト: `gemini-2.5-flash-lite`)
 - `GEMINI_PROXY_MAX_OUTPUT_TOKENS` (デフォルト: `8192`)
 - `GEMINI_PROXY_TEMPERATURE` (デフォルト: `0.2`)
@@ -250,29 +252,42 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 uv run streamlit run src/interactive_ehr/app.py
 ```
 
-サイドバーの「Gemini生成」では、プロンプトから `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
+サイドバーの「UI生成・編集ツール」では、入力した変更内容から `ScenarioGraph` を構造化出力として生成できます。Gemini は widget node ごとに専用 data node とSQLを生成し、アプリはそのSQLをローカルSQLite DBに対して実行して `context[data_node.context_key]` にDataFrameとして保持します。電子カルテデータ本体は `ScenarioGraph` JSON には埋め込みません。
 
 ## Docker（インターネット非接続環境での実行）
 
 依存関係・コード・サンプルDB（`data/dwh.sqlite`）をすべて1つのイメージに同梱します。ネット接続が必要なのは **イメージのビルド時のみ** で、生成後はオフライン環境へ持ち込んで動作します。起動時のサンプル慢性疾患外来シナリオ表示・タスクグラフJSON編集はGemini認証なしで動作します。閉域内に Gemini プロキシがある場合は `-e GEMINI_PROXY_URL=...` を付けて起動するとタスクグラフ生成も利用できます（上記「閉域ネットワーク向けプロキシモード」参照）。
 
-### 1. ビルド（ネット接続のある環境で）
+### 1. Linux AMD64イメージをビルド（ネット接続のある環境で）
 
 ```bash
-docker build -t interactive-ehr:latest .
+docker buildx build \
+  --platform linux/amd64 \
+  --load \
+  -t interactive-ehr:2026-08-24-ui \
+  -t interactive-ehr:latest \
+  .
 ```
 
-ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。
+ビルド中に `scripts/build_dwh_database.py` を実行し、`data/dwh/*.csv` からSQLite DBをイメージ内に作成します。イメージに入るのは合成データだけです。院内DWHは院内環境でバックアップと整合性確認を行ってから反映します。
 
 ### 2. オフライン環境へ転送
 
 ```bash
-# ネット接続環境でイメージをtarに保存
-docker save interactive-ehr:latest -o interactive-ehr-image.tar
+# ネット接続環境で圧縮イメージとチェックサムを作成
+mkdir -p dist
+docker save interactive-ehr:2026-08-24-ui interactive-ehr:latest \
+  | gzip -n > dist/interactive-ehr-amd64-20260824.tar.gz
+cd dist
+shasum -a 256 interactive-ehr-amd64-20260824.tar.gz \
+  > interactive-ehr-amd64-20260824.tar.gz.sha256
 
-# 非接続環境へtarを持ち込み、ロード
-docker load -i interactive-ehr-image.tar
+# 非接続環境へ2ファイルを持ち込み、検証してロード
+sha256sum -c interactive-ehr-amd64-20260824.tar.gz.sha256
+docker load -i interactive-ehr-amd64-20260824.tar.gz
 ```
+
+稼働中の院内DWHを保持したままUIだけを更新する手順は `DEPLOY.md` にあります。
 
 ### 3. 起動
 
@@ -301,7 +316,7 @@ docker exec -it interactive-ehr nano /app/src/interactive_ehr/app.py
 ```bash
 uv run pytest tests/ -v
 uv run ruff check .
-uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
+uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/interactive_ehr/provenance.py src/interactive_ehr/scenario_graph.py src/interactive_ehr/llm/gemini.py src/interactive_ehr/app.py
 ```
 
 `ty` の初期ゲートは手書き runtime code を中心に限定しています。全体 `uv run ty check` はより広い参考診断として利用できます。
@@ -325,6 +340,7 @@ npm run build -- YYYY-MM-DD/slides.md -o YYYY-MM-DD/slides.pdf
 ```
 
 共有テーマは `slides/theme/research.css` です。Markdown、テーマ、使用画像、最終PDFをGitで管理します。
+2026年8月24日のResearch Meeting資料は日本語版と英語版があり、患者文脈、情報源、データ時点、読み取り専用SQLの確認方法と院内配布手順を説明します。
 2026年8月14日の資料は、再整理した研究質問、CHI採択研究6件を参考にした評価案、月末の矢部先生との相談、9月10日のCHI提出目標を説明します。
 2026年8月28日の資料は、EHRSQL-2024とMIMIC-IV Demo v2.2を使った提案手法の技術評価について、実験方法、結果、主張できる範囲を説明します。
 
@@ -361,6 +377,7 @@ DBファイルは生成物です。CSVを更新した場合は、上記コマン
 ```
 src/interactive_ehr/
   app.py                  -- Streamlitエントリポイント
+  provenance.py           -- 情報源、データ時点、件数、欠損状態の表示用要約
   scenario_graph.py       -- タスクグラフモデル、JSONパース、Graphレンダラ、Gemini生成
   sample_scenarios.py     -- 固定サンプルデータ、ScenarioGraph、WidgetSpec互換API
   models/
@@ -395,6 +412,15 @@ data/evaluation/
   ito_clinical_tasks.v1.json -- 麻酔科術前外来T1〜T7のdraft基準モデル
   ito_case_manifest.v0.1.json -- 比較実験用の合成症例ペアテンプレート
   ui_update_benchmark.v0.4.json -- RQ1技術評価の固定入力
+
+data/scenarios/
+  ito.json                -- 麻酔科術前外来の初期表示ScenarioGraph
+
+slides/
+  2026-08-24/             -- Research Meeting資料と画面画像
+  theme/                  -- Marp共通テーマ
+
+dist/                     -- Git管理しないDocker配布物
 
 scripts/
   generate_models.py      -- xlsxからPydanticモデルを自動生成
