@@ -240,7 +240,7 @@ Vertex AI に到達できない閉域環境では、環境変数 `GEMINI_PROXY_U
 未設定なら従来どおり Vertex AI を使用）。プロキシには JSON Schema 構造化出力の
 機能がないため、スキーマをプロンプトに埋め込み、返却 JSON を Pydantic で検証します。
 
-- `GEMINI_PROXY_URL`: プロキシURL（例: `http://192.168.197.130:3000/api/gemini`）
+- `GEMINI_PROXY_URL`: プロキシURL（例: `http://gemini-proxy.example:3000/api/gemini`）
 - `GEMINI_MODEL` (プロキシモードのデフォルト: `gemini-2.5-flash-lite`)
 - `GEMINI_PROXY_MAX_OUTPUT_TOKENS` (デフォルト: `8192`)
 - `GEMINI_PROXY_TEMPERATURE` (デフォルト: `0.2`)

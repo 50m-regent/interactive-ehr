@@ -73,12 +73,12 @@ docker images interactive-ehr
 ### 現在のデータを退避する
 
 ```bash
-mkdir -p /home/hirata/interactive-ehr-backups/20260824_ui_update
+mkdir -p ~/interactive-ehr-backups/20260824_ui_update
 docker cp interactive-ehr:/app/data/dwh \
-  /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh
+  ~/interactive-ehr-backups/20260824_ui_update/dwh
 docker cp interactive-ehr:/app/data/dwh.sqlite \
-  /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
-sha256sum /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+  ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+sha256sum ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
 ```
 
 バックアップの作成とハッシュの記録が終わるまで、現在のコンテナを停止しない。
@@ -92,14 +92,14 @@ docker rename interactive-ehr interactive-ehr-before-ui-update-20260824
 docker create --name interactive-ehr \
   --restart unless-stopped \
   -p 8501:8501 \
-  -e GEMINI_PROXY_URL=http://192.168.197.130:3000/api/gemini \
+  -e GEMINI_PROXY_URL=http://gemini-proxy.example:3000/api/gemini \
   interactive-ehr:2026-08-24-ui
 
 docker cp \
-  /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh/. \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh/. \
   interactive-ehr:/app/data/dwh
 docker cp \
-  /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh.sqlite \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite \
   interactive-ehr:/app/data/dwh.sqlite
 
 docker start interactive-ehr
@@ -110,7 +110,7 @@ Geminiプロキシを使わない場合は `-e GEMINI_PROXY_URL=...` を省略�
 ### 更新結果を確認する
 
 ```bash
-sha256sum /home/hirata/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+sha256sum ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
 docker exec interactive-ehr sha256sum /app/data/dwh.sqlite
 docker exec interactive-ehr /opt/venv/bin/python -c 'import urllib.request,sys; health=urllib.request.urlopen("http://127.0.0.1:8501/_stcore/health",timeout=10); root=urllib.request.urlopen("http://127.0.0.1:8501",timeout=10); sys.stdout.write(f"health_status={health.status} root_status={root.status}\n")'
 ```
@@ -134,7 +134,7 @@ docker start interactive-ehr
 docker run -d --name interactive-ehr \
   --restart unless-stopped \
   -p 8501:8501 \
-  -e GEMINI_PROXY_URL=http://192.168.197.130:3000/api/gemini \
+  -e GEMINI_PROXY_URL=http://gemini-proxy.example:3000/api/gemini \
   interactive-ehr:latest
 ```
 
@@ -199,7 +199,7 @@ Gemini プロキシ(閉域内)向けのみ。なお `--network none` では
 閉域内のプロキシ経由で動作する。事前にプロキシへの疎通を確認しておくとよい:
 
 ```bash
-curl -s -X POST http://192.168.197.130:3000/api/gemini \
+curl -s -X POST http://gemini-proxy.example:3000/api/gemini \
   -H 'Content-Type: application/json' \
   -d '{"model":"gemini-2.5-flash-lite","maxOutputTokens":64,"temperature":0,"input":"1+1の答えだけをJSONで {\"answer\": 数値} の形で返して","jsonMode":true}'
 # → {"answer": 2} のような JSON が返れば疎通 OK
@@ -210,7 +210,7 @@ curl -s -X POST http://192.168.197.130:3000/api/gemini \
 ```bash
 docker exec interactive-ehr python -c "
 import requests
-r = requests.post('http://192.168.197.130:3000/api/gemini', json={
+r = requests.post('http://gemini-proxy.example:3000/api/gemini', json={
     'model': 'gemini-2.5-flash-lite', 'maxOutputTokens': 64,
     'temperature': 0, 'input': 'ping を JSON {\"pong\": true} で返して',
     'jsonMode': True}, timeout=60)
