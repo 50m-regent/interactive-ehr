@@ -24,6 +24,7 @@ Research.pdf
 slides/
 
 # Docker artifacts
+dist/
 *.tar
 *.tar.gz
 *.sha256

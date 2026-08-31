@@ -186,7 +186,7 @@ section.cover h1 {
 }
 
 section.cover h1:first-of-type:not(:last-of-type) {
-  bottom: calc(40% + 37px);
+  bottom: calc(40% + 64px);
 }
 
 section.cover h1 strong {

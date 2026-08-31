@@ -8,8 +8,8 @@ interactive-ehr をデモ・評価用に動かすための手順書。
 
 | ファイル | 内容 |
 |---|---|
-| `interactive-ehr-amd64.tar.gz` | Docker イメージ(SQLite DB 構築済み・オフライン動作) |
-| `interactive-ehr-amd64.tar.gz.sha256` | 転送後の破損チェック用チェックサム |
+| `interactive-ehr-amd64-20260824.tar.gz` | 最新UIを含むLinux AMD64 Dockerイメージ。データは合成サンプルのみ |
+| `interactive-ehr-amd64-20260824.tar.gz.sha256` | 転送後の破損チェック用チェックサム |
 
 ## 0. 前提条件の確認
 
@@ -29,7 +29,7 @@ docker version
 ## 1. ファイル転送
 
 Citrix のドライブマッピングまたはファイル転送ポータルで
-`interactive-ehr-amd64.tar.gz` と `.sha256` を閉域マシンの任意のディレクトリ
+`interactive-ehr-amd64-20260824.tar.gz` と `.sha256` を閉域マシンの任意のディレクトリ
 (例: `~/interactive-ehr/`)にコピーする。
 
 ### 転送ポータルにサイズ制限がある場合(分割転送)
@@ -38,25 +38,25 @@ Citrix のドライブマッピングまたはファイル転送ポータルで
 
 ```bash
 # ローカル側: 200MB ごとに分割(part-aa, part-ab, ... ができる)
-split -b 200m interactive-ehr-amd64.tar.gz part-
+split -b 200m interactive-ehr-amd64-20260824.tar.gz part-
 
 # 閉域側: 結合して元に戻す
-cat part-* > interactive-ehr-amd64.tar.gz
+cat part-* > interactive-ehr-amd64-20260824.tar.gz
 ```
 
 ### 転送後の整合性確認(必須)
 
 ```bash
 cd ~/interactive-ehr
-sha256sum -c interactive-ehr-amd64.tar.gz.sha256
-# → interactive-ehr-amd64.tar.gz: OK と出れば転送成功
+sha256sum -c interactive-ehr-amd64-20260824.tar.gz.sha256
+# → interactive-ehr-amd64-20260824.tar.gz: OK と出れば転送成功
 # FAILED の場合はファイルが壊れているので再転送する
 ```
 
 ## 2. イメージのロード
 
 ```bash
-docker load -i interactive-ehr-amd64.tar.gz
+docker load -i interactive-ehr-amd64-20260824.tar.gz
 # → Loaded image: interactive-ehr:latest と表示される
 # (gzip のまま読み込めるので解凍は不要)
 
@@ -64,13 +64,77 @@ docker images interactive-ehr
 # → REPOSITORY=interactive-ehr, TAG=latest の行があれば OK
 ```
 
+`interactive-ehr:2026-08-24-ui` も同じイメージを指す固定タグとして読み込まれる。
+
+## 稼働中のDWHを保持してUIだけを更新する
+
+配布イメージには実患者情報を含めない。院内の稼働コンテナから検証済みDWHをバックアップし、新しいUIコンテナへ院内環境内で反映する。
+
+### 現在のデータを退避する
+
+```bash
+mkdir -p ~/interactive-ehr-backups/20260824_ui_update
+docker cp interactive-ehr:/app/data/dwh \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh
+docker cp interactive-ehr:/app/data/dwh.sqlite \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+sha256sum ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+```
+
+バックアップの作成とハッシュの記録が終わるまで、現在のコンテナを停止しない。
+
+### 新しいコンテナへ切り替える
+
+```bash
+docker stop interactive-ehr
+docker rename interactive-ehr interactive-ehr-before-ui-update-20260824
+
+docker create --name interactive-ehr \
+  --restart unless-stopped \
+  -p 8501:8501 \
+  -e GEMINI_PROXY_URL=http://gemini-proxy.example:3000/api/gemini \
+  interactive-ehr:2026-08-24-ui
+
+docker cp \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh/. \
+  interactive-ehr:/app/data/dwh
+docker cp \
+  ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite \
+  interactive-ehr:/app/data/dwh.sqlite
+
+docker start interactive-ehr
+```
+
+Geminiプロキシを使わない場合は `-e GEMINI_PROXY_URL=...` を省略する。
+
+### 更新結果を確認する
+
+```bash
+sha256sum ~/interactive-ehr-backups/20260824_ui_update/dwh.sqlite
+docker exec interactive-ehr sha256sum /app/data/dwh.sqlite
+docker exec interactive-ehr /opt/venv/bin/python -c 'import urllib.request,sys; health=urllib.request.urlopen("http://127.0.0.1:8501/_stcore/health",timeout=10); root=urllib.request.urlopen("http://127.0.0.1:8501",timeout=10); sys.stdout.write(f"health_status={health.status} root_status={root.status}\n")'
+```
+
+二つのハッシュが一致し、`health_status=200 root_status=200` になった後で画面を確認する。患者文脈、データ時点、情報源、取得条件が表示されない場合は利用を開始しない。
+
+### 問題がある場合に元へ戻す
+
+```bash
+docker stop interactive-ehr
+docker rename interactive-ehr interactive-ehr-failed-20260824
+docker rename interactive-ehr-before-ui-update-20260824 interactive-ehr
+docker start interactive-ehr
+```
+
+ロールバック後もヘルスURLと画面URLがHTTP 200になることを確認する。原因を確認するまで失敗したコンテナとバックアップを削除しない。
+
 ## 3. 起動
 
 ```bash
 docker run -d --name interactive-ehr \
   --restart unless-stopped \
   -p 8501:8501 \
-  -e GEMINI_PROXY_URL=http://192.168.197.130:3000/api/gemini \
+  -e GEMINI_PROXY_URL=http://gemini-proxy.example:3000/api/gemini \
   interactive-ehr:latest
 ```
 
@@ -123,9 +187,11 @@ Gemini プロキシ(閉域内)向けのみ。なお `--network none` では
   - つながらない場合はマシンのファイアウォールで 8501/tcp を許可する
     (例: `sudo firewall-cmd --add-port=8501/tcp` または `sudo ufw allow 8501`)
 
-画面が表示されたら、左ペインに慢性疾患外来のサンプルシナリオ UI、
-右ペインに ScenarioGraph JSON エディタが出る。
-JSON を編集すると左の UI に反映されることを確認する。
+画面が表示されたら、麻酔科術前外来の診療画面が出る。
+画面上部に合成データ、情報源、最終データ日時、画面構成の作成元が表示されること、
+各タスクの「情報源と取得条件」を開いて参照テーブルとSQLを確認できることを確認する。
+左上からサイドバーを開くと、慢性疾患外来への切り替えと
+「UI生成・編集ツール」内のScenarioGraph JSON編集ができる。
 
 ## 5. タスクグラフ生成(Gemini プロキシ)の確認
 
@@ -133,7 +199,7 @@ JSON を編集すると左の UI に反映されることを確認する。
 閉域内のプロキシ経由で動作する。事前にプロキシへの疎通を確認しておくとよい:
 
 ```bash
-curl -s -X POST http://192.168.197.130:3000/api/gemini \
+curl -s -X POST http://gemini-proxy.example:3000/api/gemini \
   -H 'Content-Type: application/json' \
   -d '{"model":"gemini-2.5-flash-lite","maxOutputTokens":64,"temperature":0,"input":"1+1の答えだけをJSONで {\"answer\": 数値} の形で返して","jsonMode":true}'
 # → {"answer": 2} のような JSON が返れば疎通 OK
@@ -144,7 +210,7 @@ curl -s -X POST http://192.168.197.130:3000/api/gemini \
 ```bash
 docker exec interactive-ehr python -c "
 import requests
-r = requests.post('http://192.168.197.130:3000/api/gemini', json={
+r = requests.post('http://gemini-proxy.example:3000/api/gemini', json={
     'model': 'gemini-2.5-flash-lite', 'maxOutputTokens': 64,
     'temperature': 0, 'input': 'ping を JSON {\"pong\": true} で返して',
     'jsonMode': True}, timeout=60)

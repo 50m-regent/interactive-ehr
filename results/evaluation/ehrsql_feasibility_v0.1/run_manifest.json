@@ -1,0 +1,31 @@
+{
+  "code_commit": "74dcc2f7f35072e78b69641bebd04e33ced00d87",
+  "dataset_commit": "f9e1aa02160d39e3f8df52bf5c69c5cf2e472499",
+  "dataset_repository": "https://github.com/glee4810/ehrsql-2024",
+  "dataset_split": "train",
+  "dataset_version": "train_v1.1.2",
+  "executed_at": "2026-08-27T07:39:31.509407+00:00",
+  "experiment_id": "tracebench-ehr-feasibility",
+  "experiment_version": "0.1.0",
+  "implementation_checksums": {
+    "ehrsql_feasibility.py": "9530c1bb7132e545add50b045ee1b5f993449d5851ae1fe0c39baf43ef8ec1b7",
+    "run_ehrsql_feasibility.py": "e172115d9b47e1c29e9d153f10bb34c84354ae395dae45d7a92180e4e8d616f3"
+  },
+  "input_checksums": {
+    "annotated.json": "84bf5b26925b8f56f0c1ec06fc977d5c3b4578452feeb8b029089858a327f2ae",
+    "data.json": "d6215562c03da5aa1cb096406eebefc15279847b7466b2604055dccd40d9e005",
+    "mimic_iv.sqlite": "a26a60261d7e3bbf1869ffd92efe1803abdbce3eb256a2883fc0439c63427796"
+  },
+  "max_result_rows": 10000,
+  "output_checksums": {
+    "case_results.jsonl": "ef58eb363daf06ee470cee67be4ea2c9602c9f8c3d2dadb4b2c284f12ab624c2",
+    "report.md": "171f67e4e25b02ebb89322da24f01d90763a95dd8dfc0fd3893bd2b08ed8292a",
+    "selected_cases.json": "704728517a675db8889d2a77bceb3a44e38da8ac16c41fea616284d1347acb72",
+    "summary.json": "411d2226f97648baed9ad896215f32d971e4519b346d40df46fd57ef39ba60cf"
+  },
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python_version": "3.12.9",
+  "query_timeout_seconds": 5.0,
+  "sample_seed": 20260827,
+  "sample_size": 50
+}

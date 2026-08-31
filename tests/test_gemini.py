@@ -48,9 +48,7 @@ def mock_genai_client() -> Generator[MagicMock, None, None]:
 @pytest.fixture
 def mock_credentials() -> Generator[MagicMock, None, None]:
     """service_account.Credentials をモック."""
-    with patch(
-        "interactive_ehr.llm.gemini.service_account.Credentials"
-    ) as mock_cls:
+    with patch("interactive_ehr.llm.gemini.service_account.Credentials") as mock_cls:
         mock_cls.from_service_account_file.return_value.with_scopes.return_value = (
             MagicMock()
         )
@@ -224,10 +222,9 @@ class TestGenerate:
         )
         assert call_kwargs["contents"] == "prompt"
         assert call_kwargs["config"]["response_mime_type"] == "application/json"
-        assert (
-            call_kwargs["config"]["response_json_schema"]
-            == _to_gemini_response_json_schema(SampleResponse.model_json_schema())
-        )
+        assert call_kwargs["config"][
+            "response_json_schema"
+        ] == _to_gemini_response_json_schema(SampleResponse.model_json_schema())
 
     def test_invalid_json_raises(
         self,

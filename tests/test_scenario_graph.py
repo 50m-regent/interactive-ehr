@@ -10,7 +10,10 @@ import pytest
 from pydantic import ValidationError
 
 import interactive_ehr.scenario_graph as scenario_graph
-from interactive_ehr.sample_scenarios import get_chronic_disease_graph_scenario
+from interactive_ehr.sample_scenarios import (
+    get_anesthesia_preop_graph_scenario,
+    get_chronic_disease_graph_scenario,
+)
 from interactive_ehr.scenario_graph import (
     DataNode,
     DataNodeGenerationPlan,
@@ -30,7 +33,13 @@ from interactive_ehr.scenario_graph import (
     render_scenario_graph,
     update_scenario_graph_incrementally,
 )
-from interactive_ehr.widgets import LineChartSpec, MarkdownSpec, TableSpec, WidgetType
+from interactive_ehr.widgets import (
+    DataframeSpec,
+    LineChartSpec,
+    MarkdownSpec,
+    TableSpec,
+    WidgetType,
+)
 from tests.test_renderer import FakeContainer, FakeStreamlit
 
 
@@ -159,14 +168,14 @@ def test_render_scenario_graph_does_not_render_task_description(
             TaskNode(
                 id="task_1",
                 title="確認",
-                description="このタスクの説明文は電子カルテ画面には表示しない。",
+                description="生成処理へ渡すタスクの説明。",
             )
         ],
     )
 
     render_scenario_graph(graph, {})
 
-    assert "caption" not in [call.name for call in fake.calls]
+    assert "markdown" not in [call.name for call in fake.calls]
 
 
 def test_render_scenario_graph_warns_for_missing_references(
@@ -247,7 +256,8 @@ def test_render_scenario_graph_can_suppress_missing_reference_warnings(
         show_missing_reference_warnings=False,
     )
 
-    assert [call.name for call in fake.calls] == ["tabs"]
+    assert "warning" not in [call.name for call in fake.calls]
+    assert "expander" in [call.name for call in fake.calls]
     render_widget_mock.assert_called_once()
 
 
@@ -265,6 +275,7 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
     validated = ScenarioGraph.model_validate(graph.model_dump(mode="json"))
 
     assert validated.id == "chronic_disease_outpatient"
+    assert validated.patient_context_key == "metric_patient_profile"
     assert [task.title for task in validated.tasks] == [
         "血圧・腎機能評価",
         "副作用・服薬確認",
@@ -274,6 +285,29 @@ def test_chronic_disease_graph_scenario_builds_valid_graph(
     assert "chart_bp_trend" in context
     assert "metric_latest_egfr" in context
     assert "metric_patient_material" in context
+
+
+def test_anesthesia_preop_scenario_has_patient_header_and_compact_tables(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """麻酔科デモが患者ヘッダーとスクロール可能な表を持つ。"""
+
+    monkeypatch.setattr(
+        scenario_graph,
+        "execute_read_sql",
+        MagicMock(return_value=_dataframe({"値": ["sample"]})),
+    )
+
+    graph, context = get_anesthesia_preop_graph_scenario()
+
+    assert graph.patient_context_key == "header_patient_identity"
+    assert "header_patient_identity" in context
+    assert all(
+        isinstance(widget_node.widget, DataframeSpec)
+        for widget_node in graph.widget_nodes
+        if widget_node.id
+        in {"widget_3", "widget_4", "widget_6", "widget_7", "widget_9"}
+    )
 
 
 def test_generate_scenario_graph_passes_schema_and_context_keys(
@@ -293,7 +327,9 @@ def test_generate_scenario_graph_passes_schema_and_context_keys(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -341,7 +377,9 @@ def test_generate_scenario_graph_incrementally_yields_partial_graphs(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -384,7 +422,9 @@ def test_generate_scenario_graph_incrementally_builds_context_from_widget_sql(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -393,7 +433,13 @@ def test_generate_scenario_graph_incrementally_builds_context_from_widget_sql(
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
-    assert [event.status for event in events] == ["started", "task", "data", "widget", "completed"]
+    assert [event.status for event in events] == [
+        "started",
+        "task",
+        "data",
+        "widget",
+        "completed",
+    ]
     assert events[-1].context["sql_data_1"] is not None
 
 
@@ -417,7 +463,9 @@ def test_generate_scenario_graph_incrementally_fails_unknown_dwh_model(
         plan,
         TaskNode(id="task_1", title="確認", widget_ids=[]),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
 
     events = list(generate_scenario_graph_incrementally("検査を見たい", {}))
 
@@ -455,7 +503,9 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -465,7 +515,9 @@ def test_generate_scenario_graph_incrementally_drops_unknown_widget_data_refs(
     events = list(generate_scenario_graph_incrementally("検査を見たい", {"rows": []}))
 
     final_graph = events[-1].graph
-    assert [data_node.id for data_node in final_graph.widget_nodes[0].data_nodes] == ["data_1"]
+    assert [data_node.id for data_node in final_graph.widget_nodes[0].data_nodes] == [
+        "data_1"
+    ]
 
 
 def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
@@ -492,7 +544,9 @@ def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
 
     client = MagicMock()
     client.generate.side_effect = fake_generate
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -503,7 +557,11 @@ def test_generate_scenario_graph_incrementally_orders_widgets_by_plan(
 
     widget_events = [event for event in events if event.status == "widget"]
     assert len(widget_events) == 3
-    assert {event.node_id for event in widget_events} == {"widget_a", "widget_b", "widget_c"}
+    assert {event.node_id for event in widget_events} == {
+        "widget_a",
+        "widget_b",
+        "widget_c",
+    }
 
     final_graph = events[-1].graph
     assert [widget.id for widget in final_graph.widget_nodes] == [
@@ -540,7 +598,9 @@ def test_generate_scenario_graph_incrementally_widget_failure_stops(
 
     client = MagicMock()
     client.generate.side_effect = fake_generate
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -576,7 +636,13 @@ def test_build_sql_context_for_graph_executes_data_node_sql(
             TaskNode(
                 id="task_1",
                 title="確認",
-                widgets=[WidgetNode(id="widget_1", widget=TableSpec(data_key="sql_data_1"), data_nodes=[data_node])],
+                widgets=[
+                    WidgetNode(
+                        id="widget_1",
+                        widget=TableSpec(data_key="sql_data_1"),
+                        data_nodes=[data_node],
+                    )
+                ],
             )
         ],
     )
@@ -596,11 +662,13 @@ def _widget_plan_for_prompt(
     plan: ScenarioGraphGenerationPlan, prompt: str
 ) -> WidgetNodeGenerationPlan:
     marker = "生成する node_plan:"
-    node_plan_section = prompt[prompt.index(marker):]
+    node_plan_section = prompt[prompt.index(marker) :]
     for widget_plan in plan.widget_nodes:
         if f'"id": "{widget_plan.id}"' in node_plan_section:
             return widget_plan
-    raise AssertionError(f"widget_plan not found in prompt section: {node_plan_section[:200]}")
+    raise AssertionError(
+        f"widget_plan not found in prompt section: {node_plan_section[:200]}"
+    )
 
 
 def _multi_widget_generation_plan() -> ScenarioGraphGenerationPlan:
@@ -702,7 +770,9 @@ def test_update_incremental_scope_scenario_delegates_to_full_generation(
             sql='SELECT "匿名ID" FROM "患者基本"',
         ),
     ]
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -710,7 +780,9 @@ def test_update_incremental_scope_scenario_delegates_to_full_generation(
     )
 
     events = list(
-        update_scenario_graph_incrementally("全体作り直し", _minimal_graph(), {"rows": []})
+        update_scenario_graph_incrementally(
+            "全体作り直し", _minimal_graph(), {"rows": []}
+        )
     )
 
     assert events[-1].status == "completed"
@@ -741,7 +813,9 @@ def test_update_incremental_scope_widget_regenerates_target_widgets(
     )
     client = MagicMock()
     client.generate.return_value = new_widget_sql
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -803,7 +877,9 @@ def test_update_incremental_scope_data_regenerates_sql_only(
     client.generate.return_value = _DataSqlOnly(
         sql='SELECT "匿名ID" FROM "患者基本" WHERE "性別" = \'M\' LIMIT 10'
     )
-    monkeypatch.setattr(scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client))
+    monkeypatch.setattr(
+        scenario_graph, "_ScenarioGraphGenerator", MagicMock(return_value=client)
+    )
     monkeypatch.setattr(
         scenario_graph,
         "execute_read_sql",
@@ -852,7 +928,9 @@ def test_update_incremental_scope_widget_missing_target_yields_failed(
         MagicMock(return_value=decision),
     )
 
-    events = list(update_scenario_graph_incrementally("存在しないwidget", _minimal_graph(), {}))
+    events = list(
+        update_scenario_graph_incrementally("存在しないwidget", _minimal_graph(), {})
+    )
 
     statuses = [e.status for e in events]
     assert "failed" in statuses
