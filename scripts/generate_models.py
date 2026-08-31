@@ -256,7 +256,9 @@ def _format_default_value(
         val = str(default_val).strip("'")
         # datetime.time型の場合
         if isinstance(default_val, time):
-            return f"time({default_val.hour}, {default_val.minute}, {default_val.second})"
+            return (
+                f"time({default_val.hour}, {default_val.minute}, {default_val.second})"
+            )
         # 文字列の場合 HH:MM:SS パース
         match = re.match(r"(\d{2}):(\d{2}):(\d{2})", val)
         if match:
@@ -437,9 +439,7 @@ def generate_all(tables: dict[str, TableInfo]) -> dict[str, str]:
 
     for file_key, table_list in sorted(file_tables.items()):
         # resolved_columns を一度だけ計算して共有
-        resolved_by_table = [
-            _resolve_duplicates(table.columns) for table in table_list
-        ]
+        resolved_by_table = [_resolve_duplicates(table.columns) for table in table_list]
 
         type_imports = _collect_imports(resolved_by_table)
         import_block = _build_import_block(type_imports)
@@ -481,9 +481,7 @@ def generate_init_py(tables: dict[str, TableInfo]) -> str:
     for file_key in sorted(file_classes):
         classes = sorted(file_classes[file_key])
         for cls in classes:
-            lines.append(
-                f"from interactive_ehr.models.{file_key} import {cls}"
-            )
+            lines.append(f"from interactive_ehr.models.{file_key} import {cls}")
 
     lines.append("")
     all_classes = ["DwhBaseModel"]
@@ -534,7 +532,10 @@ def main() -> None:
             cwd=PROJECT_ROOT,
         )
     except FileNotFoundError:
-        print("WARNING: uv が見つかりません。ruff format をスキップします。", file=sys.stderr)
+        print(
+            "WARNING: uv が見つかりません。ruff format をスキップします。",
+            file=sys.stderr,
+        )
     print("完了!")
 
 

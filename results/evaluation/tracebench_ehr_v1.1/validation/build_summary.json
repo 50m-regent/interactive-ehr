@@ -1,0 +1,42 @@
+{
+  "split": "validation",
+  "total_case_count": 1163,
+  "answerable_case_count": 931,
+  "answerable_template_count": 134,
+  "baseline_success_count": 924,
+  "baseline_success_rate": 0.9924812030075187,
+  "baseline_failure_count": 7,
+  "row_count_capped_count": 0,
+  "empty_result_count": 88,
+  "pair_count": 758,
+  "pair_counts_by_mutation": {
+    "patient": 55,
+    "clinical_item": 53,
+    "time_constraint": 106,
+    "aggregation_operation": 34,
+    "information_source": 133,
+    "widget_mapping": 133,
+    "data_widget_connection": 127,
+    "stale_result": 117
+  },
+  "template_counts_by_mutation": {
+    "patient": 55,
+    "clinical_item": 53,
+    "time_constraint": 106,
+    "aggregation_operation": 34,
+    "information_source": 133,
+    "widget_mapping": 133,
+    "data_widget_connection": 127,
+    "stale_result": 117
+  },
+  "construction_failure_counts": {
+    "patient": 1128,
+    "clinical_item": 1266,
+    "time_constraint": 491,
+    "aggregation_operation": 324,
+    "information_source": 0,
+    "widget_mapping": 0,
+    "data_widget_connection": 0,
+    "stale_result": 0
+  }
+}

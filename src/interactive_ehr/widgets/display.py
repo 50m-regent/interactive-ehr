@@ -20,12 +20,16 @@ class DataframeSpec(WidgetSpec):
     """
 
     widget_type: Literal[WidgetType.DATAFRAME] = WidgetType.DATAFRAME
-    data_key: str = Field(description="表示するデータのキー（テーブル名やデータソースID）")
+    data_key: str = Field(
+        description="表示するデータのキー（テーブル名やデータソースID）"
+    )
     column_order: list[str] | None = Field(
         None, description="表示するカラムの順序。Noneで全カラム表示"
     )
     hide_index: bool = Field(True, description="インデックス列を非表示にするか")
-    height: int | None = Field(None, gt=0, description="テーブルの高さ（px）。Noneで自動")
+    height: int | None = Field(
+        None, gt=0, description="テーブルの高さ（px）。Noneで自動"
+    )
 
 
 class TableSpec(WidgetSpec):

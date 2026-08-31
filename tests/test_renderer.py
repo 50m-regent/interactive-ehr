@@ -80,6 +80,9 @@ class FakeStreamlit:
     def line_chart(self, *args: Any, **kwargs: Any) -> str:
         return self._record("line_chart", *args, **kwargs)
 
+    def altair_chart(self, *args: Any, **kwargs: Any) -> str:
+        return self._record("altair_chart", *args, **kwargs)
+
     def bar_chart(self, *args: Any, **kwargs: Any) -> str:
         return self._record("bar_chart", *args, **kwargs)
 
@@ -119,7 +122,11 @@ class FakeStreamlit:
     def columns(self, *args: Any, **kwargs: Any) -> list[FakeContainer]:
         self._record("columns", *args, **kwargs)
         count_or_widths = args[0]
-        count = count_or_widths if isinstance(count_or_widths, int) else len(count_or_widths)
+        count = (
+            count_or_widths
+            if isinstance(count_or_widths, int)
+            else len(count_or_widths)
+        )
         return [FakeContainer() for _ in range(count)]
 
     def tabs(self, *args: Any, **kwargs: Any) -> list[FakeContainer]:
@@ -190,7 +197,9 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
         LineChartSpec(data_key="trend", x="日付", y=["A"]),
         BarChartSpec(data_key="bars", x="分類", y="件数", horizontal=True),
         SelectboxSpec(label="患者", options_key="patients"),
-        MultiselectSpec(label="カテゴリ", options_key="categories", default_keys=["検査"]),
+        MultiselectSpec(
+            label="カテゴリ", options_key="categories", default_keys=["検査"]
+        ),
         DateInputSpec(label="基準日"),
         TimeInputSpec(label="服薬時刻", default_value=time(9, 0), step_seconds=1800),
         TextInputSpec(label="検索", placeholder="keyword"),
@@ -218,7 +227,7 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
     renderer.render_widgets(widgets, context)
 
     assert [call.name for call in fake.calls] == [
-        "line_chart",
+        "altair_chart",
         "bar_chart",
         "selectbox",
         "multiselect",
@@ -232,6 +241,7 @@ def test_render_chart_and_input_widgets(monkeypatch: Any) -> None:
         "slider",
     ]
     assert fake.calls[1].kwargs["horizontal"] is True
+    assert fake.calls[0].kwargs["width"] == "stretch"
     assert fake.calls[3].kwargs["default"] == ["検査"]
     assert fake.calls[5].kwargs["step"] == timedelta(seconds=1800)
     assert fake.calls[7].kwargs["height"] == 160
@@ -261,15 +271,109 @@ def test_chart_missing_columns_warn_without_exception(monkeypatch: Any) -> None:
     assert [call.name for call in fake.calls] == [
         "warning",
         "warning",
-        "line_chart",
+        "altair_chart",
     ]
     assert "date" in fake.calls[0].args[0]
     assert "missing_value" in fake.calls[1].args[0]
-    assert fake.calls[2].kwargs["x"] is None
-    assert fake.calls[2].kwargs["y"] == ["eGFR"]
+    chart_spec = fake.calls[2].args[0].to_dict()
+    assert chart_spec["layer"][0]["encoding"]["x"]["field"] == "index"
 
 
-def test_dataframe_missing_column_order_warns_without_exception(monkeypatch: Any) -> None:
+def test_line_chart_uses_temporal_spacing_and_observation_points(
+    monkeypatch: Any,
+) -> None:
+    """日付を時間軸へ変換し、折れ線と実測点を重ねて描画する."""
+
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    renderer.render_widget(
+        LineChartSpec(
+            data_key="trend",
+            x="検査日",
+            y="eGFR",
+            x_label="検査日",
+            y_label="eGFR",
+        ),
+        {
+            "trend": [
+                {"検査日": "2026-05-01", "eGFR": 42.0},
+                {"検査日": "2025-10-01", "eGFR": 50.0},
+                {"検査日": "2026-01-01", "eGFR": 47.0},
+                {"検査日": "2026-04-01", "eGFR": 43.0},
+            ]
+        },
+    )
+
+    assert [call.name for call in fake.calls] == ["altair_chart"]
+    chart_spec = fake.calls[0].args[0].to_dict()
+    assert [layer["mark"]["type"] for layer in chart_spec["layer"]] == [
+        "line",
+        "point",
+    ]
+    assert chart_spec["layer"][0]["encoding"]["x"]["type"] == "temporal"
+    assert chart_spec["layer"][1]["mark"]["filled"] is True
+    dataset = next(iter(chart_spec["datasets"].values()))
+    assert [row["検査日"] for row in dataset] == [
+        "2025-10-01T00:00:00",
+        "2026-01-01T00:00:00",
+        "2026-04-01T00:00:00",
+        "2026-05-01T00:00:00",
+    ]
+
+
+def test_line_chart_uses_quantitative_x_for_numeric_strings(
+    monkeypatch: Any,
+) -> None:
+    """数値文字列の横軸を等間隔のカテゴリとして扱わない."""
+
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    renderer.render_widget(
+        LineChartSpec(data_key="trend", x="経過日", y=["A", "B"]),
+        {
+            "trend": [
+                {"経過日": "30", "A": 2, "B": 3},
+                {"経過日": "1", "A": 1, "B": 2},
+            ]
+        },
+    )
+
+    chart_spec = fake.calls[0].args[0].to_dict()
+    assert chart_spec["layer"][0]["encoding"]["x"]["type"] == "quantitative"
+    assert chart_spec["layer"][0]["encoding"]["color"]["legend"] == {"title": None}
+
+
+def test_line_chart_warns_and_preserves_invalid_date_values(
+    monkeypatch: Any,
+) -> None:
+    """不正な日付を黙って欠落させず、カテゴリ軸へ戻す."""
+
+    fake = FakeStreamlit()
+    monkeypatch.setattr(renderer, "st", fake)
+
+    renderer.render_widget(
+        LineChartSpec(data_key="trend", x="検査日", y="A"),
+        {
+            "trend": [
+                {"検査日": "2026-01-01", "A": 1},
+                {"検査日": "日付不明", "A": 2},
+            ]
+        },
+    )
+
+    assert [call.name for call in fake.calls] == ["warning", "altair_chart"]
+    assert "カテゴリ軸" in fake.calls[0].args[0]
+    chart_spec = fake.calls[1].args[0].to_dict()
+    assert chart_spec["layer"][0]["encoding"]["x"]["type"] == "nominal"
+    dataset = next(iter(chart_spec["datasets"].values()))
+    assert {row["検査日"] for row in dataset} == {"2026-01-01", "日付不明"}
+
+
+def test_dataframe_missing_column_order_warns_without_exception(
+    monkeypatch: Any,
+) -> None:
     fake = FakeStreamlit()
     monkeypatch.setattr(renderer, "st", fake)
 
@@ -357,7 +461,9 @@ def test_chronic_disease_scenario_builds_valid_widgets(monkeypatch: Any) -> None
     assert "metric_latest_egfr" in context
     assert "metric_patient_material" in context
     flattened = _flatten_widgets(validated)
-    assert all(not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened)
+    assert all(
+        not isinstance(widget, DataframeSpec | TableSpec) for widget in flattened
+    )
     assert all(not isinstance(widget, MarkdownSpec) for widget in flattened)
 
 
@@ -389,8 +495,18 @@ def _sample_sql_result(sql: str) -> Any:
     if "慢性疾患外来_血圧推移" in sql:
         return pd.DataFrame(
             [
-                {"測定日": "2026-01-20", "外来収縮期": 146, "外来拡張期": 82, "家庭収縮期": 140},
-                {"測定日": "2026-04-21", "外来収縮期": 148, "外来拡張期": 84, "家庭収縮期": 142},
+                {
+                    "測定日": "2026-01-20",
+                    "外来収縮期": 146,
+                    "外来拡張期": 82,
+                    "家庭収縮期": 140,
+                },
+                {
+                    "測定日": "2026-04-21",
+                    "外来収縮期": 148,
+                    "外来拡張期": 84,
+                    "家庭収縮期": 142,
+                },
             ]
         )
     if "慢性疾患外来_処方" in sql:

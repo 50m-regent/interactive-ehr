@@ -57,9 +57,7 @@ class MultiselectSpec(WidgetSpec):
 def _assert_min_le_max(min_val: Any, max_val: Any) -> None:
     """min_value <= max_value を検証する共有ヘルパー."""
     if min_val is not None and max_val is not None and min_val > max_val:
-        raise ValueError(
-            f"min_value ({min_val}) must be <= max_value ({max_val})"
-        )
+        raise ValueError(f"min_value ({min_val}) must be <= max_value ({max_val})")
 
 
 class DateInputSpec(WidgetSpec):
@@ -90,9 +88,7 @@ class TimeInputSpec(WidgetSpec):
 
     widget_type: Literal[WidgetType.TIME_INPUT] = WidgetType.TIME_INPUT
     label: str = Field(description="ラベル")
-    default_value: time | None = Field(
-        None, description="デフォルト値。Noneで現在時刻"
-    )
+    default_value: time | None = Field(None, description="デフォルト値。Noneで現在時刻")
     step_seconds: int = Field(
         900, gt=0, description="時刻のステップ（秒）。デフォルト15分"
     )
@@ -138,9 +134,7 @@ class NumberInputSpec(WidgetSpec):
     max_value: float | None = Field(None, description="最大値")
     default_value: float | None = Field(None, description="デフォルト値")
     step: float | None = Field(None, gt=0, description="増減ステップ")
-    format_str: str | None = Field(
-        None, description="表示フォーマット（例: '%.2f'）"
-    )
+    format_str: str | None = Field(None, description="表示フォーマット（例: '%.2f'）")
 
     @model_validator(mode="after")
     def _validate_number_range(self) -> NumberInputSpec:

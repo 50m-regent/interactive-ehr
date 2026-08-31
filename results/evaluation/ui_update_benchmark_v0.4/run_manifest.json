@@ -1,0 +1,22 @@
+{
+  "benchmark_id": "ui-update-benchmark",
+  "benchmark_version": "0.4.0",
+  "benchmark_checksum": "a064f564ac97aa231a6dd05f08ca4268de119288a826a273df656ea25d16e7ef",
+  "baseline_artifact_checksum": "be308b16374ea7da28bd84ba4d584323272869b4fa794f1396a25a7b5fcf6c98",
+  "baseline_graph_checksum": "31469d2b50d5736939cfb9a1da9f27bbf752c16f63da2ce65a77dc7c342eaf3c",
+  "implementation_checksum": "b9b05e91814d5af0bf3b48e64dbbad4252876d763ab1a28a7b2cd0eb4597d530",
+  "random_seed": 20260814,
+  "bootstrap_iterations": 10000,
+  "python_version": "3.12.9",
+  "platform": "darwin",
+  "candidate_spec_count": 160,
+  "one_shot_run_count": 800,
+  "sequence_step_run_count": 120,
+  "output_checksums": {
+    "paired_candidates.jsonl": "10df2ac1345ebcb83434e6dd76f7d9d5bb48f6ec02974cfbba2121d56d09dca3",
+    "candidate_results.jsonl": "6f93f094a380388a6385060f806055dc5af41f3f5cab32b68a9dbee41dbe72fb",
+    "sequence_results.jsonl": "f7b7a84bcb8485f876d5129e7d995f11dcfac4ac8ba688a7c2bbbd1d8988e16c",
+    "summary.json": "567ee36c679be6a78b79abd778c0c0a70b7325ff4b23212432a4bd959fd9e6b7",
+    "report.md": "cf7e074f23b7f9e129ef5e6a634a75c9f4c421765980a535e80453ee52ad06e6"
+  }
+}

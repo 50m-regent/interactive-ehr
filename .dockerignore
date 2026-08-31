@@ -21,6 +21,9 @@ key.json
 
 # Large research artifacts not needed at runtime
 Research.pdf
+slides/
 
 # Docker artifacts
 *.tar
+*.tar.gz
+*.sha256

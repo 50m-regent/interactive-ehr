@@ -1,0 +1,59 @@
+{
+  "id": "ito-preoperative-case-pair",
+  "version": "0.1",
+  "clinical_task_graph_id": "anesthesia_preop_outpatient_clinical_tasks",
+  "cases": [
+    {
+      "id": "ITO-CASE-A",
+      "title": "麻酔科術前評価 合成症例A",
+      "synthetic_patient_id": "ITO_EVAL_A",
+      "scenario_graph_path": null,
+      "review_status": "draft",
+      "questions": [
+        {
+          "id": "Q1",
+          "prompt": "術前評価に必要な情報を確認し、対応が必要な事項を回答してください。",
+          "clinical_task_ids": ["T1", "T2", "T3", "T4", "T5", "T6", "T7"],
+          "response_type": "structured",
+          "scoring_criteria": []
+        }
+      ],
+      "complexity": {
+        "required_information_count": null,
+        "abnormal_finding_count": null,
+        "safety_critical_finding_count": null,
+        "active_conditional_task_count": null,
+        "source_system_count": null
+      }
+    },
+    {
+      "id": "ITO-CASE-B",
+      "title": "麻酔科術前評価 合成症例B",
+      "synthetic_patient_id": "ITO_EVAL_B",
+      "scenario_graph_path": null,
+      "review_status": "draft",
+      "questions": [
+        {
+          "id": "Q1",
+          "prompt": "術前評価に必要な情報を確認し、対応が必要な事項を回答してください。",
+          "clinical_task_ids": ["T1", "T2", "T3", "T4", "T5", "T6", "T7"],
+          "response_type": "structured",
+          "scoring_criteria": []
+        }
+      ],
+      "complexity": {
+        "required_information_count": null,
+        "abnormal_finding_count": null,
+        "safety_critical_finding_count": null,
+        "active_conditional_task_count": null,
+        "source_system_count": null
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "id": "ITO-PAIR-01",
+      "case_ids": ["ITO-CASE-A", "ITO-CASE-B"]
+    }
+  ]
+}
