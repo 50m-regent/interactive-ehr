@@ -1,0 +1,6 @@
+$lualatex = 'lualatex %O -interaction=nonstopmode -file-line-error %S';
+$bibtex = 'bibtex %O %B';
+$pdf_mode = 4;
+$out_dir = 'build';
+$aux_dir = 'build';
+$max_repeat = 5;

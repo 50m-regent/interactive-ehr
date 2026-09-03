@@ -71,9 +71,9 @@ uv run --with-editable . python scripts/run_ui_update_benchmark.py
 
 現行v0.4は専門家確認前の合成更新要求と合成スキーマを使います。測定対象は構造的な依存関係保護です。臨床的安全性の評価、人を対象とした評価、Geminiを含むエンドツーエンド評価はまだ実施していません。
 
-## TraceBench-EHRの実行可能性確認
+## 層間整合性評価の実行可能性確認
 
-CHI 2027向けのTraceBench-EHRでは、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行し、質問、SQL、実行結果、ScenarioGraph、Widgetを一つの追跡契約へ変換できるか確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
+CHI 2027向けの層間整合性評価では、EHRSQL-2024の質問と正解SQLをMIMIC-IV Clinical Database Demo v2.2上で実行し、質問、SQL、実行結果、ScenarioGraph、Widgetを一つの追跡契約へ変換できるか確認します。EHRSQL v1.5.xはMIMIC-IIIとeICU向けのため、この確認にはMIMIC-IV向けのEHRSQL-2024を使用します。
 
 `scripts/run_ehrsql_feasibility.py` は、train分割の回答可能ケースから異なる質問テンプレートを優先して50件を決定的に選びます。正解SQLは読み取り専用SQLite接続で実行し、単一値をMetric、それ以外をDataframeへ割り当てた最小のScenarioGraphを検証します。Geminiは呼び出しません。
 
@@ -114,7 +114,7 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 この確認から臨床上の安全性、使いやすさ、認知負荷、臨床転帰、他施設への一般化は主張しません。
 
-## TraceBench-EHRの正式技術評価
+## 層間整合性の正式技術評価
 
 `data/evaluation/tracebench_ehr.v1.json` は、EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を用いる正式技術評価v1.1の条件を固定します。実装は `src/interactive_ehr/evaluation/tracebench_ehr.py`、統計集計は `src/interactive_ehr/evaluation/tracebench_analysis.py`、実行入口は `scripts/run_tracebench_ehr.py` です。Geminiや外部モデルは使用しません。
 
@@ -323,10 +323,19 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 ## 口頭試問原稿
 
-`papers/oral-examination-2026/`には、2026年8月27日時点の研究状態を記録したLaTeX原稿とPDFがあります。原稿中では正式評価用データを未実行として扱っています。現在の正式評価結果は、このREADMEの「TraceBench-EHRの正式技術評価」と保存済み成果物を参照してください。
+`papers/oral-examination-2026/`には、2026年8月27日時点の研究状態を記録したLaTeX原稿とPDFがあります。原稿中では正式評価用データを未実行として扱っています。現在の正式評価結果は、このREADMEの「層間整合性の正式技術評価」と保存済み成果物を参照してください。
 
 ```bash
 cd papers/oral-examination-2026
+make
+```
+
+## CHI 2027 Papers 日本語確認稿
+
+`papers/chi-2027/`には、正式技術評価の結果を反映した匿名・単一カラムの日本語確認稿があります。評価基盤には固有名称を付けず、層間整合性の問題、比較結果、設計上の含意を中心に構成しています。
+
+```bash
+cd papers/chi-2027
 make
 ```
 
@@ -412,7 +421,7 @@ src/interactive_ehr/
     benchmark_analysis.py -- UI更新ベンチマークの統計集計と成果物出力
     case_manifest.py      -- 合成症例ペアの定義と準備状態の監査
     ehrsql_feasibility.py -- EHRSQL-2024の選定、SQL実行、グラフ検証
-    tracebench_analysis.py -- TraceBench-EHRの統計集計と成果物出力
+    tracebench_analysis.py -- 層間整合性評価の統計集計と成果物出力
     tracebench_ehr.py     -- 正式評価の候補生成、契約検査、修復
     task_model.py         -- 診療タスクの基準モデルと情報追跡監査
     update_benchmark.py   -- 共通変更仕様、二方式の差分生成、検査、実行器
@@ -439,8 +448,8 @@ scripts/
   audit_clinical_task_trace.py -- 診療タスクとUIの情報追跡監査
   audit_evaluation_case_manifest.py -- 合成症例ペアの準備状態監査
   run_ehrsql_feasibility.py -- EHRSQL-2024の50件実行可能性確認
-  run_tracebench_ehr.py   -- TraceBench-EHRのvalidationとtestの実行
-  export_tracebench_tsv.py -- 保存済みのTraceBench-EHR結果をTSVへ変換
+  run_tracebench_ehr.py   -- 層間整合性評価のvalidationとtestの実行
+  export_tracebench_tsv.py -- 保存済みの層間整合性評価結果をTSVへ変換
   run_ui_update_benchmark.py -- RQ1技術評価の実行と結果保存
 
 results/evaluation/ui_update_benchmark_v0.4/
@@ -463,4 +472,9 @@ papers/oral-examination-2026/
   main.tex                -- 2026年8月27日時点の口頭試問原稿
   references.bib          -- 原稿で参照する文献
   output/pdf/Hirata_Ren.pdf -- 検証済みPDF
+
+papers/chi-2027/
+  main-ja.tex             -- CHI 2027 Papersの日本語確認稿
+  references.bib          -- 原稿で参照する文献
+  output/pdf/chi-2027-ja-review.pdf -- 検証済みPDF
 ```
