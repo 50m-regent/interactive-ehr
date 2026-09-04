@@ -32,4 +32,4 @@ cp build/main-revised.pdf output/pdf/Hirata_Ren_revised.pdf
 - 和文はHaranoAji明朝、欧文はTimes New Roman互換のTimes系
 - ページ番号なし
 - 図はTikZによるベクター描画
-- 現在のPDFは9ページ、要旨は289字
+- 現在のPDFは9ページ、英語要旨は135語

@@ -72,8 +72,8 @@
   \vspace{8pt}
   \begin{center}
   \begin{minipage}{160truemm}
-  \noindent\textbf{要旨}\quad
-  生成AIで臨床UIを更新する際には、SQLと画面がそれぞれ正常に動作しても、臨床質問、SQL、実行結果、表示の対応が崩れることがある。本研究では、この問題を検査する層間整合性評価基盤を構築する。別患者の参照や期間条件の欠落など、8種類の不整合を意図的に作り、個別確認から質問と表示の一括照合まで、4種類の検査方法を比較する。最終評価前の動作確認では、931件中924件から基準を生成し、758組、6,064候補を得た。各不整合には34～133種類の質問形式が含まれ、候補生成とは別の正解判定との不一致は0件だった。最終評価用データは未使用であり、現時点で確認できているのは評価手順が成り立つことだけである。\par
+  \noindent\textbf{Abstract}\quad
+  Generative AI-based updates to clinical user interfaces can break the alignment among clinical questions, SQL queries, execution results, and presentations, even when the SQL and screen function correctly in isolation. This study develops a cross-layer integrity evaluation framework for detecting such failures. We deliberately introduce eight types of inconsistency, including references to a different patient and missing time constraints, and compare four validation approaches ranging from checks on individual artifacts to joint verification of the chain from question to presentation. In a pre-evaluation validation run, we generated baselines for 924 of 931 cases, yielding 758 pairs and 6,064 candidates. Each inconsistency type covered 34--133 question templates, with zero disagreements between candidate generation and an independently implemented oracle. The held-out test data remain unused; therefore, the current results establish only the feasibility of the evaluation procedure.\par
   \end{minipage}
   \end{center}
   \vspace{11pt}
