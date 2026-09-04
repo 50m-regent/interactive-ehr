@@ -28,10 +28,15 @@ cd papers/chi-2027
 make
 ```
 
-生成物は次の2ファイルです。
+LaTeXから生成するPDFは次の2ファイルです。
 
 - `output/pdf/chi-2027-ja-review.pdf`
 - `output/pdf/chi-2027-en-review.pdf`
+
+内容確認とコメントに使えるWord版も保存しています。本文、見出し、表、図、数式、参考文献を編集できる形式へ変換した確認用成果物です。投稿用の正本はLaTeX版とします。
+
+- `output/docx/chi-2027-ja-review.docx`
+- `output/docx/chi-2027-en-review.docx`
 
 図だけを再生成する場合は次を実行します。
 
