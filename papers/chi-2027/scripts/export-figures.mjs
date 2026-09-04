@@ -10,6 +10,9 @@ const figureNames = [
   "scenario-to-value",
   "detection-mechanism",
   "evaluation-protocol",
+  "scenario-to-value-en",
+  "detection-mechanism-en",
+  "evaluation-protocol-en",
 ];
 
 await mkdir(outputDirectory, { recursive: true });

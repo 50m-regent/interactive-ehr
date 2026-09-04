@@ -330,9 +330,9 @@ cd papers/oral-examination-2026
 make
 ```
 
-## CHI 2027 Papers 日本語確認稿
+## CHI 2027 Papers 確認稿
 
-`papers/chi-2027/`には、正式技術評価の結果を反映した匿名・単一カラムの日本語確認稿があります。評価基盤には固有名称を付けません。診療シナリオによって必要な情報と表示が変わることを出発点に、層間整合性を妥当な臨床UXの前提として位置付け、比較結果、検知メカニズム、利用者価値へつなぐための評価課題を整理しています。図はHTML内のSVGから再生成できます。
+`papers/chi-2027/`には、正式技術評価の結果を反映した匿名・単一カラムの日本語版と英語版があります。評価基盤には固有名称を付けません。診療シナリオによって必要な情報と表示が変わることを出発点に、層間整合性を妥当な臨床UXの前提として位置付け、比較結果、検知メカニズム、利用者価値へつなぐための評価課題を整理しています。図はHTML内のSVGから日本語版と英語版を再生成できます。
 
 ```bash
 cd papers/chi-2027
@@ -475,10 +475,12 @@ papers/oral-examination-2026/
 
 papers/chi-2027/
   main-ja.tex             -- CHI 2027 Papersの日本語確認稿
+  main-en.tex             -- CHI 2027 Papersの英語確認稿
   figures/src/            -- HTMLで編集する図の原稿
   figures/svg/            -- HTMLから抽出したSVG
   figures/pdf/            -- LaTeXへ読み込む図
   scripts/                -- 図をSVGへ変換するスクリプト
   references.bib          -- 原稿で参照する文献
   output/pdf/chi-2027-ja-review.pdf -- 検証済みPDF
+  output/pdf/chi-2027-en-review.pdf -- 検証済みPDF
 ```
