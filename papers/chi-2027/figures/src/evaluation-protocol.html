@@ -5,38 +5,35 @@
     <title>評価手順</title>
   </head>
   <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title description">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 60 1200 340" role="img" aria-labelledby="title description">
       <title id="title">基準ケースから検査と修復までの評価手順</title>
-      <desc id="description">正解SQLから基準ケースを作り、妥当候補と一つの関係を壊した候補を作る。独立オラクルでラベルを確認し、同じ候補を四条件で検査、診断、修復する。</desc>
+      <desc id="description">正解SQLから更新候補を作り、独立オラクルでラベルを確認する。同じ候補を四条件で検査し、問題箇所を特定して一回修復した後、オラクルで再確認する。</desc>
       <rect width="1200" height="430" fill="#ffffff"/>
-      <text x="600" y="43" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="27" font-weight="700" fill="#172033">同じ候補を四つの検査条件へ入力する</text>
       <g font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" text-anchor="middle" fill="#172033">
         <rect x="38" y="92" width="220" height="92" rx="14" fill="#eef5ff" stroke="#4d78b8" stroke-width="2"/>
-        <text x="148" y="126" font-size="18" font-weight="700">正解SQL</text><text x="148" y="153" font-size="15">基準ケースを構築</text>
+        <text x="148" y="143" font-size="18" font-weight="700">正解SQL</text>
         <rect x="326" y="92" width="220" height="92" rx="14" fill="#eef5ff" stroke="#4d78b8" stroke-width="2"/>
-        <text x="436" y="126" font-size="18" font-weight="700">更新前後を組む</text><text x="436" y="153" font-size="15">妥当候補を作成</text>
+        <text x="436" y="143" font-size="18" font-weight="700">更新ペア</text>
         <rect x="614" y="92" width="220" height="92" rx="14" fill="#fff8e8" stroke="#d49327" stroke-width="2"/>
-        <text x="724" y="126" font-size="18" font-weight="700">関係を一つ壊す</text><text x="724" y="153" font-size="15">不整合候補を作成</text>
+        <text x="724" y="143" font-size="18" font-weight="700">候補</text>
         <rect x="902" y="92" width="260" height="92" rx="14" fill="#f2f8ee" stroke="#5f8c54" stroke-width="2"/>
-        <text x="1032" y="126" font-size="18" font-weight="700">独立オラクル</text><text x="1032" y="153" font-size="15">期待ラベルと照合</text>
+        <text x="1032" y="143" font-size="18" font-weight="700">独立判定</text>
       </g>
       <g stroke="#667085" stroke-width="3" fill="#667085">
         <line x1="258" y1="138" x2="310" y2="138"/><polygon points="326,138 308,128 308,148"/>
         <line x1="546" y1="138" x2="598" y2="138"/><polygon points="614,138 596,128 596,148"/>
         <line x1="834" y1="138" x2="886" y2="138"/><polygon points="902,138 884,128 884,148"/>
       </g>
-      <path d="M724 184 V238 H436 V276" fill="none" stroke="#667085" stroke-width="3"/>
+      <path d="M1032 184 V238 H436 V276" fill="none" stroke="#667085" stroke-width="3"/>
       <polygon points="436,292 426,274 446,274" fill="#667085"/>
-      <path d="M1032 184 V238 H764 V276" fill="none" stroke="#667085" stroke-width="3"/>
-      <polygon points="764,292 754,274 774,274" fill="#667085"/>
       <rect x="245" y="292" width="382" height="91" rx="15" fill="#fff8e8" stroke="#d49327" stroke-width="3"/>
-      <text x="436" y="327" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="19" font-weight="700" fill="#8b5b0b">四条件で検査</text>
-      <text x="436" y="356" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="15" fill="#475467">局所 ／ 成果物 ／ グラフ ／ 平坦</text>
+      <text x="436" y="344" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="19" font-weight="700" fill="#8b5b0b">4条件で検査</text>
       <rect x="671" y="292" width="382" height="91" rx="15" fill="#eef5ff" stroke="#4d78b8" stroke-width="2"/>
-      <text x="862" y="327" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="19" font-weight="700" fill="#244a7c">診断と一回の修復</text>
-      <text x="862" y="356" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="15" fill="#475467">流出・妥当受理・特定・修復を記録</text>
+      <text x="862" y="344" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="19" font-weight="700" fill="#244a7c">特定・1回修復</text>
       <line x1="627" y1="338" x2="655" y2="338" stroke="#667085" stroke-width="3"/>
       <polygon points="671,338 653,328 653,348" fill="#667085"/>
+      <path d="M1053 338 H1180 V138 H1178" fill="none" stroke="#667085" stroke-width="3"/>
+      <polygon points="1162,138 1180,128 1180,148" fill="#667085"/>
     </svg>
   </body>
 </html>

@@ -21,7 +21,7 @@
 \begin{document}
 
 \begin{abstract}
-Generated clinical interfaces must do more than produce executable SQL and renderable screens: they must deliver the patient, item, time range, source, and presentation required by a clinical scenario. We define a cross-layer inconsistency as a broken correspondence among an information need, SQL, its result, and its presentation. Using EHRSQL-2024 and MIMIC-IV Demo, we deterministically generated eight inconsistency types and compared local validation, per-artifact contracts, a graph contract linking request to presentation, and a flat contract containing the same relations. Across 6,104 validations from 763 update pairs, local validation and per-artifact contracts accepted 100.00\% and 48.10\% of inconsistent candidates. Graph and flat contracts rejected every inconsistent candidate and accepted every valid one. Their identical results show that executable cross-layer relations, rather than graph storage itself, enabled detection. We position integrity as a prerequisite for evaluating clinically appropriate user experiences, not as evidence of user benefit.
+Generated clinical interfaces must do more than produce executable SQL and renderable screens: they must deliver the patient, item, time range, source, and presentation required by a clinical scenario. We define a cross-layer inconsistency as a broken correspondence among an information need, SQL, its result, and its presentation. Using EHRSQL-2024 and MIMIC-IV Demo, we deterministically generated eight inconsistency types and compared local validation, artifact-level contracts, a graph-based cross-layer contract, and a tabular cross-layer contract with equivalent relational content. Across 6,104 validations from 763 update pairs, local validation and artifact-level contracts accepted 100.00\% and 48.10\% of inconsistent candidates. The two cross-layer contracts rejected every inconsistent candidate and accepted every valid one. Their identical results show that executable cross-layer relations, rather than graph storage itself, enabled detection. We position integrity as a prerequisite for evaluating clinically appropriate user experiences, not as evidence of user benefit.
 \end{abstract}
 
 \begin{CCSXML}
@@ -61,12 +61,12 @@ We built an evaluation framework for cross-layer inconsistencies in generated cl
 We ask:
 
 \begin{description}
-  \item[RQ1] What information errors pass when SQL and presentation components are validated individually?
-  \item[RQ2] How do local validation, per-artifact contracts, and contracts spanning request to presentation differ in inconsistency leakage, valid-update acceptance, and fault localization?
+  \item[RQ1] Which of the eight modeled information errors pass when SQL and presentation components are validated individually?
+  \item[RQ2] How do local validation, artifact-level contracts, and cross-layer contracts differ in inconsistency leakage, valid-update acceptance, and fault localization?
   \item[RQ3] Which inconsistencies can be corrected by one automatic repair based on a localized validation failure?
 \end{description}
 
-After freezing the evaluation method, we ran the test split once. We formed 763 update pairs from 134 question templates and performed 6,104 validations of valid and inconsistent candidates under four conditions. Local validation accepted all 763 inconsistent candidates, while per-artifact contracts accepted 367. A graph contract linking the question to the presentation and a flat contract storing the same relations both rejected every inconsistent candidate and accepted every valid candidate. They produced identical decisions, localizations, and one-step repairs. This result does not support an advantage of graph storage for detection. What separated the conditions was the ability to represent cross-layer semantic relations as executable contracts.
+After freezing the evaluation method, we ran the test split once. We formed 763 update pairs from 134 question templates and performed 6,104 validations of valid and inconsistent candidates under four conditions. Local validation accepted all 763 inconsistent candidates, while artifact-level contracts accepted 367. A graph-based cross-layer contract and a tabular cross-layer contract with equivalent relational content both rejected every inconsistent candidate and accepted every valid candidate. They produced identical decisions, localizations, and one-step repairs. This result does not support an advantage of graph storage for detection. What separated the conditions was the ability to represent cross-layer semantic relations as executable contracts.
 
 This paper makes five contributions:
 
@@ -75,7 +75,7 @@ This paper makes five contributions:
   \item We operationalize information errors in incremental data-driven interface updates as eight inconsistency types covering patient, item, time, aggregation, source, presentation, connection, and stale result.
   \item We provide a reproducible method that deterministically generates inconsistent candidates on public demo data and checks them with an oracle independent of candidate generation.
   \item We apply four validation conditions to the same candidates and quantify where artifact-level validity fails to ensure cross-layer integrity.
-  \item From the null difference between graph and flat contracts with equivalent content, we derive the design implication that generated interfaces require testable cross-layer relations, not a particular storage format.
+  \item From the null difference between graph-based and tabular cross-layer contracts with equivalent content, we derive the design implication that generated interfaces require testable cross-layer relations, not a particular storage format.
 \end{itemize}
 
 This is a technical evaluation. It does not evaluate the clinical validity of the scenario models, clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, or deployment. We maintain this boundary while arguing that the integrity of retrieval and presentation is a prerequisite for returning value to users.
@@ -88,7 +88,7 @@ Generative-interface research has moved from producing screens from natural lang
 
 Intermediate representations provide structure for such updates. Jelly places a task-driven data model behind a generated interface and propagates task changes into data and views~\cite{cao2025jelly}. Bridging Gulfs uses semantic representations to narrow gaps among user intent, model interpretation, and interface output~\cite{park2026bridging}. SimStep separates graphs for concepts, scenarios, learning objectives, and interfaces so that assumptions can be inspected and repaired across stages~\cite{kaputa2026simstep}. Across these systems, intermediate representations become points of contact for inspection and repair.
 
-We study a narrower question. We do not compare initial generation quality or the experience of editing an interface. We test whether semantic relations to data survive an update. Although our system can store relations as a graph, the graph form is not itself a claimed contribution. We also encode equivalent relations in a flat representation, separating the effect of validation content from the effect of storage form.
+We study a narrower question. We do not compare initial generation quality or the experience of editing an interface. We test whether semantic relations to data survive an update. Although our system can store relations as a graph, the graph form is not itself a claimed contribution. We also encode equivalent relations in a tabular representation, separating the effect of validation content from the effect of storage form.
 
 \subsection{Inspection and Repair in Human-AI Collaboration}
 
@@ -121,8 +121,8 @@ Figure~\ref{fig:scenario-to-value} illustrates these differences and the scope o
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{scenario-to-value-en.pdf}
-  \caption{From clinical scenarios to user value, with the technical scope evaluated in this paper. The scenarios are design examples rather than formal benchmark cases.}
-  \Description{The preoperative anesthesia clinic and post-thyroidectomy follow-up have different temporal anchors, information needs, and presentation forms. The technical evaluation covers the path from information need through SQL and execution result to presentation. Clinical review and judgment, clinical validity, verification burden, missed errors, and effects on judgment are marked for separate evaluation.}
+  \caption{Examples of scenario-dependent information and presentation. The preoperative clinic (left) summarizes patient history, surgical context, and recent tests relative to the surgery date. Post-thyroidectomy follow-up (right) combines 12-month trends in thyroid function and replacement dose with ultrasound findings relative to the visit date. This paper evaluates the technical path from information need to presentation; clinical validity and effects on clinicians require separate evaluation. The scenarios are not benchmark cases.}
+  \Description{Boxes for preoperative anesthesia and post-thyroidectomy follow-up connect by dashed lines to a technical-evaluation frame containing information need, SQL, result, and presentation. The clinician appears outside that frame.}
   \label{fig:scenario-to-value}
 \end{figure}
 
@@ -147,7 +147,7 @@ We model four layers: information need, SQL, execution result, and presentation 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{detection-mechanism-en.pdf}
-  \caption{Local validation compared with a cross-layer contract. By comparing semantic keys and versions across adjacent layers, the contract detects information that is independently valid but inconsistent with the request.}
+  \caption{Local and cross-layer validation. Above, the need, SQL, result, and presentation each pass an isolated check, while the patient and time mismatch between the need and SQL remains unchecked. Below, cross-layer predicates compare these values across adjacent artifacts and localize the fault between the need and SQL. When the required value is unique, the same relation supports one repair attempt.}
   \Description{The top row shows an information need, SQL, result, and presentation passing local checks, while a patient and time mismatch between the need and SQL is not checked. The bottom row shows Patient A and the last 24 hours in the information need but Patient B and no time filter in SQL. The patient and time predicates fail, localizing the fault between the request and SQL.}
   \label{fig:detection-mechanism}
 \end{figure}
@@ -207,9 +207,9 @@ The oracle does not require exact equality of complete JSON. This choice permits
 
 \subsection{Four Validation Conditions}
 
-We apply the same candidate to the four conditions in Table~\ref{tab:conditions}. \condition{Local validation} checks artifacts separately: SQL must be read-only and executable, artifacts must conform to their schemas, and the presentation component must accept the result type. \condition{Artifact contracts} add conditions within SQL, result, and presentation artifacts, but do not maintain one relationship spanning the information need to presentation.
+We apply the same candidate to the four conditions in Table~\ref{tab:conditions}. \condition{Local validation} checks artifacts separately: SQL must be read-only and executable, artifacts must conform to their schemas, and the presentation component must accept the result type. \condition{Artifact-level contracts} add detailed predicates within individual artifacts and check a subset of adjacent-layer relations, but do not validate the complete chain from the information need through presentation.
 
-The \condition{graph contract} represents question templates, SQL, results, data nodes, and presentation components as nodes, with edges for patient, item, time, aggregation, source, version, reference, and presentation relations. After an update, affected relations are evaluated again. The \condition{flat contract} stores the same semantic slots and correspondences in a single sidecar table and validates the same predicates. Giving both conditions equivalent content separates the effect of what is checked from the effect of graph storage.
+The \condition{graph-based cross-layer contract} represents question templates, SQL, results, data nodes, and presentation components as nodes, with edges for patient, item, time, aggregation, source, version, reference, and presentation relations. After an update, affected relations are evaluated again. The \condition{tabular cross-layer contract} stores the same semantic slots and correspondences in a single sidecar table and validates the same predicates. Giving both conditions equivalent content separates the effect of what is checked from the effect of graph storage.
 
 \begin{table}[t]
   \caption{Four validation conditions}
@@ -219,9 +219,9 @@ The \condition{graph contract} represents question templates, SQL, results, data
     Condition & Individual artifacts & Cross-layer relations & Storage \\
     \midrule
     Local validation & Basic checks & None & Artifacts \\
-    Artifact contracts & Detailed checks & Partial & Artifacts \\
-    Graph contract & Detailed checks & All & Nodes and edges \\
-    Flat contract & Detailed checks & All & One table \\
+    Artifact-level & Detailed checks & Partial & Artifacts \\
+    Graph-based & Detailed checks & All & Nodes and edges \\
+    Tabular & Detailed checks & All & One table \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -239,8 +239,8 @@ Figure~\ref{fig:protocol} summarizes the protocol. On development data, we prior
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{evaluation-protocol-en.pdf}
-  \caption{Evaluation protocol from baseline construction through candidate generation, validation, localization, and repair.}
-  \Description{Reference SQL produces a baseline case. Before-and-after cases form a valid candidate, and one relation is broken to form an inconsistent candidate. An independent oracle verifies labels. The same candidates are evaluated under four conditions, followed by localization and one repair attempt.}
+  \caption{Evaluation protocol. Reference SQL yields a baseline case. A pair of cases with the same question form yields a valid update; changing one relation yields an inconsistent candidate. An independent oracle verifies candidate labels. We then apply local validation, artifact-level contracts, a graph-based cross-layer contract, and a tabular cross-layer contract, and record leakage, valid acceptance, localization, and one repair attempt. The oracle also verifies repaired candidates.}
+  \Description{Reference SQL produces an update pair and candidates whose labels are checked by an independent oracle. The candidates are evaluated under four conditions, localized, and repaired once, after which an arrow returns to the oracle.}
   \label{fig:protocol}
 \end{figure}
 
@@ -268,10 +268,10 @@ We generated 52 patient, 55 item, 106 time, 34 aggregation, 134 source, 134 pres
 
 Local validation accepted every inconsistent candidate across all eight types, producing a leakage rate of 100.00\%. Each candidate was constructed to remain valid as read-only executable SQL and to have an independently valid result and presentation component. The result shows that individually checking syntax, schemas, and renderability does not detect patient or time errors, presentation errors, data-presentation misconnection, or stale results.
 
-Leakage under artifact contracts varied by inconsistency type. As Table~\ref{tab:mutation-results} shows, artifact contracts rejected every source, presentation, and stale-result inconsistency. In contrast, 92.73\% to 98.08\% of patient, item, time, and aggregation inconsistencies leaked, as did every connection inconsistency. Conditions expressible inside an artifact were checked, but cross-artifact correspondences between the need and SQL or between a data node and presentation remained weak points.
+Leakage under artifact-level contracts varied by inconsistency type. As Table~\ref{tab:mutation-results} shows, artifact-level contracts rejected every source, presentation, and stale-result inconsistency. In contrast, 92.73\% to 98.08\% of patient, item, time, and aggregation inconsistencies leaked, as did every connection inconsistency. Conditions expressible inside an artifact were checked, but cross-artifact correspondences between the need and SQL or between a data node and presentation remained weak points.
 
 \begin{table}[t]
-  \caption{Artifact-contract leakage by inconsistency type}
+  \caption{Inconsistencies accepted by artifact-level contracts}
   \label{tab:mutation-results}
   \begin{tabularx}{\linewidth}{Yrrr}
     \toprule
@@ -293,7 +293,7 @@ Leakage under artifact contracts varied by inconsistency type. As Table~\ref{tab
 
 \subsection{RQ2: Detection, Acceptance, and Localization}
 
-Table~\ref{tab:main-results} presents the primary and secondary results. The graph and flat contracts rejected all 763 inconsistent candidates and accepted all 763 valid candidates. Compared with local validation, the leakage difference was $-100.00$ percentage points with a 95\% confidence interval of $[-100.00,-100.00]$. Compared with artifact contracts, it was $-48.10$ points, with a 95\% confidence interval of $[-49.56,-46.53]$. Valid-update acceptance was 100.00\% for all four conditions, yielding no condition difference.
+Table~\ref{tab:main-results} presents the primary and secondary results. The graph-based and tabular cross-layer contracts rejected all 763 inconsistent candidates and accepted all 763 valid candidates. Compared with local validation, the leakage difference was $-100.00$ percentage points with a 95\% confidence interval of $[-100.00,-100.00]$. Compared with artifact-level contracts, it was $-48.10$ points, with a 95\% confidence interval of $[-49.56,-46.53]$. Valid-update acceptance was 100.00\% for all four conditions, yielding no condition difference.
 
 \begin{table}[t]
   \caption{Primary and secondary results across four conditions}
@@ -303,20 +303,20 @@ Table~\ref{tab:main-results} presents the primary and secondary results. The gra
     Condition & Leakage & Valid accepted & Localized & Mean time \\
     \midrule
     Local validation & 763/763 & 763/763 & 0/763 & 2.152 ms \\
-    Artifact contracts & 367/763 & 763/763 & 387/763 & 7.441 ms \\
-    Graph contract & 0/763 & 763/763 & 763/763 & 9.339 ms \\
-    Flat contract & 0/763 & 763/763 & 763/763 & 9.296 ms \\
+    Artifact-level & 367/763 & 763/763 & 387/763 & 7.441 ms \\
+    Graph-based & 0/763 & 763/763 & 763/763 & 9.339 ms \\
+    Tabular & 0/763 & 763/763 & 763/763 & 9.296 ms \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-Artifact contracts correctly localized the injection in 387 of the 396 inconsistent candidates that they rejected, for an overall localization rate of 50.72\%. Graph and flat contracts localized the type and location in all 763 cases. The two full-relation conditions disagreed on zero decisions, and their difference in leakage was zero points. Mean validation time per candidate was 2.152 ms for local validation, 7.441 ms for artifact contracts, 9.339 ms for the graph contract, and 9.296 ms for the flat contract. In this implementation and environment, the difference between the two full-relation conditions was 0.043 ms.
+Artifact-level contracts correctly localized the injection in 387 of the 396 inconsistent candidates that they rejected, for an overall localization rate of 50.72\%. Graph-based and tabular cross-layer contracts localized the type and location in all 763 cases. The two cross-layer contracts disagreed on zero decisions, and their difference in leakage was zero points. Mean validation time per candidate was 2.152 ms for local validation, 7.441 ms for artifact-level contracts, 9.339 ms for the graph-based contract, and 9.296 ms for the tabular contract. In this implementation and environment, the difference between the two cross-layer contracts was 0.043 ms.
 
 \subsection{RQ3: One-Step Repair}
 
-Local validation did not detect inconsistent candidates and therefore attempted no repair. Artifact contracts attempted one repair on each of the 396 candidates they rejected, after which 387 satisfied every predicate of the independent oracle. The repair success rate among attempted cases was 97.73\%. Nine remained inconsistent after the single repair.
+Local validation did not detect inconsistent candidates and therefore attempted no repair. Artifact-level contracts attempted one repair on each of the 396 candidates they rejected, after which 387 satisfied every predicate of the independent oracle. The repair success rate among attempted cases was 97.73\%. Nine remained inconsistent after the single repair.
 
-Graph and flat contracts localized all 763 inconsistent candidates, and all 763 satisfied every integrity predicate after one repair. Neither condition rejected a valid candidate, and no repair was applied to valid candidates. This 100\% result is bounded by our use of one known fault, a known contract, and a deterministic repair rule. It does not generalize to compound or naturally occurring generation errors.
+Graph-based and tabular cross-layer contracts localized all 763 inconsistent candidates, and all 763 satisfied every integrity predicate after one repair. Neither condition rejected a valid candidate, and no repair was applied to valid candidates. This 100\% result is bounded by our use of one known fault, a known contract, and a deterministic repair rule. It does not generalize to compound or naturally occurring generation errors.
 
 \section{Discussion}
 
@@ -328,7 +328,7 @@ Within this framing, improvement in SQL generation is one component of a longer 
 
 \subsection{Why Cross-Layer Contracts Detected the Errors}
 
-Artifact contracts rejected all source, presentation, and stale-result inconsistencies but missed most patient, item, time, and aggregation inconsistencies and all connection inconsistencies. The former can be constrained within a single artifact through an allowlist, result shape, or version. The latter require a comparison between the request and query or between a data node and presentation component.
+Artifact-level contracts rejected all source, presentation, and stale-result inconsistencies but missed most patient, item, time, and aggregation inconsistencies and all connection inconsistencies. The former can be constrained within a single artifact through an allowlist, result shape, or version. The latter require a comparison between the request and query or between a data node and presentation component.
 
 Cross-layer contracts retained patient, item, time, aggregation, source, and presentation as semantic keys and compared them between adjacent artifacts together with versions and references. They did not merely execute SQL again; they determined whether a value inherited from the request remained equivalent across an artifact boundary. Associating a failed predicate with the relation it checked enabled both localization and repair. This mechanism is necessary for interpreting a leakage rate of zero: the result came from explicitly testable correspondences, not from the storage structure alone.
 
@@ -340,7 +340,7 @@ In medicine, whether information is displayed is insufficient: whose information
 
 \subsection{Relational Content, Not Graph Storage, Produced the Result}
 
-Graph and flat contracts produced identical decisions, localizations, and one-step repairs. The detection result supports only the claim that explicitly storing and checking the eight relationships allowed either representation to reject the tested candidates. Graph storage by itself cannot serve as evidence of safety or better performance.
+Graph-based and tabular cross-layer contracts produced identical decisions, localizations, and one-step repairs. The detection result supports only the claim that explicitly storing and checking the eight relationships allowed either representation to reject the tested candidates. Graph storage by itself cannot serve as evidence of safety or better performance.
 
 This null result separates the storage representation from the capability presented to users. A graph may support impact exploration, propagation of partial updates, or visualization of relations, but our benchmark did not measure editing efficiency or comprehensibility. A future comparison should give both conditions the same atomic information and repair actions, then test whether presenting cross-layer paths as a graph helps clinicians locate and repair problems.
 
@@ -356,15 +356,15 @@ Work on how clinicians ignore, trust, or negotiate generated suggestions~\cite{s
 
 \subsection{Separating Automatic Repair from Human Judgment}
 
-The two full-relation conditions repaired all 763 known single faults in one step. When a contract uniquely specifies a patient condition, reference, result version, or presentation form, the system can mechanically restore a minimal difference. Validation can therefore produce a repair candidate rather than ending with rejection.
+The two cross-layer contracts repaired all 763 known single faults in one step. When a contract uniquely specifies a patient condition, reference, result version, or presentation form, the system can mechanically restore a minimal difference. Validation can therefore produce a repair candidate rather than ending with rejection.
 
 An ambiguous natural-language request, a choice of clinically appropriate presentation granularity, or simultaneous changes to several artifacts may not have a unique repair. Generated interfaces should distinguish relations that can be repaired mechanically, relations that require presenting alternatives, and relations that require domain-expert judgment. The 100\% repair result does not demonstrate the general safety of automatic repair. It characterizes the bounded case in which a known contract identifies one value to restore.
 
-\subsection{Transfer to Other High-Accuracy Domains}
+\subsection{Applying the Approach Beyond Healthcare}
 
-Systems that retrieve data from an information need and generate a dashboard, table, or visualization can also arise in finance, aviation, and industrial operations. In these domains, an executable query and renderable screen likewise do not guarantee agreement in entity, period, source, or version. The structure of a cross-layer contract may therefore transfer.
+The approach may extend to other systems that retrieve data from a user's request and generate a dashboard, table, or visualization. In finance, an interface may need to preserve the account or instrument, valuation period, currency, and price source from request to display. In aviation and industrial maintenance, it may need to preserve the aircraft or asset identifier, observation window, sensor, aggregation, and data version. In each case, an executable query and renderable screen can still refer to the wrong entity, period, source, or version.
 
-The transferable element is the validation pattern, not the eight healthcare-oriented categories unchanged. Each domain must specify who makes which judgment, how incorrect information affects the task, which relations can be checked mechanically, and where responsibility passes to a person. Our HCI contribution is to add traceability and diagnosis from a user's task to the final presentation to evaluations of generated artifacts.
+The eight healthcare-oriented inconsistency types should not be transferred unchanged. An application domain must permit a task to be decomposed into testable fields, record correspondences from retrieval through presentation, and distinguish mechanically checkable relations from judgments that require a person. Domain-specific relations also matter: finance may require valuation timestamps and currencies, whereas aviation may require aircraft identifiers and sensor-calibration status. Future work should rebuild the inconsistency taxonomy with domain experts and test whether cross-layer diagnoses change error acceptance, fault localization, and verification time. The broader HCI implication is that evaluations of data-backed generated interfaces should include traceability from a user's task to the final presentation and explain where that correspondence breaks, rather than stopping at appearance or executability.
 
 \section{Limitations and Ethics}
 
@@ -372,9 +372,9 @@ First, we inject one inconsistency at a time using deterministic rules. The gene
 
 Second, the benchmark begins with reference SQL and therefore excludes initial errors from a text-to-SQL model. Question interpretation and query generation can fail in practice. Our result is limited to incremental updates after a valid reference is available. Evaluation that includes initial SQL generation must separately address abstention, multiple interpretations, and the clinical appropriateness of a query.
 
-Third, we use only MIMIC-IV Demo v2.2 and EHRSQL-2024 question templates. The preoperative anesthesia and post-thyroidectomy scenarios illustrate the problem but are not formal evaluation cases. Candidate counts differ across inconsistency types because result shapes and valid alternatives differ. We cannot generalize the findings to other clinical scenarios, data models, institutions, complex visualizations, or updates spanning multiple sources.
+Third, we use only MIMIC-IV Demo v2.2 and EHRSQL-2024 question templates. The preoperative anesthesia and post-thyroidectomy scenarios illustrate the problem but are not formal evaluation cases. Candidate counts differ across inconsistency types because result shapes and valid alternatives differ. We cannot generalize the findings to other clinical scenarios, data models, institutions, complex visualizations, or updates spanning multiple sources. We also evaluated no non-healthcare dataset or workflow, so the examples beyond healthcare are design hypotheses for future study rather than evidence of transfer.
 
-Fourth, we intentionally give the graph and flat contracts equivalent relational content to isolate storage form. This comparison does not test editing at scale, implementation maintainability, or the understandability of explanations. Validation times come from one implementation and environment and should not be interpreted as general performance differences between representations.
+Fourth, we intentionally give the graph-based and tabular cross-layer contracts equivalent relational content to isolate storage form. This comparison does not test editing at scale, implementation maintainability, or the understandability of explanations. Validation times come from one implementation and environment and should not be interpreted as general performance differences between representations.
 
 Fifth, this is a technical evaluation on publicly available deidentified demo data. Reference SQL is a technical baseline, not a clinically validated definition of appropriate presentation. We did not measure effects on verification burden, acceptance of faulty updates, or clinical judgment. We make no claims about clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, deployment, or generalization across institutions. Any human-participant study will be separate work conducted only after applicable ethics review, permission, recruitment, consent, withdrawal, and data-management procedures are established.
 
@@ -384,9 +384,9 @@ Released artifacts contain no question text, reference SQL, patient identifiers,
 
 Generating an interface appropriate for a clinical scenario requires more than retrieving data with executable SQL. The requested information must remain consistent through execution and presentation. We operationalized failures in that process as eight cross-layer inconsistencies, generated them deterministically on public demo data, and compared four validation conditions on the same candidates.
 
-Across 763 update pairs and 6,104 validations, local validation accepted every inconsistency and artifact contracts accepted 48.10\%. Graph and flat contracts with equivalent content rejected every inconsistent candidate and accepted every valid one. Their identical results indicate that detection was supported by executable relations over patient, item, time, aggregation, source, presentation, connection, and version, rather than by graph storage itself.
+Across 763 update pairs and 6,104 validations, local validation accepted every inconsistency and artifact-level contracts accepted 48.10\%. Graph-based and tabular cross-layer contracts with equivalent content rejected every inconsistent candidate and accepted every valid one. Their identical results indicate that detection was supported by executable relations over patient, item, time, aggregation, source, presentation, connection, and version, rather than by graph storage itself.
 
-A generated interface that will continue to change should be evaluated not only for its visible output and artifact-level validity, but also for provenance from a scenario-grounded information need to presentation and for diagnoses that explain failures. This study identifies a technical prerequisite and its detection mechanism before evaluating a clinically appropriate user experience. The next step is to apply it to expert-reviewed scenarios and test, with human participants, how cross-layer diagnoses affect acceptance of faulty updates, fault localization, repair, and verification burden.
+A generated interface that will continue to change should be evaluated not only for its visible output and artifact-level validity, but also for provenance from a scenario-grounded information need to presentation and for diagnoses that explain failures. This study identifies a technical prerequisite and its detection mechanism before evaluating a clinically appropriate user experience. The next step is to apply it to expert-reviewed scenarios and test, with human participants, how cross-layer diagnoses affect acceptance of faulty updates, fault localization, repair, and verification burden. Beyond healthcare, future work should redefine the checked relations for each domain and determine where the same design principle holds.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

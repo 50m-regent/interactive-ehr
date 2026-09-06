@@ -5,23 +5,21 @@
     <title>How cross-layer inconsistency is detected</title>
   </head>
   <body>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" role="img" aria-labelledby="title description">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 55 1200 460" role="img" aria-labelledby="title description">
       <title id="title">Local validation compared with cross-layer contracts</title>
       <desc id="description">Local validation passes when each artifact works in isolation. Cross-layer contracts compare semantic keys and versions across adjacent layers, detecting information that executes but does not match the request.</desc>
       <rect width="1200" height="610" fill="#ffffff"/>
-      <text x="600" y="42" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#172033">Valid artifacts can still be connected incorrectly</text>
-
       <rect x="38" y="75" width="1124" height="206" rx="18" fill="#f7f8fa" stroke="#98a2b3" stroke-width="2"/>
       <text x="66" y="110" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#344054">Local validation</text>
       <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
         <rect x="75" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="174" y="176" font-size="19" font-weight="700" fill="#172033">Information need</text><text x="174" y="204" font-size="15" fill="#3b6e4b">parseable ✓</text>
+        <text x="174" y="187" font-size="19" font-weight="700" fill="#172033">Need</text>
         <rect x="339" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="438" y="176" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="204" font-size="15" fill="#3b6e4b">executable ✓</text>
+        <text x="438" y="187" font-size="19" font-weight="700" fill="#172033">SQL</text>
         <rect x="603" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="702" y="176" font-size="19" font-weight="700" fill="#172033">Result</text><text x="702" y="204" font-size="15" fill="#3b6e4b">valid type ✓</text>
+        <text x="702" y="187" font-size="19" font-weight="700" fill="#172033">Result</text>
         <rect x="867" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="966" y="176" font-size="19" font-weight="700" fill="#172033">Presentation</text><text x="966" y="204" font-size="15" fill="#3b6e4b">renderable ✓</text>
+        <text x="966" y="187" font-size="19" font-weight="700" fill="#172033">Presentation</text>
       </g>
       <g stroke="#667085" stroke-width="3" fill="#667085">
         <line x1="273" y1="183" x2="327" y2="183"/><polygon points="339,183 324,174 324,192"/>
@@ -29,19 +27,18 @@
         <line x1="801" y1="183" x2="855" y2="183"/><polygon points="867,183 852,174 852,192"/>
       </g>
       <line x1="306" y1="132" x2="306" y2="235" stroke="#c1534d" stroke-width="4" stroke-dasharray="9 7"/>
-      <text x="306" y="259" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#a33d37">patient and time mismatch not checked</text>
 
-      <rect x="38" y="316" width="1124" height="251" rx="18" fill="#fff8e8" stroke="#d49327" stroke-width="3"/>
-      <text x="66" y="352" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#8b5b0b">Cross-layer contract</text>
+      <rect x="38" y="316" width="1124" height="184" rx="18" fill="#fff8e8" stroke="#d49327" stroke-width="3"/>
+      <text x="66" y="352" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#8b5b0b">Cross-layer validation</text>
       <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
         <rect x="75" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="174" y="417" font-size="19" font-weight="700" fill="#172033">Information need</text><text x="174" y="446" font-size="14" fill="#475467">Patient A, last 24 h</text>
+        <text x="174" y="417" font-size="19" font-weight="700" fill="#172033">Need</text><text x="174" y="446" font-size="14" fill="#475467">Patient A, 24 h</text>
         <rect x="339" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#c1534d" stroke-width="3"/>
-        <text x="438" y="417" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="446" font-size="14" fill="#a33d37">Patient B, no time filter</text>
+        <text x="438" y="417" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="446" font-size="14" fill="#a33d37">Patient B, no filter</text>
         <rect x="603" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="702" y="417" font-size="19" font-weight="700" fill="#172033">Result</text><text x="702" y="446" font-size="14" fill="#475467">SQL version v2</text>
+        <text x="702" y="417" font-size="19" font-weight="700" fill="#172033">Result</text><text x="702" y="446" font-size="14" fill="#475467">SQL v2</text>
         <rect x="867" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="966" y="417" font-size="19" font-weight="700" fill="#172033">Presentation</text><text x="966" y="446" font-size="14" fill="#475467">result version v2</text>
+        <text x="966" y="417" font-size="19" font-weight="700" fill="#172033">Presentation</text><text x="966" y="446" font-size="14" fill="#475467">Result v2</text>
       </g>
       <g stroke="#d49327" stroke-width="3" fill="#d49327">
         <line x1="537" y1="427" x2="591" y2="427"/><polygon points="603,427 588,418 588,436"/>
@@ -51,10 +48,6 @@
       <polygon points="339,427 324,418 324,436" fill="#c1534d"/>
       <circle cx="306" cy="427" r="19" fill="#fff2f0" stroke="#c1534d" stroke-width="3"/>
       <text x="306" y="434" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#a33d37">!</text>
-      <rect x="168" y="501" width="700" height="42" rx="10" fill="#fff2f0" stroke="#c1534d" stroke-width="2"/>
-      <text x="518" y="528" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#8b302b">P(c) and T(c) fail → localize the fault between the request and SQL</text>
-      <rect x="888" y="501" width="228" height="42" rx="10" fill="#eef5ff" stroke="#4d78b8" stroke-width="2"/>
-      <text x="1002" y="528" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#244a7c">repair if unambiguous</text>
     </svg>
   </body>
 </html>
