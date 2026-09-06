@@ -4,7 +4,7 @@
 
 ## 原稿の範囲
 
-- EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を使った決定的な技術評価を扱います。
+- EHRSQL-2024とMIMIC-IV Clinical Database Demo v2.2を使った、再現可能な手順による技術評価を扱います。
 - 8種類の層間不整合と4種類の検査条件を比較します。
 - 検出、妥当候補の受理、問題箇所の特定、一回の自動修復を報告します。
 - 麻酔科術前外来と甲状腺術後フォローを、診療シナリオによって情報要求と表示が変わる設計例として示します。正式評価ケースには使いません。
@@ -14,7 +14,7 @@
 
 ## CHI 2027の形式
 
-2026年9月4日時点の公式案内に従い、匿名、単一カラムの `acmart` review形式で作成しています。英語版の抄録は147語、`texcount` による本文等の合計は5,780語です。投稿前に公式案内を再確認してください。
+2026年9月4日時点の公式案内に従い、匿名、単一カラムの `acmart` review形式で作成しています。英語版の抄録は144語、`texcount` による本文等の合計は6,052語です。投稿前に公式案内を再確認してください。
 
 - Papers: https://chi2027.acm.org/authors/papers/
 - Publication Formats: https://chi2027.acm.org/chi-publication-formats/

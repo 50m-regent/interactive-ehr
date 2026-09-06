@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" role="img" aria-labelledby="title description">
-      <title id="title">局所検査と層間契約の検知方法の違い</title>
-      <desc id="description">局所検査では各成果物が単独で動作すれば合格する。層間契約では意味キーと版を隣接層で照合するため、実行できても要求と異なる情報を検知できる。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 55 1200 460" role="img" aria-labelledby="title description">
+      <title id="title">局所検査と層間検査の違い</title>
+      <desc id="description">局所検査では各成果物が単独で動作すれば合格する。層間検査では意味キーと版を隣接層で照合するため、実行できても要求と異なる情報を検知できる。</desc>
       <rect width="1200" height="610" fill="#ffffff"/>
-      <text x="600" y="42" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="27" font-weight="700" fill="#172033">各箱の正常性だけでは、箱の間のずれを検知できない</text>
-
       <rect x="38" y="75" width="1124" height="206" rx="18" fill="#f7f8fa" stroke="#98a2b3" stroke-width="2"/>
       <text x="66" y="110" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="20" font-weight="700" fill="#344054">局所検査</text>
       <g font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" text-anchor="middle">
         <rect x="75" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="174" y="176" font-size="19" font-weight="700" fill="#172033">情報要求</text><text x="174" y="204" font-size="15" fill="#3b6e4b">解釈可能 ✓</text>
+        <text x="174" y="187" font-size="19" font-weight="700" fill="#172033">要求</text>
         <rect x="339" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="438" y="176" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="204" font-size="15" fill="#3b6e4b">実行可能 ✓</text>
+        <text x="438" y="187" font-size="19" font-weight="700" fill="#172033">SQL</text>
         <rect x="603" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="702" y="176" font-size="19" font-weight="700" fill="#172033">実行結果</text><text x="702" y="204" font-size="15" fill="#3b6e4b">型が妥当 ✓</text>
+        <text x="702" y="187" font-size="19" font-weight="700" fill="#172033">結果</text>
         <rect x="867" y="139" width="198" height="88" rx="13" fill="#ffffff" stroke="#4f8a62" stroke-width="3"/>
-        <text x="966" y="176" font-size="19" font-weight="700" fill="#172033">表示部品</text><text x="966" y="204" font-size="15" fill="#3b6e4b">描画可能 ✓</text>
+        <text x="966" y="187" font-size="19" font-weight="700" fill="#172033">表示</text>
       </g>
       <g stroke="#667085" stroke-width="3" fill="#667085">
         <line x1="273" y1="183" x2="327" y2="183"/><polygon points="339,183 324,174 324,192"/>
@@ -23,19 +21,18 @@
         <line x1="801" y1="183" x2="855" y2="183"/><polygon points="867,183 852,174 852,192"/>
       </g>
       <line x1="306" y1="132" x2="306" y2="235" stroke="#c1534d" stroke-width="4" stroke-dasharray="9 7"/>
-      <text x="306" y="259" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="15" font-weight="700" fill="#a33d37">患者・期間のずれは未検査</text>
 
-      <rect x="38" y="316" width="1124" height="251" rx="18" fill="#fff8e8" stroke="#d49327" stroke-width="3"/>
-      <text x="66" y="352" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="20" font-weight="700" fill="#8b5b0b">層間契約</text>
+      <rect x="38" y="316" width="1124" height="184" rx="18" fill="#fff8e8" stroke="#d49327" stroke-width="3"/>
+      <text x="66" y="352" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="20" font-weight="700" fill="#8b5b0b">層間検査</text>
       <g font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" text-anchor="middle">
         <rect x="75" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="174" y="417" font-size="19" font-weight="700" fill="#172033">情報要求</text><text x="174" y="446" font-size="14" fill="#475467">患者A・直近24時間</text>
+        <text x="174" y="417" font-size="19" font-weight="700" fill="#172033">要求</text><text x="174" y="446" font-size="14" fill="#475467">患者A・24時間</text>
         <rect x="339" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#c1534d" stroke-width="3"/>
-        <text x="438" y="417" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="446" font-size="14" fill="#a33d37">患者B・期間指定なし</text>
+        <text x="438" y="417" font-size="19" font-weight="700" fill="#172033">SQL</text><text x="438" y="446" font-size="14" fill="#a33d37">患者B・指定なし</text>
         <rect x="603" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="702" y="417" font-size="19" font-weight="700" fill="#172033">実行結果</text><text x="702" y="446" font-size="14" fill="#475467">SQL版 v2</text>
+        <text x="702" y="417" font-size="19" font-weight="700" fill="#172033">結果</text><text x="702" y="446" font-size="14" fill="#475467">SQL v2</text>
         <rect x="867" y="383" width="198" height="88" rx="13" fill="#ffffff" stroke="#d49327" stroke-width="2"/>
-        <text x="966" y="417" font-size="19" font-weight="700" fill="#172033">表示部品</text><text x="966" y="446" font-size="14" fill="#475467">参照版 v2</text>
+        <text x="966" y="417" font-size="19" font-weight="700" fill="#172033">表示</text><text x="966" y="446" font-size="14" fill="#475467">結果 v2</text>
       </g>
       <g stroke="#d49327" stroke-width="3" fill="#d49327">
         <line x1="537" y1="427" x2="591" y2="427"/><polygon points="603,427 588,418 588,436"/>
@@ -45,8 +42,4 @@
       <polygon points="339,427 324,418 324,436" fill="#c1534d"/>
       <circle cx="306" cy="427" r="19" fill="#fff2f0" stroke="#c1534d" stroke-width="3"/>
       <text x="306" y="434" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="22" font-weight="700" fill="#a33d37">!</text>
-      <rect x="168" y="501" width="700" height="42" rx="10" fill="#fff2f0" stroke="#c1534d" stroke-width="2"/>
-      <text x="518" y="528" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="16" fill="#8b302b">P(c) と T(c) が不一致 → 要求とSQLの間を問題箇所として返す</text>
-      <rect x="888" y="501" width="228" height="42" rx="10" fill="#eef5ff" stroke="#4d78b8" stroke-width="2"/>
-      <text x="1002" y="528" text-anchor="middle" font-family="Noto Sans CJK JP, Hiragino Sans, sans-serif" font-size="16" fill="#244a7c">一意なら最小差分で修復</text>
     </svg>
