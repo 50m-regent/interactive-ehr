@@ -329,7 +329,7 @@ uv run ty check src/interactive_ehr/widgets src/interactive_ehr/evaluation src/i
 
 ## 口頭試問原稿
 
-`papers/oral-examination-2026/`には、2026年8月27日時点の研究状態を記録したLaTeX原稿とPDFがあります。原稿中では正式評価用データを未実行として扱っています。現在の正式評価結果は、このREADMEの「層間整合性の正式技術評価」と保存済み成果物を参照してください。編集元のLaTeXと確認用PDFだけを版管理します。
+`papers/oral-examination-2026/`には、電子カルテ利用時の認知負荷軽減を軸に研究全体を説明するLaTeX原稿とPDFがあります。タスクグラフによるUI生成、院内実装、完了した層間整合性の技術評価、卒業までに行う現行電子カルテとのユーザー評価を扱います。編集元のLaTeXと確認用PDFだけを版管理します。
 
 ```bash
 cd papers/oral-examination-2026
