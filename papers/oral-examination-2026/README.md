@@ -35,6 +35,7 @@ cp build/main-revised.pdf output/pdf/Hirata_Lenne_revised.pdf
 - 英文要旨は157語
 - 提出用PDFは10MB未満
 - ページ番号なし
+- 所属・指導教員欄の直上に左段幅の横線
 - 図はTikZによるベクター描画
 - 英語氏名は`Lenne Hirata`
 - 図表番号はLaTeXが自動で付与

@@ -22,7 +22,10 @@
 \pagestyle{empty}
 
 \makeatletter
-\renewcommand{\footnoterule}{}
+\renewcommand{\footnoterule}{%
+  \kern -3pt
+  \hrule width \columnwidth
+  \kern 2.6pt}
 \renewcommand{\@makefntext}[1]{\noindent #1}
 \makeatother
 
