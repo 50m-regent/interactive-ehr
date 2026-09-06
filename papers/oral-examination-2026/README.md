@@ -1,16 +1,17 @@
-# 口頭試問会原稿
+# 中間諮問会原稿
 
-Notionの研究ダッシュボードと関連ページ、`socguide202304.doc`の作成要領を基にしたLaTeX原稿です。
+Notionの研究ダッシュボードと関連ページ、`socguide202304.doc`の作成要領を基にした中間諮問会用のLaTeX原稿です。
 
 ## ビルド
 
 TeX Live 2024以降で次を実行します。
 
 ```bash
-make
+latexmk main-revised.tex
+cp build/main-revised.pdf output/pdf/Hirata_Ren_revised.pdf
 ```
 
-最終PDFは`output/pdf/Hirata_Ren.pdf`へ生成されます。中間生成物は`build/`へ保存されます。
+確認用PDFは`output/pdf/Hirata_Ren_revised.pdf`です。中間生成物は`build/`へ保存されます。
 
 ## 資料の時点
 
@@ -31,4 +32,4 @@ make
 - 和文はHaranoAji明朝、欧文はTimes New Roman互換のTimes系
 - ページ番号なし
 - 図はTikZによるベクター描画
-- 現在のPDFは9ページ、要旨は289字
+- 現在のPDFは9ページ、英語要旨は135語
