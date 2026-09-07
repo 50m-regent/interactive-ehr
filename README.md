@@ -173,6 +173,8 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 正式結果は `results/evaluation/tracebench_ehr_v1.1/test/`、パイロット結果は `results/evaluation/tracebench_ehr_v1.1/validation/` に保存しています。完全な変異別集計と実行時間は各 `summary.json` を参照してください。
 
+全体査読後の追加評価は [experiments/chi-additional-20260907/](experiments/chi-additional-20260907/README.md) で管理します。保存済みログの診断除去を再構成し、同じ固定データを使ってSQLの別解と等号を反転した候補を評価します。追加コードは `src/interactive_ehr/evaluation/chi_sql_stress.py`、入口は `scripts/run_chi_sql_stress.py` です。正式評価と追加評価の結果は分けて報告します。
+
 保存済みの正式結果を表計算ソフトで確認する場合は、元のJSONとJSON Linesを変更せずTSVへ変換します。この処理は正式評価を再実行しません。元成果物のチェックサム、候補単位から再計算した主要指標、95%信頼区間を照合してから出力します。
 
 ```bash
