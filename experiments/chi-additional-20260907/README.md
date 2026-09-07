@@ -26,4 +26,4 @@ uv run python experiments/chi-additional-20260907/log-replay/replay_diagnostics.
 uv run pytest experiments/chi-additional-20260907/log-replay/test_replay_diagnostics.py -q
 ```
 
-実験結果の確認後、原稿の結果・限界と査読判断へ反映します。実際の生成エラーや医療者への効果は、この実験の対象外です。
+追加実験は約146秒で完了し、3,736行の判定を保存しました。[結果と原稿への影響](REPORT.md)を確認してください。実際の生成エラーや医療者への効果は、この実験の対象外です。

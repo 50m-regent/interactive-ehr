@@ -7,7 +7,7 @@
 
 \settopmatter{printacmref=true,printccs=true,printfolios=true}
 \setcopyright{none}
-\acmConference[CHI '27]{Proceedings of the 2027 CHI Conference on Human Factors in Computing Systems}{2027}{Pittsburgh, PA, USA}
+\acmConference[CHI '27]{2027 CHI Conference on Human Factors in Computing Systems}{2027}{Pittsburgh, PA, USA}
 \acmYear{2027}
 \copyrightyear{2027}
 
@@ -21,7 +21,7 @@
 \begin{document}
 
 \begin{abstract}
-Data-backed interfaces can remain executable while an update breaks correspondence between a request, query, result, and presentation. We study this problem through reference-based regression testing for generated clinical interfaces. Using EHRSQL-2024 and MIMIC-IV Demo, we construct 763 update pairs spanning eight injected fault types and compare four validation conditions in 6,104 validations. Candidates are selected to pass local checks; their 100\% leakage is therefore a construction property. Artifact-level contracts accept 48.10\% of inconsistent candidates. Two cross-layer implementations reject all injected inconsistencies and accept all reference-valid candidates, but share expected values and checking functions. We document which checks expose each fault and distinguish fault-type reporting from restoration using a saved valid artifact. The results characterize coverage of a predefined fault model with trusted reference information. They do not establish robustness to natural generation errors, independent benefits of graph storage, or improvements in clinicians' work.
+Data-backed interfaces can remain executable while an update breaks correspondence between a request, query, result, and presentation. We study this problem through reference-based regression testing for generated clinical interfaces. Using EHRSQL-2024 and MIMIC-IV Demo, we construct 763 update pairs spanning eight injected fault types and compare four validation conditions in 6,104 validations. Candidates are selected to pass local checks; their 100\% leakage is therefore a construction property. Artifact-level contracts accept 48.10\% of inconsistent candidates. Two cross-layer implementations reject all injected inconsistencies and accept all reference-valid candidates, but share expected values and checking functions. An exploratory stress test reveals that both also reject 648 result-equivalent SQL alternatives. Reconstructing decisions without query-equality checks accepts those alternatives but lets 329 of 476 result-changing queries pass. We distinguish fault-type reporting from restoration using a saved valid artifact. These results characterize reference-dependent coverage and its limits, not general semantic validation, robustness to natural generation errors, or improvements in clinicians' work.
 \end{abstract}
 
 \begin{CCSXML}
@@ -69,6 +69,8 @@ We ask:
 \end{description}
 
 After freezing the evaluation method, we ran the test split once. We formed 763 update pairs from 134 question templates and performed 6,104 validations. Local validation accepted all inconsistent candidates because passing that condition is required for inclusion. Artifact-level contracts accepted 367; both full conditions rejected all inconsistent candidates and accepted all reference-valid candidates. The full conditions share core checking functions as well as expected values. Their agreement is an implementation consistency check, not independent evidence that storage representation has no effect.
+
+An exploratory follow-up tests the reference dependence directly. Both full conditions reject all 648 query wrappers that preserve columns and typed result multisets on the same database. Reconstructed decisions without query equality accept these alternatives but also accept 329 of 476 result-changing equality inversions. Thus, acceptance of reference-derived candidates does not imply tolerance of valid alternatives.
 
 The paper contributes a bounded evaluation artifact:
 
@@ -256,6 +258,17 @@ The primary metrics are \term{inconsistency leakage rate} and \term{valid-update
 
 We calculate paired condition differences and use 10,000 question-template cluster bootstrap resamples for 95\% intervals. This retains dependence among candidates from one template. It does not address shared patients, overlapping cases, or common injection rules across templates. The intervals describe variation in the retained template sample under the fixed fault model, not uncertainty about natural error rates or new hospitals. Degenerate intervals arise when all resampled clusters have the same contrast; they are not proof of universal performance.
 
+\subsection{Exploratory Checks of Reference Dependence}
+\label{sec:stress-method}
+
+After inspecting the primary results, we designed two exploratory analyses and froze their rules before execution. First, we reconstructed acceptance from the saved diagnostic codes in the test and validation logs. The validator collects all applicable issues and accepts exactly when none remain. Removing selected codes therefore reconstructs acceptance decisions, but does not rerun an ablated validator or estimate diagnosis, restoration, or latency effects.
+
+Second, we applied the unchanged validators to the 934 answerable test cases using four query forms: the original query, a whitespace control, a wrapper of the form \texttt{SELECT * FROM (original) WHERE 1 = 1}, and one equality-to-inequality change between a column and literal in a \texttt{WHERE} clause. The latter changes the first applicable equality in depth-first syntax-tree order, preserving all literals and other query text. We retain the reference widget and bind each executed result to its actual query. We do not require candidates to pass local validation for inclusion.
+
+A separate comparison executes queries on read-only SQLite and compares column names and multisets of type-tagged cell values without using the reference oracle or its result-digest function. A wrapper is counted as a valid alternative only when these observations agree. An equality inversion is counted as result-changing only when columns agree and the result multiset differs; unchanged results are reported separately. The reference SQL remains a proxy for the requested information, not a clinical judgment. This comparison concerns one database state and ignores row order.
+
+We exclude non-read-only or unparseable queries, nondeterministic functions, and limits without an ordering clause. Execution has a five-second query limit and a 10,000-row cap; failures and exclusions retain their own counts. Original-query repetition checks result stability. We report acceptance, issue codes, and denominators, including reconstructions that remove query equality, annotation checks, or both. These finite, exploratory case sets do not support estimates of natural generation-error frequency.
+
 \subsection{Data Management and Reproducibility}
 
 Released artifacts do not contain raw data, question text, reference SQL, patient identifiers, or patient-level result values. They contain hashed case identifiers, input and candidate checksums, inconsistency type, decision, diagnosis, restoration outcome, aggregates, and execution environment. We froze formal results as JSON and JSON Lines, then converted them to TSV in an independent procedure that recomputed counts, primary metrics, and confidence intervals. The recomputed values matched the original summary.
@@ -324,13 +337,42 @@ Local validation rejected no inconsistent candidate and attempted no restoration
 
 Both full conditions enabled restoration of all 763 injections using the saved valid data artifact or widget. Because restoration is gated by correct type reporting and copies a known valid component, these successes are coupled to the type-coverage result. They do not constitute an independent demonstration of automatic repair capability. No valid candidate was rejected, and the protocol would not attempt restoration of a candidate labeled valid even if it were rejected.
 
+\subsection{Exploratory Results on Reference Dependence}
+\label{sec:stress-results}
+
+Replaying the saved diagnostic codes produces zero leakage after removing either query equality or annotation checks alone: 0/763 on test and 0/758 on validation. Removing both produces 238/763 and 237/758 leakage, respectively. Artifact-level checks plus query equality and target binding reproduce the full graph's acceptance decisions on all 3,042 valid and inconsistent candidates across these splits. These are acceptance-only reconstructions, not measurements of diagnostic or representation equivalence.
+
+The SQL stress test excludes 286 of 934 cases containing current-time expressions under the fixed nondeterminism rule. The remaining 648 cases cover 126 templates. Original queries and whitespace controls are accepted under every condition. All 648 wrappers preserve column names and typed result multisets, yet both full conditions reject every wrapper solely with \texttt{target\_query\_mismatch}. These are false rejections under the result-based criterion in Section~\ref{sec:stress-method}, although they correctly enforce the stricter reference-encoding contract.
+
+For equality inversion, 60 cases have no applicable equality, 42 change column names, and 70 retain the same result; we do not score these as result-changing faults. The remaining 476 cases span 96 templates and change the result while preserving column names; 147 yield empty results. No execution failure or row cap occurs. Table~\ref{tab:stress-results} reports the retained candidates. Reconstructed decisions without query equality let 329/476 result-changing candidates pass. Annotation checks report no mismatch on these candidates; the 147 remaining rejections arise from result-shape checks, including 143 also caught locally.
+
+\begin{table}[t]
+  \caption{Exploratory SQL stress test. The last three rows reconstruct acceptance by removing graph diagnostic codes; they do not rerun modified validators. Denominators exclude the separately reported cases.}
+  \label{tab:stress-results}
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Condition & Valid wrappers rejected & Result changes accepted \\
+    \midrule
+    Local validation & 0/648 & 333/476 \\
+    Artifact-level contracts & 0/648 & 329/476 \\
+    Graph contract & 648/648 & 0/476 \\
+    Tabular contract & 648/648 & 0/476 \\
+    Graph codes minus query equality & 0/648 & 329/476 \\
+    Graph codes minus annotations & 648/648 & 0/476 \\
+    Graph codes minus both & 0/648 & 329/476 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \section{Discussion}
 
 \subsection{What the Controlled Comparison Establishes}
 
 The benchmark identifies gaps between the specified checks under a known-target assumption. Artifact-level checks detect provenance metadata, baseline presentation mapping, and query-result version mismatches. They can also reject a semantic-query mutation when it changes result shape, without reporting the injected semantic type. The full conditions add target-query and binding checks and reject all retained injections.
 
-This is evidence about coverage of the implemented fault model. Both the fault generator and the check designer know the relationships to change or preserve. In particular, comparing normalized query checksums makes rejection of a changed reference query unsurprising. A useful next comparison would separate annotated-slot checks, reference-checksum checks, result checks, and binding checks, and include semantically equivalent valid alternatives. Such a comparison would identify the contribution of each check beyond exact reference matching.
+This is evidence about coverage of the implemented fault model. Both the fault generator and the check designer know the relationships to change or preserve. The diagnostic replay shows that query equality and annotation checks overlap on that suite. The exploratory stress test separates them: exact-query matching rejects result-equivalent wrappers, while retaining annotation checks without exact-query matching misses 329 result-changing candidates. Removing query equality alone is therefore not a sufficient remedy. The current target-result comparison is also conditional on matching the reference query version. A broader contract must specify which alternative queries and outputs are permissible, then be evaluated on cases not used to design it.
 
 \subsection{Implications for Data-Backed Interface Updates}
 
@@ -362,7 +404,7 @@ Second, the benchmark uses the known target query and its executed result, not m
 
 Third, we use only MIMIC-IV Demo v2.2 and EHRSQL-2024 question templates. The preoperative anesthesia and post-thyroidectomy scenarios illustrate the problem but are not formal evaluation cases. Candidate counts differ across inconsistency types because result shapes and valid alternatives differ. We cannot generalize the findings to other clinical scenarios, data models, institutions, complex visualizations, or updates spanning multiple sources. Applicability to non-healthcare data and workflows is also untested.
 
-Fourth, full validation and the oracle share the target reference; graph and tabular implementations additionally share core checking functions. This common dependency limits evidence from agreement. No ablation separates reference-SQL equality from annotated-slot or relationship checks. Valid candidates cover the chosen reference encoding, not the space of semantically equivalent queries and displays. The evaluation cannot establish false-rejection rates for such alternatives.
+Fourth, full validation and the oracle share the target reference; graph and tabular implementations additionally share core checking functions. This common dependency limits evidence from agreement. The exploratory reconstructions concern acceptance only. The SQL stress test uses one wrapper rule and one equality inversion on a single database state, excludes 286 time-dependent cases, and ignores row order. Its comparison code avoids the original oracle and digest, but still shares the reference SQL and SQLite engine. The observed false-rejection and leakage counts cannot estimate performance across naturally generated queries or all semantically equivalent interfaces.
 
 Fifth, this is a technical evaluation on publicly available deidentified demo data. Reference SQL is a technical baseline, not a clinically validated definition of appropriate presentation. We did not measure effects on verification burden, acceptance of faulty updates, or clinical judgment. We make no claims about clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, deployment, or generalization across institutions. Any human-participant study will be separate work conducted only after applicable ethics review, permission, recruitment, consent, withdrawal, and data-management procedures are established.
 
@@ -374,7 +416,7 @@ We present a reference-based regression-testing artifact for request, query, res
 
 All injected candidates passed local checks by construction. Artifact-level contracts accepted 48.10\% of them. The two full conditions rejected every injected inconsistency and accepted every reference-valid candidate while sharing target information and checking functions. These results describe coverage of this predefined fault model. Type reporting and copying saved valid components do not establish fault localization or repair of unknown generated states.
 
-The practical question is which trusted expectations an interface developer can obtain and check during an update. The next evaluation should apply frozen checks to naturally generated updates and valid alternatives, then compare their decisions with independently assessed outcomes. Whether these checks help people inspect and correct an interface remains open.
+The exploratory stress test exposes a limit hidden by the primary candidate set: full validation rejects 648 result-equivalent query wrappers, whereas reconstructed decisions without query equality accept 329 of 476 result-changing queries. The practical question is which trusted expectations an interface developer can obtain and how those expectations distinguish permissible alternatives from changed information. Broader contracts require evaluation on held-out and naturally generated updates with independently assessed outcomes. Whether these checks help people inspect and correct an interface remains open.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
