@@ -14,6 +14,8 @@ PRの統合によってIssueが完了する場合は`Closes #番号`、作業が
 
 ## 概要
 
+実アプリの連続更新による追加評価は [experiments/chi-sequential-update-20260908/PROTOCOL.md](experiments/chi-sequential-update-20260908/PROTOCOL.md) で管理します。既存の更新範囲判定とScenarioGraphの増分生成を、6系列・各3回の合成更新で評価します。実行入口は `scripts/run_sequential_update_pilot.py` です。生成前に課題と検査を固定し、モデルの出力、途中状態、キャッシュ、検査結果を保存します。保存済みの応答によるローカル再実行もできます。結果はまだ取得しておらず、[Issue #54](https://github.com/50m-regent/interactive-ehr/issues/54)で追跡します。
+
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
 現在は麻酔科術前外来と慢性疾患外来の合成サンプルをStreamlit上で切り替えて表示できます。初期表示は麻酔科術前外来です。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
