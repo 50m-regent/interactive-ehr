@@ -222,7 +222,9 @@ uv run python scripts/run_tracebench_ehr.py \
 
 ## 実生成による更新の予備評価
 
-実際のモデル出力を使う更新課題の予備評価を `experiments/chi-generated-update-20260908/` で準備しています。[Issue #53](https://github.com/50m-regent/interactive-ehr/issues/53)で、20件の合成課題、生成前に固定する条件、複数のデータ状態による検査を追跡します。既存の正式評価と異なる小さなSQL・表示仕様を用い、表示には既存のStreamlitレンダラを使います。本アプリ全体の生成性能や臨床的な有効性は評価しません。実行手順と停止条件は[実験計画](experiments/chi-generated-update-20260908/PROTOCOL.md)、入口は `scripts/run_generated_update_pilot.py`、テストは `tests/test_generated_update_pilot.py` です。
+Gemini 2.5 Proで20件の合成UI更新を生成し、検証しました。最新件数を求めた2件で期間条件が消え、構造・実行検査は通過しました。要求に応じた結果の検査は両方を拒否して適合18件を受理しましたが、事後に追加した簡単な期間条件の検査と20件すべてで判定が一致しました。1状態と3状態の判定にも差はありません。参照SQLとの厳密な一致は適合3件も拒否しました。[結果と制約](experiments/chi-generated-update-20260908/REPORT.md)に、原稿への影響と次の評価を記録しています。
+
+既存の正式評価と異なる小さなSQL・表示仕様を用い、既存レンダラへ渡された表39個・グラフ1個のデータを照合しました。アプリの更新範囲判定とグラフの増分生成は通していません。本アプリ全体の性能と臨床的な有効性は未評価です。[Issue #53](https://github.com/50m-regent/interactive-ehr/issues/53)、[実験計画](experiments/chi-generated-update-20260908/PROTOCOL.md)、`scripts/run_generated_update_pilot.py`から再現条件を確認できます。応答と集計は `results/evaluation/chi_generated_update_20260908/`、結果の別集計と描画データの照合は `scripts/verify_generated_update_pilot.py`、事後の期間条件の診断は `scripts/check_generated_update_time_filters.py` です。テストは `tests/test_generated_update_*.py` にあります。
 
 ## セットアップ
 

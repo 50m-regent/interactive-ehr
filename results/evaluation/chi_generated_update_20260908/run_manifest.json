@@ -1,0 +1,218 @@
+{
+  "attempts": 1,
+  "code_commit": "0f509f64623abfc9228347296811eb53eb79efbd",
+  "completed_cases": [
+    "update_01",
+    "update_02",
+    "update_03",
+    "update_04",
+    "update_05",
+    "update_06",
+    "update_07",
+    "update_08",
+    "update_09",
+    "update_10",
+    "update_11",
+    "update_12",
+    "update_13",
+    "update_14",
+    "update_15",
+    "update_16",
+    "update_17",
+    "update_18",
+    "update_19",
+    "update_20"
+  ],
+  "config": {
+    "max_output_tokens": 4096,
+    "response_json_schema": {
+      "$defs": {
+        "Query": {
+          "additionalProperties": false,
+          "description": "One named, read-only query in the generated artifact.",
+          "properties": {
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "sql": {
+              "title": "Sql",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "sql"
+          ],
+          "title": "Query",
+          "type": "object"
+        },
+        "Widget": {
+          "additionalProperties": false,
+          "description": "Small supported subset of the repository's real widget renderer.",
+          "properties": {
+            "columns": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Columns",
+              "type": "array"
+            },
+            "data_key": {
+              "title": "Data Key",
+              "type": "string"
+            },
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "dataframe",
+                "line_chart"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "title": {
+              "title": "Title",
+              "type": "string"
+            },
+            "x": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X"
+            },
+            "y": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Y"
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "kind",
+            "data_key",
+            "columns"
+          ],
+          "title": "Widget",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Portable query and widget artifact generated in one model call.",
+      "properties": {
+        "queries": {
+          "items": {
+            "$ref": "#/$defs/Query"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Queries",
+          "type": "array"
+        },
+        "widgets": {
+          "items": {
+            "$ref": "#/$defs/Widget"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Widgets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "queries",
+        "widgets"
+      ],
+      "title": "Interface",
+      "type": "object"
+    },
+    "response_mime_type": "application/json",
+    "temperature": 0.2,
+    "thinking_config": {
+      "thinking_budget": 1024
+    },
+    "top_p": 1.0
+  },
+  "finished_at": "2026-09-08T04:22:54.553541+00:00",
+  "google_genai": "1.73.1",
+  "input_manifest_sha256": "c960f031d6caed57d1d08d797caf99381452fc49ee8df1ad398f358f0425b772",
+  "location": "asia-northeast1",
+  "model_requested": "gemini-2.5-pro",
+  "outputs_sha256": {
+    "update_01.metadata.json": "520cdf4f2dacf6b5e7de4c66e5be5e2c823f9935997316dc5bf5a4dbaac4da65",
+    "update_01.txt": "5f83f86d35f961edf722c9d3ba7a68799ffce796147c3138f4433d41c11a9f4c",
+    "update_02.metadata.json": "b3d02a3dbbdd67dff89206f09b112c27be3a43b2fbd9e2cf0dda5829baf6f2e1",
+    "update_02.txt": "bd28a1cc44b8da07cdb4507185de3f750270f630562e19397885284d0cf87f2a",
+    "update_03.metadata.json": "6fe2f11811278a62eec5999b52fc96bceda390b5b85bec239e8e938fa38b8784",
+    "update_03.txt": "4dec2386fc3415a28a2f61591fbe588a36f2e43e9a00c17867dd3fa6b0fd53b7",
+    "update_04.metadata.json": "de66a1d46193161b2d1a405493188b4ff6b61f024e4db5a5c95cef14aee753a9",
+    "update_04.txt": "893d7b169cf4be2fc5679a73d9cfc23b62fe857bd3dec03073145661d88c92bd",
+    "update_05.metadata.json": "a9e6b08018e85e20b0a55f3b64f5412156a249bb44f01f1a9c780a2f561755e5",
+    "update_05.txt": "d8117d33c5df53d065749832eba80f4963de5d08b86e86e52c19a193f2452d3f",
+    "update_06.metadata.json": "a3424a5d4aa525e8910a1e1b839795910377f0ace9330ff40dd36425ee6fa41b",
+    "update_06.txt": "b7f1b50e061fb0567fc72f11ba2178259e153a15c993b1dfe4db82fdc25100c9",
+    "update_07.metadata.json": "77b02bef0a299c4f913da4594af422d4d82a55b404438da4791f4cab79c0a22d",
+    "update_07.txt": "7fc2a031544552f3c16a63e0365c38ef5a60f04804d0f269e76cbbfaab21633d",
+    "update_08.metadata.json": "44abdab8b404b2b961363615be5f805aac4bf3c67d1ef9bf7f3c506cfffcee49",
+    "update_08.txt": "6a74be98a9b0d39d48b1053196a652b7b89bc460b9338b6ca86e36c6dc9561dc",
+    "update_09.metadata.json": "7aeab890e82961d188681c660a64bb5651a226f4a3ffd94d5079eb1024437399",
+    "update_09.txt": "15b2d33fb4b712cd32d950ac2740dda3fc1326a9ee665ba44e4b28cc734d60ed",
+    "update_10.metadata.json": "15cbbd6bd627c9d8e5d8cbbf0331483811ec9edc309a5a6bab5a4bc2a40c8816",
+    "update_10.txt": "23241f4c68da44a0a8c9ebfa441bfbed3d4666c01175cc734b71bfd6c85cca4b",
+    "update_11.metadata.json": "af2022a94f6f94fc74e42d5540f33a9026f6a36af89624d2f7521d218579ce88",
+    "update_11.txt": "0554912810496ec07a3f37f05d346874cbe94295b188c62a3b2aa9b19240a8be",
+    "update_12.metadata.json": "7ee7413f9ae148ecc860f7ae1864a6f7e10d9d330ef6b6df87eff2e90fcaadaa",
+    "update_12.txt": "6879041ed78ee962e897709bb71c7d7b1a4dc62cb31d21457709af6291c3e8c2",
+    "update_13.metadata.json": "be49141ce19a6bdd401078b0a5eb442047d958d62ded1b2d1f36e6bfd724536d",
+    "update_13.txt": "22f03c6209aeb19142d4e889cdbd83e73f490efed5d18458a2a1053ccadc4c9b",
+    "update_14.metadata.json": "b5a6ec062ef0f0393fb0c77cd4f6caeaeb44bd20bfb9fd80ec65d7f888bcb0e5",
+    "update_14.txt": "016331d7f7cf20c86be73e9cb80978bdd99b444824c47e0ead0b8bf44c61a467",
+    "update_15.metadata.json": "7d989e1fe70184b15f1f390d0031a486d422d653330ebafc78b4534ee5126327",
+    "update_15.txt": "3f01d3d50a6495db80e02029d436c96b0aa146bf03c800b86e97cc073f3dcd9b",
+    "update_16.metadata.json": "d572fea12cd5afab23738de112a25e3a85b38d1fd6023a01772681bc50f7d605",
+    "update_16.txt": "c7b301f1ce022b80a3e85428502f8831ec912909e9c0b361340788c5ca8afdf3",
+    "update_17.metadata.json": "2c7ffbae9ee33bf72ff0cbdbe0f09ac86e9a969a7061e56011f31a4dc4aacebf",
+    "update_17.txt": "842f71ade66eda81b1896170e79310bc7961f4a3ca2fbc0656b7397265577aaf",
+    "update_18.metadata.json": "1526cdcb3490ce06d03bf7b8eaddf67e8d1c0f0f7a6fa54ee958436d17af42c7",
+    "update_18.txt": "bfc651962a723c990fff37347908089294026b1e4706b283b36906319f066561",
+    "update_19.metadata.json": "74aa00f2a787e16b2d2e27f54f0d9315726c003551c471bc151bf67d271b80de",
+    "update_19.txt": "d33eef9b96635e7138429aedc8465262bd3df169962312f8dccdf0b4d3ac72cd",
+    "update_20.metadata.json": "4aa943a7a3241097a1c3eefd91476dd2abca0bad0684e3abf9d9b347a04aa094",
+    "update_20.txt": "1fbb3863364123eb183b2a7db233bed279873d29dbc334fa9eec49e582aa109d"
+  },
+  "planned_cases": 20,
+  "python": "3.12.9",
+  "seed_base": 20260908,
+  "source_sha256": {
+    "experiments/chi-generated-update-20260908/PROTOCOL.md": "70a2c92c1be3677983f1a4c8244b0b0dec69054a5e0b03dac841839b53910eb0",
+    "scripts/run_generated_update_pilot.py": "7d0d17234ba407066a7e7e64f6853bc9c9914f6658b8b76ad589fe6993330ec1",
+    "src/interactive_ehr/evaluation/generated_update_pilot.py": "bfb39d9316989e89712c9cefed872a20383cfc292f67f883cd5bcf43f69d009b",
+    "src/interactive_ehr/llm/schema_utils.py": "cf13b82d2e1de059ee1f7e2b4ed7c7196bff4d7738a8fa7ebc782cebabfe3a0a",
+    "src/interactive_ehr/widgets/chart.py": "461657e0ca5fdaf3c30eeb2591c59b7283b36f2b4e2a927526e2107ba8fb1d3c",
+    "src/interactive_ehr/widgets/display.py": "bde35f77d1f1e5bcd82c646b4bcb8503857de8798e62d13606671a4a389e776c",
+    "src/interactive_ehr/widgets/renderer.py": "1d9881a5afda7d86bb77a6c66db8a1a1f4c9bae3d31bce5d92a2eaa5584ef8d1",
+    "tests/test_generated_update_pilot.py": "81567cb1a3956283a1e7f873901467a3acb953935da14b5e7982f28bca806caa",
+    "tests/test_generated_update_runner.py": "a2268e851b8602a7935c652ca0b0199efde445f57c7a604a215d5ffb6b324567",
+    "uv.lock": "36c7eb548c3a543bb26f6c8fe94cb632eb43b51b1ac9bd1e45a99bc4b5b8d4e6"
+  },
+  "sqlite": "3.47.1",
+  "started_at": "2026-09-08T04:19:40.261986+00:00",
+  "status": "completed",
+  "timeout_ms": 120000,
+  "unattempted_cases": []
+}

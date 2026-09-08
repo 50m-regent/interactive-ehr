@@ -1,0 +1,45 @@
+{
+  "audit_invalid": 2,
+  "audit_valid": 18,
+  "conditions": {
+    "one_state": {
+      "accepted": 18,
+      "invalid_accepted": 0,
+      "valid_rejected": 0
+    },
+    "reference": {
+      "accepted": 15,
+      "invalid_accepted": 0,
+      "valid_rejected": 3
+    },
+    "structure": {
+      "accepted": 20,
+      "invalid_accepted": 2,
+      "valid_rejected": 0
+    },
+    "three_states": {
+      "accepted": 18,
+      "invalid_accepted": 0,
+      "valid_rejected": 0
+    }
+  },
+  "families": {
+    "limit": 2,
+    "measure": 1,
+    "order": 1,
+    "patient": 2,
+    "patient_measure": 1,
+    "patient_window": 2,
+    "unit": 1,
+    "unit_window": 2,
+    "visualization": 1,
+    "window": 4,
+    "window_limit": 1,
+    "window_order": 2
+  },
+  "label_scope": "finite held-out synthetic executions and explicit display policy; no expert labels",
+  "n": 20,
+  "parse_errors": 0,
+  "planned": 20,
+  "unavailable": []
+}
