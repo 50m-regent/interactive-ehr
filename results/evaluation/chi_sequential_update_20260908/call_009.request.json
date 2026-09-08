@@ -1,0 +1,56 @@
+{
+  "config": {
+    "max_output_tokens": 8192,
+    "response_json_schema": {
+      "$defs": {
+        "ScenarioGraphUpdateScope": {
+          "enum": [
+            "scenario",
+            "task",
+            "widget",
+            "data"
+          ],
+          "title": "ScenarioGraphUpdateScope",
+          "type": "string"
+        }
+      },
+      "properties": {
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rationale"
+        },
+        "scope": {
+          "$ref": "#/$defs/ScenarioGraphUpdateScope"
+        },
+        "target_node_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Target Node Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scope"
+      ],
+      "title": "ScenarioGraphUpdateDecision",
+      "type": "object"
+    },
+    "response_mime_type": "application/json",
+    "seed": 20260989,
+    "temperature": 0.2,
+    "thinking_config": {
+      "thinking_budget": 1024
+    },
+    "top_p": 1.0
+  },
+  "contents": "あなたは電子カルテ UI のタスクグラフ更新範囲を判断するアシスタントです。\n現在のグラフ構造と修正要望を読み、どの階層のノードを再生成すべきかを ScenarioGraphUpdateDecision で出力してください。\n\n判断ルール:\n- 要望が「タスクの構成・並び・全体方針」に関わるなら scope=scenario（target_node_ids は空）\n- 特定タスクの中身を変える要望なら scope=task で target_node_ids にそのtask ID\n- 特定 widget の種別・データ参照・SQL だけを変えるなら scope=widget で target_node_ids にその widget ID\n- データの取り方（SQL）だけを変えたい場合は scope=data で target_node_ids にその data node ID\n\n現在のタスク一覧:\n- id=overview, title=測定の確認\n\n現在の widget 一覧:\n- id=main, type=WidgetType.DATAFRAME\n- id=stable, type=WidgetType.DATAFRAME\n\n現在の data node 一覧:\n- id=main_data, context_key=main_data\n- id=stable_data, context_key=stable_data\n\n現在のグラフ (詳細):\n{\n  \"id\": \"synthetic_sequence\",\n  \"title\": \"合成データの連続更新\",\n  \"description\": null,\n  \"patient_context_key\": null,\n  \"tasks\": [\n    {\n      \"id\": \"overview\",\n      \"title\": \"測定の確認\",\n      \"description\": null,\n      \"order\": 0,\n      \"widgets\": [\n        {\n          \"id\": \"main\",\n          \"title\": \"主表示\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"main_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"main_data\",\n              \"context_key\": \"main_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT \\\"observed_at\\\", \\\"value\\\" AS \\\"value\\\", \\\"unit\\\" AS \\\"unit\\\" FROM \\\"measurements\\\" WHERE \\\"patient\\\" = 'SYN_B' AND \\\"measure\\\" = 'weight' AND \\\"observed_at\\\" >= '2026-09-07 12:00:00' AND \\\"observed_at\\\" <= '2026-09-08 12:00:00' ORDER BY \\\"observed_at\\\" ASC\"\n            }\n          ]\n        },\n        {\n          \"id\": \"stable\",\n          \"title\": \"保持する脈拍\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"stable_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"stable_data\",\n              \"context_key\": \"stable_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n\nユーザー要望:\n合成データだけのUI更新課題です。利用できるテーブルとDWHモデルはmeasurementsです。\nスキーマ: CREATE TABLE measurements (patient TEXT, measure TEXT, observed_at TEXT, value REAL, unit TEXT)\npatientはSYN_A/SYN_B/SYN_C、measureはweightまたはpulseです。\nweightはkg、pulseはbpmです。valueがNULLなら欠損です。\nobserved_atはYYYY-MM-DD HH:MM:SSのTEXTです。基準日時は2026-09-08 12:00:00です。\n直近N日間は基準日時-N日以上、基準日時以下の両端を含む範囲です。\n明示していない条件は現在のまま保持してください。stableの脈拍表示は変更対象外です。\noverview/main/stable/main_data/stable_dataのIDと対応関係を保持してください。\n測定値の一覧はobserved_at,value,unitをこの順で返します。集約ではvalue,unitを返します。\n表はSQL結果の列を順にすべて表示します。折れ線はx=observed_at,y=valueです。\n新しい表示部品や説明文は追加しません。タイトルの言い換えは許容します。\n今回の更新要求:\n主表示を直近3日間に広げてください。\n\n",
+  "model": "gemini-2.5-pro"
+}

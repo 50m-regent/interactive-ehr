@@ -1,0 +1,25 @@
+{
+  "widget_node": {
+    "id": "main",
+    "widget": {
+      "widget_type": "markdown"
+    },
+    "data_nodes": [
+      {
+        "id": "main_data",
+        "context_key": "main_data",
+        "data_type": "dataframe",
+        "description": "独立した合成測定データ",
+        "model_name": "measurements",
+        "primary_fields": [
+          "observed_at",
+          "value",
+          "unit"
+        ],
+        "sql": "SELECT AVG(\"value\") AS \"value\", 'kg' AS \"unit\" FROM \"measurements\" WHERE \"patient\" = 'SYN_A' AND \"measure\" = 'weight' AND \"observed_at\" >= '2026-09-01 12:00:00' AND \"observed_at\" <= '2026-09-08 12:00:00'"
+      }
+    ],
+    "title": "主表示"
+  },
+  "sql": "SELECT AVG(\"value\") AS \"value\", 'kg' AS \"unit\" FROM \"measurements\" WHERE \"patient\" = 'SYN_A' AND \"measure\" = 'weight' AND \"observed_at\" >= '2026-09-01 12:00:00' AND \"observed_at\" <= '2026-09-08 12:00:00'"
+}

@@ -14,7 +14,9 @@ PRの統合によってIssueが完了する場合は`Closes #番号`、作業が
 
 ## 概要
 
-実アプリの連続更新による追加評価は [experiments/chi-sequential-update-20260908/PROTOCOL.md](experiments/chi-sequential-update-20260908/PROTOCOL.md) で管理します。既存の更新範囲判定とScenarioGraphの増分生成を、6系列・各3回の合成更新で評価します。実行入口は `scripts/run_sequential_update_pilot.py` です。生成前に課題と検査を固定し、モデルの出力、途中状態、キャッシュ、検査結果を保存します。保存済みの応答によるローカル再実行もできます。結果はまだ取得しておらず、[Issue #54](https://github.com/50m-regent/interactive-ehr/issues/54)で追跡します。
+実アプリの連続更新による追加評価を [experiments/chi-sequential-update-20260908/REPORT.md](experiments/chi-sequential-update-20260908/REPORT.md) に記録しました。計画18更新のうち12件を試行し、9件が処理を完了、3件が表示部品の形式検証で失敗しました。後続6件は未実行です。適合7件と、1系列で期間条件が消えて次へ残った不適合2状態を確認しましたが、簡単なSQL検査と1状態・3状態の結果検査は同じ判定でした。保存した24応答から全イベントを再現し、24個の表の描画データも照合しました。[Issue #54](https://github.com/50m-regent/interactive-ehr/issues/54)で追跡します。次は生成先のスキーマとアプリの必須条件、表示種別を変える計画の整合を修正する必要があります。
+
+実行入口は `scripts/run_sequential_update_pilot.py`、照合は `scripts/verify_sequential_update_pilot.py`、事後の形式診断は `scripts/diagnose_sequential_update_failures.py` です。固定条件、停止条件、再実行のコマンドは[実験計画](experiments/chi-sequential-update-20260908/PROTOCOL.md)を参照してください。既存のアプリ実装と正式評価の結果は変更していません。
 
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 

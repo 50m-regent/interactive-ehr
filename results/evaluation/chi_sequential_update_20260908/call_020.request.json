@@ -1,0 +1,28 @@
+{
+  "config": {
+    "max_output_tokens": 8192,
+    "response_json_schema": {
+      "description": "Holds only the regenerated SQL for a data node.",
+      "properties": {
+        "sql": {
+          "title": "Sql",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sql"
+      ],
+      "title": "_DataSqlOnly",
+      "type": "object"
+    },
+    "response_mime_type": "application/json",
+    "seed": 20261000,
+    "temperature": 0.2,
+    "thinking_config": {
+      "thinking_budget": 1024
+    },
+    "top_p": 1.0
+  },
+  "contents": "あなたは電子カルテ DWH のクエリ作成アシスタントです。\n以下の data node 用の SELECT SQL を生成し、_DataSqlOnly JSON として出力してください。\n\n制約:\n- 読み取り専用の SELECT のみ使ってください。INSERT/UPDATE/DELETE/DDL は禁止です。\n- テーブル名と列名はダブルクォートしてください。例: SELECT \"匿名ID\" FROM \"患者基本\" LIMIT 20\n- 既存の context_key \"main_data\" 用の SQL を生成してください。\n\n対象 data node:\n{\n  \"id\": \"main_data\",\n  \"context_key\": \"main_data\",\n  \"model_name\": \"measurements\",\n  \"data_type\": \"dataframe\",\n  \"description\": \"独立した合成測定データ\",\n  \"primary_fields\": [\n    \"observed_at\",\n    \"value\",\n    \"unit\"\n  ],\n  \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n}\n\n現在のグラフ (参照用):\n{\n  \"id\": \"synthetic_sequence\",\n  \"title\": \"合成データの連続更新\",\n  \"description\": null,\n  \"patient_context_key\": null,\n  \"tasks\": [\n    {\n      \"id\": \"overview\",\n      \"title\": \"測定の確認\",\n      \"description\": null,\n      \"order\": 0,\n      \"widgets\": [\n        {\n          \"id\": \"main\",\n          \"title\": \"主表示\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"main_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"main_data\",\n              \"context_key\": \"main_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n            }\n          ]\n        },\n        {\n          \"id\": \"stable\",\n          \"title\": \"保持する脈拍\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"stable_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"stable_data\",\n              \"context_key\": \"stable_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n\nユーザー要望:\n合成データだけのUI更新課題です。利用できるテーブルとDWHモデルはmeasurementsです。\nスキーマ: CREATE TABLE measurements (patient TEXT, measure TEXT, observed_at TEXT, value REAL, unit TEXT)\npatientはSYN_A/SYN_B/SYN_C、measureはweightまたはpulseです。\nweightはkg、pulseはbpmです。valueがNULLなら欠損です。\nobserved_atはYYYY-MM-DD HH:MM:SSのTEXTです。基準日時は2026-09-08 12:00:00です。\n直近N日間は基準日時-N日以上、基準日時以下の両端を含む範囲です。\n明示していない条件は現在のまま保持してください。stableの脈拍表示は変更対象外です。\noverview/main/stable/main_data/stable_dataのIDと対応関係を保持してください。\n測定値の一覧はobserved_at,value,unitをこの順で返します。集約ではvalue,unitを返します。\n表はSQL結果の列を順にすべて表示します。折れ線はx=observed_at,y=valueです。\n新しい表示部品や説明文は追加しません。タイトルの言い換えは許容します。\n今回の更新要求:\n主表示を直近3日間に広げてください。\n\n",
+  "model": "gemini-2.5-pro"
+}

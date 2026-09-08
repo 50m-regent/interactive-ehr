@@ -1,0 +1,475 @@
+{
+  "before": {
+    "context": {
+      "main_data": {
+        "columns": [
+          "observed_at",
+          "value",
+          "unit"
+        ],
+        "data": [
+          [
+            "2026-09-07 12:00:00",
+            53.0,
+            "kg"
+          ],
+          [
+            "2026-09-08 00:00:00",
+            52.0,
+            "kg"
+          ],
+          [
+            "2026-09-08 06:00:00",
+            51.0,
+            "kg"
+          ],
+          [
+            "2026-09-08 12:00:00",
+            50.0,
+            "kg"
+          ]
+        ],
+        "index": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "dataframe"
+      },
+      "stable_data": {
+        "columns": [
+          "observed_at",
+          "value",
+          "unit"
+        ],
+        "data": [
+          [
+            "2026-09-07 12:00:00",
+            93.0,
+            "bpm"
+          ],
+          [
+            "2026-09-08 00:00:00",
+            92.0,
+            "bpm"
+          ],
+          [
+            "2026-09-08 06:00:00",
+            91.0,
+            "bpm"
+          ],
+          [
+            "2026-09-08 12:00:00",
+            90.0,
+            "bpm"
+          ]
+        ],
+        "index": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "dataframe"
+      }
+    },
+    "graph": {
+      "description": null,
+      "id": "synthetic_sequence",
+      "patient_context_key": null,
+      "tasks": [
+        {
+          "description": null,
+          "id": "overview",
+          "order": 0,
+          "title": "測定の確認",
+          "widgets": [
+            {
+              "data_nodes": [
+                {
+                  "context_key": "main_data",
+                  "data_type": "dataframe",
+                  "description": "独立した合成測定データ",
+                  "id": "main_data",
+                  "model_name": "measurements",
+                  "primary_fields": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                }
+              ],
+              "id": "main",
+              "title": "主表示",
+              "widget": {
+                "column_order": [
+                  "observed_at",
+                  "value",
+                  "unit"
+                ],
+                "data_key": "main_data",
+                "height": null,
+                "hide_index": true,
+                "key": null,
+                "widget_type": "dataframe"
+              }
+            },
+            {
+              "data_nodes": [
+                {
+                  "context_key": "stable_data",
+                  "data_type": "dataframe",
+                  "description": "独立した合成測定データ",
+                  "id": "stable_data",
+                  "model_name": "measurements",
+                  "primary_fields": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                }
+              ],
+              "id": "stable",
+              "title": "保持する脈拍",
+              "widget": {
+                "column_order": [
+                  "observed_at",
+                  "value",
+                  "unit"
+                ],
+                "data_key": "stable_data",
+                "height": null,
+                "hide_index": true,
+                "key": null,
+                "widget_type": "dataframe"
+              }
+            }
+          ]
+        }
+      ],
+      "title": "合成データの連続更新"
+    }
+  },
+  "events": [
+    {
+      "context": {
+        "main_data": {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data": [
+            [
+              "2026-09-07 12:00:00",
+              53.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 00:00:00",
+              52.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 06:00:00",
+              51.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 12:00:00",
+              50.0,
+              "kg"
+            ]
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "dataframe"
+        },
+        "stable_data": {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data": [
+            [
+              "2026-09-07 12:00:00",
+              93.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 00:00:00",
+              92.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 06:00:00",
+              91.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 12:00:00",
+              90.0,
+              "bpm"
+            ]
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "dataframe"
+        }
+      },
+      "graph": {
+        "description": null,
+        "id": "synthetic_sequence",
+        "patient_context_key": null,
+        "tasks": [
+          {
+            "description": null,
+            "id": "overview",
+            "order": 0,
+            "title": "測定の確認",
+            "widgets": [
+              {
+                "data_nodes": [
+                  {
+                    "context_key": "main_data",
+                    "data_type": "dataframe",
+                    "description": "独立した合成測定データ",
+                    "id": "main_data",
+                    "model_name": "measurements",
+                    "primary_fields": [
+                      "observed_at",
+                      "value",
+                      "unit"
+                    ],
+                    "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                  }
+                ],
+                "id": "main",
+                "title": "主表示",
+                "widget": {
+                  "column_order": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "data_key": "main_data",
+                  "height": null,
+                  "hide_index": true,
+                  "key": null,
+                  "widget_type": "dataframe"
+                }
+              },
+              {
+                "data_nodes": [
+                  {
+                    "context_key": "stable_data",
+                    "data_type": "dataframe",
+                    "description": "独立した合成測定データ",
+                    "id": "stable_data",
+                    "model_name": "measurements",
+                    "primary_fields": [
+                      "observed_at",
+                      "value",
+                      "unit"
+                    ],
+                    "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                  }
+                ],
+                "id": "stable",
+                "title": "保持する脈拍",
+                "widget": {
+                  "column_order": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "data_key": "stable_data",
+                  "height": null,
+                  "hide_index": true,
+                  "key": null,
+                  "widget_type": "dataframe"
+                }
+              }
+            ]
+          }
+        ],
+        "title": "合成データの連続更新"
+      },
+      "message": "widget を再生成します: main",
+      "node_id": null,
+      "status": "started"
+    },
+    {
+      "context": {
+        "main_data": {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data": [
+            [
+              "2026-09-07 12:00:00",
+              53.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 00:00:00",
+              52.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 06:00:00",
+              51.0,
+              "kg"
+            ],
+            [
+              "2026-09-08 12:00:00",
+              50.0,
+              "kg"
+            ]
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "dataframe"
+        },
+        "stable_data": {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data": [
+            [
+              "2026-09-07 12:00:00",
+              93.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 00:00:00",
+              92.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 06:00:00",
+              91.0,
+              "bpm"
+            ],
+            [
+              "2026-09-08 12:00:00",
+              90.0,
+              "bpm"
+            ]
+          ],
+          "index": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "dataframe"
+        }
+      },
+      "graph": {
+        "description": null,
+        "id": "synthetic_sequence",
+        "patient_context_key": null,
+        "tasks": [
+          {
+            "description": null,
+            "id": "overview",
+            "order": 0,
+            "title": "測定の確認",
+            "widgets": [
+              {
+                "data_nodes": [
+                  {
+                    "context_key": "main_data",
+                    "data_type": "dataframe",
+                    "description": "独立した合成測定データ",
+                    "id": "main_data",
+                    "model_name": "measurements",
+                    "primary_fields": [
+                      "observed_at",
+                      "value",
+                      "unit"
+                    ],
+                    "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                  }
+                ],
+                "id": "main",
+                "title": "主表示",
+                "widget": {
+                  "column_order": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "data_key": "main_data",
+                  "height": null,
+                  "hide_index": true,
+                  "key": null,
+                  "widget_type": "dataframe"
+                }
+              },
+              {
+                "data_nodes": [
+                  {
+                    "context_key": "stable_data",
+                    "data_type": "dataframe",
+                    "description": "独立した合成測定データ",
+                    "id": "stable_data",
+                    "model_name": "measurements",
+                    "primary_fields": [
+                      "observed_at",
+                      "value",
+                      "unit"
+                    ],
+                    "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+                  }
+                ],
+                "id": "stable",
+                "title": "保持する脈拍",
+                "widget": {
+                  "column_order": [
+                    "observed_at",
+                    "value",
+                    "unit"
+                  ],
+                  "data_key": "stable_data",
+                  "height": null,
+                  "hide_index": true,
+                  "key": null,
+                  "widget_type": "dataframe"
+                }
+              }
+            ]
+          }
+        ],
+        "title": "合成データの連続更新"
+      },
+      "message": "widget 'main' の再生成に失敗しました: 1 validation error for WidgetNodeSqlGeneration\nwidget_node.widget.markdown\n  Value error, body or data_key must be provided [type=value_error, input_value={'widget_type': 'markdown'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.12/v/value_error",
+      "node_id": "main",
+      "status": "failed"
+    }
+  ],
+  "first_call": 13,
+  "id": "sequence_03_step_1",
+  "last_call": 14
+}

@@ -1,0 +1,438 @@
+{
+  "all_events_replayed": true,
+  "all_rendered_data_match": true,
+  "candidate_results_sha256": "f0de94340e94c4c7263864e41085d4f9befa22aee5b4f758a5bfef326cab59dd",
+  "hashes_match": true,
+  "independent_recount": {
+    "audit_invalid": 5,
+    "audit_valid": 7,
+    "one_state:accepted": 7,
+    "one_state:invalid_accepted": 0,
+    "one_state:valid_rejected": 0,
+    "pipeline_completed": 9,
+    "simple_sql:accepted": 7,
+    "simple_sql:invalid_accepted": 0,
+    "simple_sql:valid_rejected": 0,
+    "structure:accepted": 9,
+    "structure:invalid_accepted": 2,
+    "structure:valid_rejected": 0,
+    "three_states:accepted": 7,
+    "three_states:invalid_accepted": 0,
+    "three_states:valid_rejected": 0
+  },
+  "records": 12,
+  "renderings": [
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_01_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 9,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_01_step_2",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 3,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_01_step_3",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 3,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_02_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_02_step_2",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 7,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_02_step_3",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 1,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_03_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_04_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_05_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_06_step_1",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 7,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_06_step_2",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 7,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    },
+    {
+      "all_data_match": true,
+      "exceptions": [],
+      "id": "sequence_06_step_3",
+      "warnings": [],
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "main",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 7,
+          "warnings": 0
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "exceptions": 0,
+          "id": "stable",
+          "kind": "dataframe",
+          "matched": true,
+          "rows": 4,
+          "warnings": 0
+        }
+      ]
+    }
+  ],
+  "sequence_state_continuity": true,
+  "summary_sha256": "001931990ad9487d9c87b9c2babd3d552015a6fe65a549bc8250cda97701a2cf",
+  "verified_at": "2026-09-08T07:52:50.697888+00:00",
+  "verifier_sha256": "3d835fc88b543cb0602cb043f435755f44b85553479ac40030dda3f699fc699e"
+}

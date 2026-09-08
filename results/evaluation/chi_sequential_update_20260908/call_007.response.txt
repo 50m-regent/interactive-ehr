@@ -1,0 +1,7 @@
+{
+  "scope": "data",
+  "rationale": "ユーザーの要望は主表示のデータを患者SYN_Bに切り替えることです。これは`main_data`データノードのSQLクエリの`WHERE`句を`patient = 'SYN_A'`から`patient = 'SYN_B'`に変更するだけで実現できます。ウィジェットの種別やタスクの構成は変わらないため、データノードのみの更新が最も効率的です。",
+  "target_node_ids": [
+    "main_data"
+  ]
+}

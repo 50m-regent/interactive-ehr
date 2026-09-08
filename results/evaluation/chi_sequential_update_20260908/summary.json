@@ -1,0 +1,47 @@
+{
+  "audit_invalid": 5,
+  "audit_valid": 7,
+  "conditions": {
+    "one_state": {
+      "accepted": 7,
+      "invalid_accepted": 0,
+      "valid_rejected": 0
+    },
+    "simple_sql": {
+      "accepted": 7,
+      "invalid_accepted": 0,
+      "valid_rejected": 0
+    },
+    "structure": {
+      "accepted": 9,
+      "invalid_accepted": 2,
+      "valid_rejected": 0
+    },
+    "three_states": {
+      "accepted": 7,
+      "invalid_accepted": 0,
+      "valid_rejected": 0
+    }
+  },
+  "first_invalid_by_sequence": {
+    "average_patient_unit": "sequence_03_step_1",
+    "chart_window_patient": "sequence_05_step_1",
+    "count_window_patient": "sequence_04_step_1",
+    "window_latest_unit": "sequence_01_step_2"
+  },
+  "n": 12,
+  "paired_disagreements": {
+    "one_state_vs_three_states": [],
+    "simple_sql_vs_three_states": []
+  },
+  "pipeline_completed": 9,
+  "planned_steps": 18,
+  "unattempted": [
+    "sequence_03_step_2",
+    "sequence_03_step_3",
+    "sequence_04_step_2",
+    "sequence_04_step_3",
+    "sequence_05_step_2",
+    "sequence_05_step_3"
+  ]
+}

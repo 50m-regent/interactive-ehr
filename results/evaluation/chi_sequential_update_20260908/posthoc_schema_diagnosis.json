@@ -1,0 +1,84 @@
+{
+  "jsonschema_version": "4.26.0",
+  "records": [
+    {
+      "application_errors": [
+        {
+          "location": [
+            "widget_node",
+            "widget",
+            "markdown"
+          ],
+          "message": "Value error, body or data_key must be provided",
+          "type": "value_error"
+        }
+      ],
+      "call": "call_014",
+      "generated_widget": {
+        "widget_type": "markdown"
+      },
+      "json_schema_errors": [],
+      "planned_widget_kind": "dataframe",
+      "request_sha256": "2143365dac0ec070aeb2cfa99ea03b2755e6638d9ab7f77cac9e2e84f25d0aae",
+      "response_sha256": "5f5b8108bba42efafa45cedf9c4c64f8d6a93a4285c4ebdda103a511d84aae18",
+      "schema_allows_application_invalid_output": true,
+      "step": "sequence_03_step_1",
+      "terminal_context_unchanged": true,
+      "terminal_graph_unchanged": true
+    },
+    {
+      "application_errors": [
+        {
+          "location": [
+            "widget_node",
+            "widget",
+            "markdown"
+          ],
+          "message": "Value error, body or data_key must be provided",
+          "type": "value_error"
+        }
+      ],
+      "call": "call_016",
+      "generated_widget": {
+        "widget_type": "markdown"
+      },
+      "json_schema_errors": [],
+      "planned_widget_kind": "dataframe",
+      "request_sha256": "6944b55ec5957106b24bde76d26a02875cb726737b80243965b62fb2736b8906",
+      "response_sha256": "2f505ecc0c864c67d6a607be9374cc18a70fcdfdaf1c1538572abe0a4d3bf050",
+      "schema_allows_application_invalid_output": true,
+      "step": "sequence_04_step_1",
+      "terminal_context_unchanged": true,
+      "terminal_graph_unchanged": true
+    },
+    {
+      "application_errors": [
+        {
+          "location": [
+            "widget_node",
+            "widget",
+            "markdown"
+          ],
+          "message": "Value error, body or data_key must be provided",
+          "type": "value_error"
+        }
+      ],
+      "call": "call_018",
+      "generated_widget": {
+        "widget_type": "markdown"
+      },
+      "json_schema_errors": [],
+      "planned_widget_kind": "dataframe",
+      "request_sha256": "60dc6679ef9f11ae9d7252a628d858e03e9b75a327757afd834c7807dc77e986",
+      "response_sha256": "cd50b49a6d27bd5496915cb59d95643df297123e34d4a8cfdfe8fe2b2e948a79",
+      "schema_allows_application_invalid_output": true,
+      "step": "sequence_05_step_1",
+      "terminal_context_unchanged": true,
+      "terminal_graph_unchanged": true
+    }
+  ],
+  "schema_application_mismatches": 3,
+  "source_sha256": "da7df22e461c0f1ad98d864f1e6687cb4c6d13615e08cb1f314b1d05bf41dbbf",
+  "status": "post_hoc_after_observing_pipeline_failures",
+  "widget_responses": 3
+}
