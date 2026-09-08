@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "Query": {
+      "additionalProperties": false,
+      "description": "One named, read-only query in the generated artifact.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "sql": {
+          "title": "Sql",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "sql"
+      ],
+      "title": "Query",
+      "type": "object"
+    },
+    "Widget": {
+      "additionalProperties": false,
+      "description": "Small supported subset of the repository's real widget renderer.",
+      "properties": {
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "data_key": {
+          "title": "Data Key",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "dataframe",
+            "line_chart"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "data_key",
+        "columns"
+      ],
+      "title": "Widget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Portable query and widget artifact generated in one model call.",
+  "properties": {
+    "queries": {
+      "items": {
+        "$ref": "#/$defs/Query"
+      },
+      "maxItems": 6,
+      "minItems": 1,
+      "title": "Queries",
+      "type": "array"
+    },
+    "widgets": {
+      "items": {
+        "$ref": "#/$defs/Widget"
+      },
+      "maxItems": 6,
+      "minItems": 1,
+      "title": "Widgets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "queries",
+    "widgets"
+  ],
+  "title": "Interface",
+  "type": "object"
+}

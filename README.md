@@ -220,6 +220,10 @@ uv run python scripts/run_tracebench_ehr.py \
 
 成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
 
+## 実生成による更新の予備評価
+
+実際のモデル出力を使う更新課題の予備評価を `experiments/chi-generated-update-20260908/` で準備しています。[Issue #53](https://github.com/50m-regent/interactive-ehr/issues/53)で、20件の合成課題、生成前に固定する条件、複数のデータ状態による検査を追跡します。既存の正式評価と異なる小さなSQL・表示仕様を用い、表示には既存のStreamlitレンダラを使います。本アプリ全体の生成性能や臨床的な有効性は評価しません。実行手順と停止条件は[実験計画](experiments/chi-generated-update-20260908/PROTOCOL.md)、入口は `scripts/run_generated_update_pilot.py`、テストは `tests/test_generated_update_pilot.py` です。
+
 ## セットアップ
 
 ```bash

@@ -1,0 +1,282 @@
+[
+  {
+    "family": "window",
+    "id": "update_01",
+    "request": "体重を直近7日間に広げてください。",
+    "target": {
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "window",
+    "id": "update_02",
+    "request": "体重を直近3日間に広げてください。",
+    "target": {
+      "days": 3,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "window",
+    "id": "update_03",
+    "request": "体重を直近14日間に広げてください。",
+    "target": {
+      "days": 14,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "window",
+    "id": "update_04",
+    "request": "体重を直近30日間に広げてください。",
+    "target": {
+      "days": 30,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "patient",
+    "id": "update_05",
+    "request": "体重ウィジェットだけ患者SYN_Bへ切り替えてください。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "family": "patient",
+    "id": "update_06",
+    "request": "体重ウィジェットだけ患者SYN_Cへ切り替えてください。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_C"
+    }
+  },
+  {
+    "family": "order",
+    "id": "update_07",
+    "request": "体重を新しい日時から順に並べてください。",
+    "target": {
+      "days": 1,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "limit",
+    "id": "update_08",
+    "request": "体重の最新1件だけを表示してください。",
+    "target": {
+      "days": 1,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": 1,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "limit",
+    "id": "update_09",
+    "request": "体重の最新3件までを、新しい順に表示してください。",
+    "target": {
+      "days": 1,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": 3,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "unit",
+    "id": "update_10",
+    "request": "体重をkgからgへ変換し、値と単位を合わせてください。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": true,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "measure",
+    "id": "update_11",
+    "request": "主ウィジェットを体重から脈拍へ切り替えてください。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "pulse",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "visualization",
+    "id": "update_12",
+    "request": "体重を折れ線グラフにしてください。横軸はobserved_at、縦軸はvalueです。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "line_chart",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "window_order",
+    "id": "update_13",
+    "request": "体重を直近7日間に広げ、新しい順にしてください。",
+    "target": {
+      "days": 7,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "window_order",
+    "id": "update_14",
+    "request": "体重を直近14日間に広げ、新しい順にしてください。",
+    "target": {
+      "days": 14,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "patient_window",
+    "id": "update_15",
+    "request": "体重ウィジェットだけを患者SYN_Bの直近7日間にしてください。",
+    "target": {
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "family": "patient_window",
+    "id": "update_16",
+    "request": "体重ウィジェットだけを患者SYN_Cの直近3日間にしてください。",
+    "target": {
+      "days": 3,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_C"
+    }
+  },
+  {
+    "family": "unit_window",
+    "id": "update_17",
+    "request": "体重を直近7日間に広げ、kgからgへ値と単位を変換してください。",
+    "target": {
+      "days": 7,
+      "descending": false,
+      "grams": true,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "unit_window",
+    "id": "update_18",
+    "request": "体重を直近30日間に広げ、kgからgへ値と単位を変換してください。",
+    "target": {
+      "days": 30,
+      "descending": false,
+      "grams": true,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "family": "patient_measure",
+    "id": "update_19",
+    "request": "主ウィジェットだけを患者SYN_Bの脈拍へ切り替えてください。",
+    "target": {
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "pulse",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "family": "window_limit",
+    "id": "update_20",
+    "request": "体重を直近7日間に広げ、最新3件までを新しい順に表示してください。",
+    "target": {
+      "days": 7,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": 3,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  }
+]
