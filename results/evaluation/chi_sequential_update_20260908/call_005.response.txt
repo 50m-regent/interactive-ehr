@@ -1,0 +1,7 @@
+{
+  "scope": "data",
+  "rationale": "ユーザー要望は、主表示の単位をkgからgに変換することです。これは、`main_data`データノードのSQLクエリを修正して、値(value)を1000倍し、単位(unit)を'g'に書き換えることで実現できます。データの取得方法(SQL)のみの変更であるため、scopeは`data`が最も適切です。",
+  "target_node_ids": [
+    "main_data"
+  ]
+}

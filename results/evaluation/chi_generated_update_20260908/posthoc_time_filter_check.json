@@ -1,0 +1,131 @@
+{
+  "accepted": 18,
+  "invalid_accepted": 0,
+  "n": 20,
+  "records": [
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_01",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_02",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_03",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_04",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_05",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_06",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_07",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": false,
+      "audit_valid": false,
+      "id": "update_08",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": false,
+      "audit_valid": false,
+      "id": "update_09",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_10",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_11",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_12",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_13",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_14",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_15",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_16",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_17",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_18",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_19",
+      "matches_three_state_decision": true
+    },
+    {
+      "accepted": true,
+      "audit_valid": true,
+      "id": "update_20",
+      "matches_three_state_decision": true
+    }
+  ],
+  "same_decisions_as_three_states": 20,
+  "source_sha256": "b559a43b677ef3b78d48f2d2feb2196e5a1b37a055afd66877d2b7ce7a2260e8",
+  "status": "post_hoc_after_inspecting_outputs",
+  "valid_rejected": 0
+}

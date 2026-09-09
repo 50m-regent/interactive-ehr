@@ -1,0 +1,35 @@
+{
+  "elapsed_seconds": 10.417934750001223,
+  "finish_reasons": [
+    "FinishReason.STOP"
+  ],
+  "id": "update_03",
+  "model_version": "gemini-2.5-pro",
+  "seed": 20260910,
+  "started_at": "2026-09-08T04:20:01.146812+00:00",
+  "status": "returned",
+  "text_sha256": "4dec2386fc3415a28a2f61591fbe588a36f2e43e9a00c17867dd3fa6b0fd53b7",
+  "usage": {
+    "cache_tokens_details": null,
+    "cached_content_token_count": null,
+    "candidates_token_count": 405,
+    "candidates_tokens_details": [
+      {
+        "modality": "TEXT",
+        "token_count": 405
+      }
+    ],
+    "prompt_token_count": 767,
+    "prompt_tokens_details": [
+      {
+        "modality": "TEXT",
+        "token_count": 767
+      }
+    ],
+    "thoughts_token_count": 856,
+    "tool_use_prompt_token_count": null,
+    "tool_use_prompt_tokens_details": null,
+    "total_token_count": 2028,
+    "traffic_type": "ON_DEMAND"
+  }
+}

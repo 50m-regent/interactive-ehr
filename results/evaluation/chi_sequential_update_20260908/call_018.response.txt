@@ -1,0 +1,9 @@
+{
+  "widget_node": {
+    "id": "main",
+    "widget": {
+      "widget_type": "markdown"
+    }
+  },
+  "sql": "SELECT 'This is a placeholder for a widget that is not yet implemented.' AS \"message\""
+}

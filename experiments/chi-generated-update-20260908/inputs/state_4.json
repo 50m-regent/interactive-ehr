@@ -1,0 +1,604 @@
+[
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 55.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": null
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 57.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 58.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 59.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 60.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 61.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 62.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 63.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 64.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_A",
+    "unit": "kg",
+    "value": 65.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 91.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 06:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 92.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 00:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 93.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 94.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 95.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": null
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 97.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 98.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 99.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 100.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 101.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 102.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 103.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 104.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_A",
+    "unit": "bpm",
+    "value": 105.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 71.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 06:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 72.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 00:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 73.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-07 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 74.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 75.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": null
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 77.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 78.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 79.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 80.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 81.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 82.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 83.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 84.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_B",
+    "unit": "kg",
+    "value": 85.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 111.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 06:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 112.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 00:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 113.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 114.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 115.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": null
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 117.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 118.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 119.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 120.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 121.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 122.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 123.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 124.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_B",
+    "unit": "bpm",
+    "value": 125.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 91.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 06:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 92.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-08 00:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 93.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-07 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 94.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 95.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": null
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 97.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 98.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 99.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 100.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 101.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 102.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 103.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 104.0
+  },
+  {
+    "measure": "weight",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_C",
+    "unit": "kg",
+    "value": 105.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 131.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 06:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 132.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-08 00:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 133.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 134.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-07 11:59:59",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 135.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-06 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": null
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 137.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-05 11:59:59",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 138.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 139.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-01 11:59:59",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 140.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 141.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-25 11:59:59",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 142.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-09 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 143.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-08-08 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 144.0
+  },
+  {
+    "measure": "pulse",
+    "observed_at": "2026-09-09 12:00:00",
+    "patient": "SYN_C",
+    "unit": "bpm",
+    "value": 145.0
+  }
+]

@@ -1,0 +1,13 @@
+合成データだけのUI更新課題です。利用できるテーブルとDWHモデルはmeasurementsです。
+スキーマ: CREATE TABLE measurements (patient TEXT, measure TEXT, observed_at TEXT, value REAL, unit TEXT)
+patientはSYN_A/SYN_B/SYN_C、measureはweightまたはpulseです。
+weightはkg、pulseはbpmです。valueがNULLなら欠損です。
+observed_atはYYYY-MM-DD HH:MM:SSのTEXTです。基準日時は2026-09-08 12:00:00です。
+直近N日間は基準日時-N日以上、基準日時以下の両端を含む範囲です。
+明示していない条件は現在のまま保持してください。stableの脈拍表示は変更対象外です。
+overview/main/stable/main_data/stable_dataのIDと対応関係を保持してください。
+測定値の一覧はobserved_at,value,unitをこの順で返します。集約ではvalue,unitを返します。
+表はSQL結果の列を順にすべて表示します。折れ線はx=observed_at,y=valueです。
+新しい表示部品や説明文は追加しません。タイトルの言い換えは許容します。
+今回の更新要求:
+主表示を新しい日時から順に並べてください。

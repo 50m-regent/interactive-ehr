@@ -7,7 +7,7 @@
 
 \settopmatter{printacmref=true,printccs=true,printfolios=true}
 \setcopyright{none}
-\acmConference[CHI '27]{Proceedings of the 2027 CHI Conference on Human Factors in Computing Systems}{May 2027}{Barcelona, Spain}
+\acmConference[CHI '27]{2027 CHI Conference on Human Factors in Computing Systems}{2027}{Pittsburgh, PA, USA}
 \acmYear{2027}
 \copyrightyear{2027}
 
@@ -21,7 +21,7 @@
 \begin{document}
 
 \begin{abstract}
-Generated clinical interfaces must do more than produce executable SQL and renderable screens: they must deliver the patient, item, time range, source, and presentation required by a clinical scenario. We define a cross-layer inconsistency as a broken correspondence among an information need, SQL, its result, and its presentation. Using EHRSQL-2024 and MIMIC-IV Demo, we deterministically generated eight inconsistency types and compared local validation, artifact-level contracts, a graph-based cross-layer contract, and a tabular cross-layer contract with equivalent relational content. Across 6,104 validations from 763 update pairs, local validation and artifact-level contracts accepted 100.00\% and 48.10\% of inconsistent candidates. The two cross-layer contracts rejected every inconsistent candidate and accepted every valid one. Their identical results show that executable cross-layer relations, rather than graph storage itself, enabled detection. We position integrity as a prerequisite for evaluating clinically appropriate user experiences, not as evidence of user benefit.
+Data-backed interfaces can remain executable while updates change requested information. We examine reference-based integrity checks using 763 update pairs with eight injected fault types. Local checks accept every fault by construction; two cross-layer implementations reject every fault but share references and checking functions. A stress test shows that exact matching rejects 648 result-preserving SQL alternatives, while removing query equality lets 329 of 476 result-changing queries pass. Exploratory studies examine 20 independent updates, followed by six planned three-step sequences using the application pipeline. Time-window loss appears in both studies, but execution-based checks and simpler predicates make identical decisions. Three sequential attempts fail schema validation, leaving six steps unattempted. Multiple database states add no discrimination among observed outputs. These results expose limits of reference matching and generation contracts, without establishing an advantage for graph representation, general semantic validation, or clinical utility.
 \end{abstract}
 
 \begin{CCSXML}
@@ -48,37 +48,39 @@ Generated clinical interfaces must do more than produce executable SQL and rende
 
 \section{Introduction}
 
-A useful clinical interface depends on the situation in which it is used. In a preoperative anesthesia clinic, a clinician may need to assemble a patient's background, planned procedure, and recent tests for a one-time assessment and then document anesthesia risks. In follow-up after thyroid surgery, a clinician may instead compare thyroid function, ultrasound findings, and hormone-replacement doses every three to six months. The same electronic health record therefore calls for different variables, time windows, sources, and presentations. The goal of a generated interface is not merely to produce SQL. It is to return the information required for a clinical task in a form that a clinician can review.
+Clinical records may contain more information than a person can review for a particular task. Selecting and arranging that information introduces choices about patient, item, period, source, and presentation. An interface can reduce what is shown while also hiding a mismatch between what was requested and what was retrieved. We investigate a technical way to expose such mismatches during updates. This paper does not measure a person's information-processing capacity or demonstrate a reduction in review burden.
+
+For illustration, a preoperative assessment might summarize recent findings, whereas a follow-up view might combine selected trends and current values. These are motivating design examples, not validated clinical requirements or evaluation tasks. They motivate a data-backed interface whose information changes with a request, and the need to check the correspondence from request to presentation.
 
 Existing technical checks leave a gap relative to that goal. SQL syntax, query execution, result schemas, interface code, and rendering can each be validated independently. Yet every artifact may pass while a query selects another patient, omits a time filter, leaves a result from the previous update, or connects a widget to the wrong data. Better text-to-SQL accuracy does not ensure that the same information need survives subsequent execution, connection, and presentation. A system can therefore work mechanically while returning information that does not answer the user's request.
 
 We call a broken semantic correspondence between a scenario-grounded information need and the displayed information a \term{cross-layer inconsistency}. We evaluate a generated clinical interface as a process spanning an information need, SQL, an execution result, and a presentation, rather than as a collection of independently valid artifacts. Correctness here does not mean that the complete clinical judgment is correct. It means that the patient, item, time, aggregation, source, presentation, connection, and version specified for an update remain consistent across layers.
 
-Research on generative and malleable interfaces has connected natural-language requests to interfaces through task models and semantic representations. Jelly preserves evolving information tasks in a task-driven data model and supports updates through natural language and direct manipulation~\cite{cao2025jelly}. Bridging Gulfs places a semantic representation of design intent between user input and generated interfaces so that users can inspect interpretations as they generate~\cite{park2026bridging}. SimStep separates concept, scenario, learning-objective, and interface graphs, allowing people to inspect and repair assumptions at multiple levels~\cite{kaputa2026simstep}. These systems demonstrate the value of intermediate representations. They do not, however, compare which relationships fail across a data-backed interface update and which validation conditions detect those failures on the same candidates.
+Research on generative and malleable interfaces connects requests to interfaces through intermediate representations. Jelly maintains an evolving task-driven data model~\cite{cao2025jelly}; Bridging Gulfs exposes semantic design intent~\cite{park2026bridging}; SimStep supports inspection and correction across task-level abstractions and evaluates fidelity across transformations~\cite{kaputa2026simstep}. Our comparison focuses on eight injected faults in request-to-data correspondence, applying four specified checking conditions to the same candidates.
 
-We built an evaluation framework for cross-layer inconsistencies in generated clinical interface updates. We execute the clinical information requests and reference SQL in EHRSQL-2024~\cite{lee2024ehrsql} on the publicly available MIMIC-IV Clinical Database Demo v2.2~\cite{johnson2023mimic} and construct baseline data-driven interfaces. We then introduce one of eight inconsistencies: patient, clinical item, time, aggregation, information source, presentation, data-presentation connection, or stale result. An oracle implemented independently from candidate generation verifies the expected labels. Each candidate is evaluated under the same four validation conditions. This benchmark measures one prerequisite in the process of generating a clinically appropriate user experience: whether the requested information reaches the presentation unchanged.
+We built a reference-based regression-testing framework for cross-layer inconsistencies in updates to clinical data-backed interfaces. EHRSQL-2024 supplies annotated questions and reference SQL~\cite{lee2024ehrsql}; MIMIC-IV Clinical Database Demo v2.2 supplies execution data~\cite{johnson2023mimic}. The framework constructs minimal data and presentation artifacts and injects eight predefined fault types. The primary benchmark does not run a UI-generating model or test rendered screens; a separate constrained generation pilot is described in Section~\ref{sec:generated-pilot}. A separately implemented oracle checks candidates against a contract: selected fields and expected values derived from the known target case. Both full validation conditions also receive that contract. Thus, the evaluation examines whether predefined checks cover injected faults when trusted reference information is available.
 
 We ask:
 
 \begin{description}
-  \item[RQ1] Which of the eight modeled information errors pass when SQL and presentation components are validated individually?
-  \item[RQ2] How do local validation, artifact-level contracts, and cross-layer contracts differ in inconsistency leakage, valid-update acceptance, and fault localization?
-  \item[RQ3] Which inconsistencies can be corrected by one automatic repair based on a localized validation failure?
+  \item[RQ1] Which of the eight fault types can be constructed while preserving the local checks?
+  \item[RQ2] How do local validation, artifact-level contracts, and cross-layer contracts differ in inconsistency leakage, valid-update acceptance, and fault-type coverage?
+  \item[RQ3] For which rejected injections does a reported fault type enable one restoration from a saved valid artifact?
 \end{description}
 
-After freezing the evaluation method, we ran the test split once. We formed 763 update pairs from 134 question templates and performed 6,104 validations of valid and inconsistent candidates under four conditions. Local validation accepted all 763 inconsistent candidates, while artifact-level contracts accepted 367. A graph-based cross-layer contract and a tabular cross-layer contract with equivalent relational content both rejected every inconsistent candidate and accepted every valid candidate. They produced identical decisions, localizations, and one-step repairs. This result does not support an advantage of graph storage for detection. What separated the conditions was the ability to represent cross-layer semantic relations as executable contracts.
+After freezing the evaluation method, we ran the test split once. We formed 763 update pairs from 134 question templates and performed 6,104 validations. Local validation accepted all inconsistent candidates because passing that condition is required for inclusion. Artifact-level contracts accepted 367; both full conditions rejected all inconsistent candidates and accepted all reference-valid candidates. The full conditions share core checking functions as well as expected values. Their agreement is an implementation consistency check, not independent evidence that storage representation has no effect.
 
-This paper makes five contributions:
+An exploratory follow-up tests the reference dependence directly. Both full conditions reject all 648 query wrappers that preserve columns and typed result multisets on the same database. Reconstructed decisions without query equality accept these alternatives but also accept 329 of 476 result-changing equality inversions. Thus, acceptance of reference-derived candidates does not imply tolerance of valid alternatives.
+
+The paper contributes a bounded evaluation artifact:
 
 \begin{itemize}
-  \item We separate the evaluation of generated clinical interfaces into the clinical validity of task definitions, cross-layer integrity, and clinicians' use of the resulting presentation, recognizing that information needs and appropriate presentations vary by clinical scenario.
-  \item We operationalize information errors in incremental data-driven interface updates as eight inconsistency types covering patient, item, time, aggregation, source, presentation, connection, and stale result.
-  \item We provide a reproducible method that deterministically generates inconsistent candidates on public demo data and checks them with an oracle independent of candidate generation.
-  \item We apply four validation conditions to the same candidates and quantify where artifact-level validity fails to ensure cross-layer integrity.
-  \item From the null difference between graph-based and tabular cross-layer contracts with equivalent content, we derive the design implication that generated interfaces require testable cross-layer relations, not a particular storage format.
+  \item A fault model for request, query, result, and presentation correspondence, with eight deterministic injection rules and explicit construction gates.
+  \item A reproducible protocol that pairs reference-valid and inconsistent candidates, applies four specified checking conditions, and records detection, type reporting, and reference-assisted restoration.
+  \item An analysis connecting implemented checks to detected and missed fault types, with explicit reference assumptions.
 \end{itemize}
 
-This is a technical evaluation. It does not evaluate the clinical validity of the scenario models, clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, or deployment. We maintain this boundary while arguing that the integrity of retrieval and presentation is a prerequisite for returning value to users.
+This is a technical evaluation. It does not evaluate the clinical validity of the scenario models, clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, or deployment. We treat technical correspondence and user benefit as separate evaluation targets.
 
 \section{Related Work}
 
@@ -88,13 +90,13 @@ Generative-interface research has moved from producing screens from natural lang
 
 Intermediate representations provide structure for such updates. Jelly places a task-driven data model behind a generated interface and propagates task changes into data and views~\cite{cao2025jelly}. Bridging Gulfs uses semantic representations to narrow gaps among user intent, model interpretation, and interface output~\cite{park2026bridging}. SimStep separates graphs for concepts, scenarios, learning objectives, and interfaces so that assumptions can be inspected and repaired across stages~\cite{kaputa2026simstep}. Across these systems, intermediate representations become points of contact for inspection and repair.
 
-We study a narrower question. We do not compare initial generation quality or the experience of editing an interface. We test whether semantic relations to data survive an update. Although our system can store relations as a graph, the graph form is not itself a claimed contribution. We also encode equivalent relations in a tabular representation, separating the effect of validation content from the effect of storage form.
+We study a narrower question: which specified checks cover faults injected into an update with known reference information? We do not compare initial generation quality or editing experience. The graph and tabular conditions provide two access paths to shared checking logic; they do not isolate the effect of storage architecture.
 
 \subsection{Inspection and Repair in Human-AI Collaboration}
 
 People do not simply accept or reject generated suggestions. Ignore, Trust, or Negotiate documents how clinicians ignore, trust, and negotiate AI suggestions, and argues for interactions that expose uncertainty and supporting information~\cite{sivaraman2023ignore}. For generated interfaces, an undifferentiated error message may be less actionable than a diagnosis that identifies the broken relationship and the scope affected by a repair.
 
-Debugging support must enable movement from detecting failure to locating its cause. We measure detection, fault localization, and one-step repair separately. This distinction separates a validator that rejects broadly from one that returns a diagnosis that can drive correction. We do not evaluate whether a person understands the resulting diagnosis. Machine-readable localization and support for human judgment remain separate research questions.
+A rejection and an actionable diagnosis need not coincide. We record whether a validator rejects a fault, whether it reports the injected type, and whether a routine using that type and a saved valid artifact restores the candidate. The latter two measurements are coupled by the restoration procedure. Neither measures whether a person can locate or correct an error from the diagnosis.
 
 \subsection{From Natural-Language Questions to Data and Presentation}
 
@@ -106,7 +108,7 @@ We do not compare SQL-generation performance. We use reference SQL as a starting
 
 Bidirectional-transformation research has formalized how updates to structured sources and views should correspond. Lenses define laws for transformations between a source and its view~\cite{foster2007lenses}. Metamorphic testing has also been proposed for model transformations where enumerating every correct output is difficult, using invariant relations instead of complete expected outputs~\cite{he2018metamorphic}.
 
-We likewise avoid requiring exact equality of complete interface JSON. We encode the relationships that should change and those that should remain invariant. Stable identifiers, order, and display wording may vary without changing meaning, while a visually similar interface can still be inconsistent if it refers to another patient, a different period, or a stale result. Our contribution relative to prior consistency work is to place a user's natural-language information need, data retrieval, execution result, and presentation boundaries in one evaluation unit for generated-interface updates.
+The oracle problem concerns how a test distinguishes expected behavior from a fault; prior work includes specification-based, derived, and partial oracles~\cite{barr2015oracle}. Our implementation uses a restricted reference oracle: it requires equality of selected query, result, and binding fields from a known target. It does not implement lens laws or establish general semantic equivalence. The connection to consistency testing is methodological; the proposed artifact specializes fault injection and reference checking to boundaries in data-backed interface updates.
 
 \section{Clinical Problem and Evaluation Scope}
 
@@ -114,7 +116,7 @@ We likewise avoid requiring exact equality of complete interface JSON. We encode
 
 Our design process organized two clinical scenarios that motivated this work: a preoperative anesthesia clinic and follow-up after thyroid surgery. In the preoperative scenario, the surgery date anchors a one-time assessment that brings together patient demographics, the planned procedure, lifestyle and allergy information, medical and treatment histories, recent examinations, and prior anesthesia records. The clinician ultimately compiles a list of anesthesia risks. This scenario emphasizes a broad view of the patient's latest state.
 
-In post-thyroidectomy follow-up, the visit date anchors the review. The clinician examines thyroid function, ultrasound findings, and levothyroxine replacement dose. Thyroid function and dose require a twelve-month trend, while other tasks use the latest values. Appropriate views therefore combine longitudinal trends with current summaries.
+In post-thyroidectomy follow-up, the visit date anchors the review. The clinician examines thyroid function, ultrasound findings, and levothyroxine replacement dose. In this design example, thyroid function and dose use a twelve-month trend, while other tasks use the latest values. Appropriate views therefore combine longitudinal trends with current summaries.
 
 Figure~\ref{fig:scenario-to-value} illustrates these differences and the scope of this paper. The scenarios are design examples, not clinically validated ground truth for our benchmark. Their task models have not completed expert validation. We use them to explain why the information and presentation retrieved from the same electronic health record must depend on a clinical scenario.
 
@@ -126,17 +128,17 @@ Figure~\ref{fig:scenario-to-value} illustrates these differences and the scope o
   \label{fig:scenario-to-value}
 \end{figure}
 
-\subsection{A Causal Path to User Value}
+\subsection{From Technical Correspondence to User Value}
 
-At least three conditions separate a generated clinical interface from value to a clinician. First, domain experts must define questions, required information, and completion criteria for a clinical scenario. Second, the system must translate the resulting information need into appropriate retrieval and presentation. Third, a clinician must use the presentation to review necessary information and perform the clinical task. This paper directly evaluates the second condition.
+At least three conditions separate a generated clinical interface from value to a clinician. First, domain experts must define questions, required information, and completion criteria for a clinical scenario. Second, the system must translate the resulting information need into appropriate retrieval and presentation. Third, a clinician must use the presentation to review necessary information and perform the clinical task. This paper tests selected reference checks related to the second condition, using a known target; it does not evaluate that condition as a whole.
 
-Our results cannot show that cross-layer integrity reduces verification effort or missed information. Instead, integrity is a precondition for evaluating an experience built on appropriate information. Measuring completion time or preference on a screen that refers to the wrong patient or period would not establish that the interface supports its intended clinical task. A future study should use expert-reviewed scenarios and synthetic cases to measure incorrect acceptance of faulty updates, acceptance of valid updates, fault localization, repair, review time, interaction counts, and cognitive load as distinct outcomes.
+Our results cannot show that cross-layer integrity reduces verification effort or missed information. We examine selected technical checks separately from user experience. In a later user study, information correctness should be assessed alongside completion time and preference, so that a fast but incorrect response is not counted as a successful clinical task.
 
 \subsection{Defining an Information Error}
 
 Information can be wrong at several stages. This study does not determine whether source records are factually correct, whether a scenario's task model is clinically appropriate, or whether a clinician makes the correct judgment after viewing the interface. We define an \term{information error} within our scope as a state in which information delivered to the screen does not match a specified information need in at least one of eight dimensions: patient, item, time, aggregation, source, presentation, connection, or version. A cross-layer inconsistency localizes such an error to a relationship between artifacts.
 
-This definition distinguishes a query that fails to run from a query that runs while retrieving different information. Local validation can detect the former. Detecting the latter requires comparison between the information need and SQL, between SQL and its execution result, and between the result and its presentation.
+This definition distinguishes an ill-formed query from a well-formed query that retrieves different information. The local validator checks permitted SQL form and artifact compatibility. Detecting a mismatch with a request additionally requires a trusted expectation; the full conditions in this experiment receive that expectation from the target case.
 
 \section{Defining Cross-Layer Integrity}
 
@@ -147,20 +149,20 @@ We model four layers: information need, SQL, execution result, and presentation 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{detection-mechanism-en.pdf}
-  \caption{Local and cross-layer validation. Above, the need, SQL, result, and presentation each pass an isolated check, while the patient and time mismatch between the need and SQL remains unchecked. Below, cross-layer predicates compare these values across adjacent artifacts and localize the fault between the need and SQL. When the required value is unique, the same relation supports one repair attempt.}
-  \Description{The top row shows an information need, SQL, result, and presentation passing local checks, while a patient and time mismatch between the need and SQL is not checked. The bottom row shows Patient A and the last 24 hours in the information need but Patient B and no time filter in SQL. The patient and time predicates fail, localizing the fault between the request and SQL.}
+  \caption{Illustrative patient mismatch, using invented labels. The local validator checks permitted SQL form and artifact compatibility without comparing the requested patient. The full checks compare the candidate against a known target contract. Patient B differs from reference Patient A; the 24-hour interval is unchanged. The diagnosis can report a patient fault, but the evaluation does not score the exact node or edge location.}
+  \Description{The same illustrative update passes local checks but fails a comparison with the known target patient. Both reference and candidate use 24 hours. SQL, result, and presentation remain mutually compatible.}
   \label{fig:detection-mechanism}
 \end{figure}
 
-Figure~\ref{fig:detection-mechanism} explains why cross-layer inconsistencies are detectable. Local validation inspects only the inside of each box. A cross-layer contract compares semantic keys parsed from an information need against the parsed SQL; compares the SQL version against the result version; and compares the result reference and shape against the presentation component. On a mismatch, it returns both the failed predicate and the pair of artifacts joined by that predicate. Detection therefore does not arise from graph traversal alone. It arises because equivalent meanings can be compared at artifact boundaries.
+Figure~\ref{fig:detection-mechanism} illustrates a single patient mismatch. The implementation derives expected values from annotated target cases and reference SQL, rather than extracting a validated clinical intent from arbitrary prose. It compares selected query, result, reference, and presentation fields and returns issue codes and type labels. The figure depicts the conceptual flow; exact checks and the privileged information used by the oracle and restoration routine are specified below.
 
-An update candidate $c$ satisfies cross-layer integrity when the information need and SQL have the same meaning, the SQL and execution result have matching versions, and the result and presentation agree in reference and presentation form. We express this as:
+For conceptual organization of the fault model, we express the required correspondences of an update candidate $c$ as a conjunction. The implemented checks use selected reference fields; the equation is not a general semantic-equivalence test:
 
 \begin{equation}
 I(c)=P(c)\land D(c)\land T(c)\land A(c)\land S(c)\land V(c)\land L(c)\land R(c)
 \end{equation}
 
-$P$ denotes patient, $D$ clinical item, $T$ time, $A$ aggregation, $S$ source, $V$ presentation form, $L$ the data-presentation link, and $R$ the correspondence between SQL and result versions. Valid candidates satisfy all eight predicates. Each inconsistent candidate violates exactly one.
+$P$ denotes patient, $D$ clinical item, $T$ time, $A$ aggregation, $S$ source, $V$ presentation form, $L$ the data-presentation link, and $R$ the correspondence between SQL and result versions. These symbols organize the fault model rather than specify the exact implementation of the oracle. Each inconsistent candidate receives one injection rule; that mutation may trigger several failed checks. Passing the selected reference checks is narrower than satisfying general semantic equivalence.
 
 \subsection{Eight Inconsistency Types}
 
@@ -171,21 +173,21 @@ Table~\ref{tab:mutations} defines the eight inconsistencies. A patient inconsist
   \label{tab:mutations}
   \begin{tabularx}{\linewidth}{lYY}
     \toprule
-    Type & Mutated element & Checks the candidate may still pass \\
+    Type & Mutated element & Properties preserved during construction \\
     \midrule
     Patient & Patient condition in SQL & Syntax, read-only, execution \\
     Clinical item & Selected column or target & Syntax, execution, result type \\
     Time & Point or interval condition & Syntax, execution \\
     Aggregation & Count, maximum, minimum, mean, etc. & Syntax, execution, result type \\
-    Source & Referenced table & Syntax, execution \\
-    Presentation & Component used to show result & UI structure, rendering \\
+    Source & Recorded provenance metadata & SQL remains unchanged \\
+    Presentation & Component used to show result & Reference and shape checks \\
     Connection & Data node referenced by component & Per-node type \\
-    Stale result & Result version after SQL update & SQL execution, result type, rendering \\
+    Stale result & Result version after SQL update & Existing result schema \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-A source inconsistency changes the table referenced by SQL relative to the source associated with the information need. For presentation inconsistency, SQL, result, columns, and values remain fixed while the baseline component type changes: for example, a scalar metric becomes a dataframe, or a dataframe uses another table component. A connection inconsistency redirects a presentation component to another data node. A stale-result inconsistency updates SQL while retaining the execution result from the earlier version.
+A source inconsistency changes the recorded provenance-table metadata while leaving SQL and its result fixed. It does not execute a query against an alternative table. A presentation inconsistency changes the baseline component type while preserving SQL and data: a metric becomes a dataframe, or a dataframe becomes another table component. The label denotes violation of a predetermined presentation rule; it does not establish that the alternative is misleading or clinically inappropriate. A connection inconsistency redirects the widget to the source data node with compatible columns and mapping. A stale-result inconsistency attaches the source result to the target query when the two result digests differ.
 
 These categories are not an empirical distribution of errors observed in clinical practice. They form a fault model that makes specific relationships testable. Because we inject one inconsistency into each candidate, the results do not characterize performance on compound failures.
 
@@ -195,42 +197,46 @@ These categories are not an empirical distribution of errors observed in clinica
 
 The inputs are answerable questions and reference SQL from EHRSQL-2024. Unanswerable cases lack reference SQL from which to construct a baseline interface, so we exclude them from the primary evaluation while recording their count. Reference queries are executed read-only against the SQLite version of MIMIC-IV Demo v2.2. We reject statements that write data, contain multiple statements, or use disallowed syntax before execution, and impose a five-second limit on each query.
 
-We use a metric component when an execution result is a single value and a dataframe when it contains multiple rows or columns. Empty results are retained as results with a defined column structure. Each baseline case stores semantic slots parsed from the question template, parsed SQL, result shape, data node, presentation component, and version identifiers for these artifacts.
+We use a metric component when an execution result is a single value and a dataframe when it contains multiple rows or columns. Empty results are retained as results with a defined column structure. Each baseline case stores annotated patient, item, time, and aggregation fields associated with the question template, parsed SQL, result shape, data node, presentation component, and version identifiers for these artifacts.
 
-Cases sharing a question template and SQL structure are paired as before-and-after updates. From each pair, we create a valid candidate in which all relations are updated together and an inconsistent candidate in which exactly one relation is broken. Candidates derived from the same question form are not independent. Our statistical procedure therefore resamples question templates rather than individual candidates.
+We group cases by question-template string and consider ordered source-target pairs within each group. For each template and fault type, a seeded hash orders eligible descriptors; we retain the first pair that passes construction checks. Thus, there is at most one pair per template and type. A template can contribute to several types, and the same underlying source or target case can recur. These are constructed transitions, not observed sequences of user edits.
 
-\subsection{Independent Oracle}
+For inclusion, a valid candidate must pass the reference oracle, its injected counterpart must fail that oracle, and the inconsistent candidate must pass local validation. This last gate intentionally concentrates the benchmark on locally admissible faults and makes 100\% local leakage true by construction. It is not an estimate of failure prevalence or of local-check accuracy on naturally generated candidates.
 
-Candidate generation and ground-truth evaluation are implemented as separate processes. The oracle compares semantic slots from the question template, parsed SQL, the execution result's shape and version, and references between data nodes and presentation components. Evaluation stops if the label expected by the candidate generator disagrees with the oracle.
+\subsection{Reference Oracle and Its Dependence on the Contract}
 
-The oracle does not require exact equality of complete JSON. This choice permits differences in stable identifiers, ordering, and presentation text that do not change meaning. Conversely, a candidate is inconsistent when it refers to another patient, period, or result version even if the visible screen appears similar. The oracle thereby separates surface similarity from semantic correspondence.
+The oracle is implemented separately from mutation generation and validator dispatch, but it uses the same target-case contract. It checks the question checksum, normalized reference-SQL checksum, provenance-table list, result-query checksum, result digest, column checksums, widget identifier, data-node binding, fields, and component type. This is equality of selected reference fields, not an independent judgment of clinical intent or SQL semantic equivalence.
+
+The oracle does not compare the complete JSON document. It nevertheless requires the selected identifiers, column order, SQL checksum, and other contract fields to match. A semantically equivalent alternative query or presentation may fail these reference checks. Valid candidates in this experiment are constructed from the reference itself; their acceptance cannot estimate acceptance of diverse valid solutions. Separate code paths reduce some implementation coupling, but common reference errors can affect generation, the oracle, and full validation together.
 
 \subsection{Four Validation Conditions}
 
-We apply the same candidate to the four conditions in Table~\ref{tab:conditions}. \condition{Local validation} checks artifacts separately: SQL must be read-only and executable, artifacts must conform to their schemas, and the presentation component must accept the result type. \condition{Artifact-level contracts} add detailed predicates within individual artifacts and check a subset of adjacent-layer relations, but do not validate the complete chain from the information need through presentation.
+We apply the same candidate to the four conditions in Table~\ref{tab:conditions}. \condition{Local validation} checks SQL syntax and permitted read-only form, node-reference existence, a nonempty column schema, widget-field membership, and metric-shape compatibility. Query execution occurs during candidate construction, not during the timed validator call. No browser rendering is checked. \condition{Artifact-level contracts} additionally compare recorded provenance with tables parsed from SQL, the result's query checksum with current SQL, and the widget type with the type assigned from result shape. Despite its short name, this condition includes these adjacent-artifact checks. It does not compare the target request annotations or target binding against the full reference contract.
 
-The \condition{graph-based cross-layer contract} represents question templates, SQL, results, data nodes, and presentation components as nodes, with edges for patient, item, time, aggregation, source, version, reference, and presentation relations. After an update, affected relations are evaluated again. The \condition{tabular cross-layer contract} stores the same semantic slots and correspondences in a single sidecar table and validates the same predicates. Giving both conditions equivalent content separates the effect of what is checked from the effect of graph storage.
+The \condition{graph-based cross-layer contract} follows the question, target data artifact, and widget references and compares them with the target contract. The \condition{tabular cross-layer contract} first compares flat fields against the same expected values. Both then call the same semantic-query, target-data, and target-widget checking functions. The semantic-query function checks annotated literals or normalized fragments and also requires equality with the normalized reference-SQL checksum. Neither implementation infers correctness from unrestricted natural language. These are two access paths over shared checking logic, not independently implemented storage architectures. Their agreement cannot establish a causal effect of storage form.
 
 \begin{table}[t]
   \caption{Four validation conditions}
   \label{tab:conditions}
   \begin{tabularx}{\linewidth}{lYYY}
     \toprule
-    Condition & Individual artifacts & Cross-layer relations & Storage \\
+    Condition & Individual artifacts & Cross-layer relations & Access \\
     \midrule
-    Local validation & Basic checks & None & Artifacts \\
+    Local validation & Basic checks & Reference existence; shape & Artifacts \\
     Artifact-level & Detailed checks & Partial & Artifacts \\
-    Graph-based & Detailed checks & All & Nodes and edges \\
-    Tabular & Detailed checks & All & One table \\
+    Graph-based & Same lower checks & Target reference & Linked access \\
+    Tabular & Same lower checks & Same target reference & Flat access \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\subsection{Localization and One-Step Repair}
+\subsection{Fault-Type Reporting and Reference-Assisted Restoration}
 
-When a validator rejects a candidate, it returns the failed predicate and the related artifacts as a diagnosis. We count localization as successful only when the diagnosis identifies the injected inconsistency type. Detecting an inconsistency while returning the wrong location or type does not count as successful localization.
+A diagnosis contains an issue code, a layer label, and sometimes a fault-type label. We score fault-type coverage when the injected type is present in the set of reported type labels. We do not require a unique diagnosis, penalize extra type labels in this score, or verify an exact node or edge location. We therefore interpret this metric as fault-type coverage.
 
-Repair uses the diagnosis once to restore a value uniquely determined by the baseline contract. A presentation component's reference, result version, or presentation form can, for example, be restored from its correspondence in the contract. We run the oracle's integrity predicates after repair and count success only if the candidate satisfies all of them. Repair does not search, retry, or invoke a generative model.
+The restoration routine receives the injection type and the saved valid candidate. If the reported labels include the injected type, it copies the complete target data artifact for SQL, provenance, or stale-result faults, or the complete valid widget for presentation and connection faults. Otherwise it returns the candidate unchanged. The restored candidate must pass both the same validator and the reference oracle.
+
+This procedure tests recovery with privileged reference information. It does not infer the injected type solely from the diagnosis, synthesize a minimal patch, or discover a correct state from an unknown error. Restoration attempts are gated by the known invalid label and validator rejection. Consequently, this protocol does not measure the risk of modifying an incorrectly rejected valid update.
 
 \subsection{Evaluation Protocol}
 
@@ -239,36 +245,67 @@ Figure~\ref{fig:protocol} summarizes the protocol. On development data, we prior
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{evaluation-protocol-en.pdf}
-  \caption{Evaluation protocol. Reference SQL yields a baseline case. A pair of cases with the same question form yields a valid update; changing one relation yields an inconsistent candidate. An independent oracle verifies candidate labels. We then apply local validation, artifact-level contracts, a graph-based cross-layer contract, and a tabular cross-layer contract, and record leakage, valid acceptance, localization, and one repair attempt. The oracle also verifies repaired candidates.}
-  \Description{Reference SQL produces an update pair and candidates whose labels are checked by an independent oracle. The candidates are evaluated under four conditions, localized, and repaired once, after which an arrow returns to the oracle.}
+  \caption{Evaluation protocol and reference information. Candidates are retained only if their labels match the reference oracle and the inconsistent candidate passes local checks. The oracle and both full conditions use the same target contract; the full conditions also share core checks. Restoration receives the known invalid label, injected type, and saved valid candidate, and must pass the same validator and oracle afterward.}
+  \Description{Known target information supplies candidate construction, the oracle, and full validation. Selected candidates enter four conditions, followed by type reporting. A separate restoration step uses the injected type and saved valid component and is rechecked.}
   \label{fig:protocol}
 \end{figure}
 
-After the validation-data criteria were met, we froze the evaluation code, configuration, and analysis at Git commit \texttt{baa82075b6bf}. We then ran the test split once. No generative or external model was called during evaluation.
+After the validation-data criteria were met, we froze the evaluation code, configuration, and analysis in a versioned execution manifest. We then ran the test split once. No generative or external model was called during evaluation.
 
 \subsection{Metrics and Statistical Analysis}
 
-The primary metrics are \term{inconsistency leakage rate} and \term{valid-update acceptance rate}. Leakage is the proportion of injected inconsistent candidates accepted by a validator and is better when lower. Valid acceptance is the proportion of candidates with all relations correctly updated that are accepted and is better when higher. Secondary metrics are fault-localization rate, one-step repair success rate, and mean validation time per candidate.
+The primary metrics are \term{inconsistency leakage rate} and \term{valid-update acceptance rate}. Leakage is the fraction of injected inconsistent candidates accepted; valid acceptance is the fraction of reference-valid candidates accepted. Secondary metrics are fault-type coverage, reference-assisted restoration success, and mean validation time per candidate. Type coverage divides correctly reported injections by all 763 injections. Restoration is reported both per attempted restoration and per injected fault.
 
-We calculate condition differences within the same candidates. We obtain 95\% confidence intervals from 10,000 cluster bootstrap resamples at the question-template level. Resampling templates rather than candidates prevents cases derived from the same SQL structure and mutation rule from being treated as independent examples.
+We calculate paired condition differences and use 10,000 question-template cluster bootstrap resamples for 95\% intervals. This retains dependence among candidates from one template. It does not address shared patients, overlapping cases, or common injection rules across templates. The intervals describe variation in the retained template sample under the fixed fault model, not uncertainty about natural error rates or new hospitals. Degenerate intervals arise when all resampled clusters have the same contrast; they are not proof of universal performance.
+
+\subsection{Exploratory Checks of Reference Dependence}
+\label{sec:stress-method}
+
+After inspecting the primary results, we designed two exploratory analyses and froze their rules before execution. First, we reconstructed acceptance from the saved diagnostic codes in the test and validation logs. The validator collects all applicable issues and accepts exactly when none remain. Removing selected codes therefore reconstructs acceptance decisions, but does not rerun an ablated validator or estimate diagnosis, restoration, or latency effects.
+
+Second, we applied the unchanged validators to the 934 answerable test cases using four query forms: the original query, a whitespace control, a wrapper of the form \texttt{SELECT * FROM (original) WHERE 1 = 1}, and one equality-to-inequality change between a column and literal in a \texttt{WHERE} clause. The latter changes the first applicable equality in depth-first syntax-tree order, preserving all literals and other query text. We retain the reference widget and bind each executed result to its actual query. We do not require candidates to pass local validation for inclusion.
+
+A separate comparison executes queries on read-only SQLite and compares column names and multisets of type-tagged cell values without using the reference oracle or its result-digest function. A wrapper is counted as a valid alternative only when these observations agree. An equality inversion is counted as result-changing only when columns agree and the result multiset differs; unchanged results are reported separately. The reference SQL remains a proxy for the requested information, not a clinical judgment. This comparison concerns one database state and ignores row order.
+
+We exclude non-read-only or unparseable queries, nondeterministic functions, and limits without an ordering clause. Execution has a five-second query limit and a 10,000-row cap; failures and exclusions retain their own counts. Original-query repetition checks result stability. We report acceptance, issue codes, and denominators, including reconstructions that remove query equality, annotation checks, or both. These finite, exploratory case sets do not support estimates of natural generation-error frequency.
+
+\subsection{Exploratory Pilot with Model-Generated Updates}
+\label{sec:generated-pilot}
+
+After the stress test, we froze a separate, constrained generation pilot. Twenty purposively authored requests independently modify one synthetic interface containing weight and pulse displays. They change time windows, patients, latest-item counts, units, measures, ordering, or visualization. The prompt explicitly preserves unspecified conditions and an unchanged companion widget. Each request starts from the same initial interface; these are not sequential updates or clinician-authored tasks.
+
+Gemini 2.5 Pro generated one SQL-and-widget JSON artifact per request through Vertex AI, with temperature 0.2, top-p 1, a 4,096-token output cap, a 1,024-token thinking budget, and seeds 20260908--20260927. We made no repairs or retries. This compact artifact uses the existing Streamlit widget renderer but bypasses the application's scope-selection and incremental graph-generation pipeline. Only synthetic schema, initial queries, and requests were sent to the model; target SQL and database rows were withheld.
+
+We compare structural and execution checks, strict target-SQL matching with display checks, and execution-based checks on one or three synthetic database states. The latter interpret manually specified change and preservation conditions in Python and compare ordered rows, units, bindings, and display settings; they do not access reference SQL. For audit labels, a separate SQL implementation evaluates the same conditions on four other states. All states contain temporal boundaries and distractors; selected states also have missing values or no measurements in the requested interval. The audit shares requirement specifications and display-checking code and is not independent expert ground truth. Finite-state agreement is not SQL equivalence. Execution-based SQL evaluation has precedents~\cite{zhong2020semantic}; we do not claim a new general SQL evaluation method.
+
+We retain all returned outputs, including malformed responses, and record API failures separately. These conditions differ from the primary benchmark's validators. They do not isolate graph representation or establish population error rates. A simpler time-filter diagnostic was designed only after inspecting the outputs and is reported separately.
+
+\subsection{Follow-Up through the Incremental Application Pipeline}
+\label{sec:sequential-pilot}
+
+We then froze six purposively authored three-step sequences that combine window, patient, latest-count, unit, aggregation, and chart changes. They use the application's existing scope selection, prompt construction, graph normalization, and result attachment. A process-local synthetic DWH model, restricted SQLite connection, and recording SDK client replace external dependencies; application update code remains unchanged. Gemini 2.5 Pro uses temperature 0.2, top-p 1, an 8,192-token output cap, a 1,024-token thinking budget, and one attempt per call. Requests expose schema and the current edit, while cumulative target specifications and database rows remain withheld. Every sequence starts from the same initial graph.
+
+Completed states feed the next update without semantic repair. Audit targets accumulate the authored requests, so later failures may propagate earlier drift rather than represent new errors. A pipeline failure stops that sequence and leaves dependent steps unattempted. We preserve all attempted terminal states and separately count completion and requirement conformance. Structural checks include actual cached-result consistency. A simple syntax-tree baseline checks mandatory patient, item, and time predicates, aggregate kind, non-null counts, unit conversion, ordering, and limits. It supports inclusive BETWEEN and constant datetime expressions, but is not a complete SQL semantic analyzer. All informed conditions share display and binding requirements. Execution checks use one or three states; audit SQL uses four other states. As before, shared authored requirements and fixture construction limit independence. We report paired decisions and the first failure per sequence, without treating steps as independent samples or estimating population rates.
 
 \subsection{Data Management and Reproducibility}
 
-Released artifacts do not contain raw data, question text, reference SQL, patient identifiers, or patient-level result values. They contain hashed case identifiers, input and candidate checksums, inconsistency type, decision, diagnosis, repair outcome, aggregates, and execution environment. We froze formal results as JSON and JSON Lines, then converted them to TSV in an independent procedure that recomputed counts, primary metrics, and confidence intervals. The recomputed values matched the original summary.
+EHRSQL-derived released artifacts do not contain raw data, question text, reference SQL, patient identifiers, or patient-level result values. They contain hashed case identifiers, input and candidate checksums, inconsistency type, decision, diagnosis, restoration outcome, aggregates, and execution environment. We froze formal results as JSON and JSON Lines, then converted them to TSV in an independent procedure that recomputed counts, primary metrics, and confidence intervals. The recomputed values matched the original summary. The separate generation pilot releases its fully synthetic fixtures, requests, model responses, token usage, and checksums.
 
 \section{Results}
 
 \subsection{Baseline Cases and Candidates}
 
-The test split contained 1,167 cases. We evaluated the 934 answerable cases with reference SQL and excluded 233 unanswerable cases from the primary evaluation. Reference SQL executed and baseline artifacts were constructed successfully for all 934 cases; 82 yielded empty results with defined column structures. We formed 763 before-and-after update pairs from 134 question templates. For each pair, we created one valid and one inconsistent candidate and applied four conditions, yielding $763\times2\times4=6{,}104$ validations. Candidate labels disagreed with the independent oracle in zero cases.
+The test split contained 1,167 cases. We evaluated the 934 answerable cases with reference SQL and excluded 233 unanswerable cases from the primary evaluation. Reference SQL executed and baseline artifacts were constructed successfully for all 934 cases; 82 yielded empty results with defined column structures. We formed 763 before-and-after update pairs from 134 question templates. For each pair, we created one valid and one inconsistent candidate and applied four conditions, yielding $763\times2\times4=6{,}104$ validations. Candidate labels disagreed with the reference oracle in zero cases.
 
 We generated 52 patient, 55 item, 106 time, 34 aggregation, 134 source, 134 presentation, 129 connection, and 119 stale-result inconsistencies, totaling 763. For patient, item, time, and aggregation mutations, we skipped cases where no alternative SQL could change exactly one semantic dimension. Candidate counts therefore differ across types and depend on the data and question forms.
 
+Construction recorded 3,420 failed pair-building attempts: 1,140 for patient, 1,383 for item, 576 for time, and 321 for aggregation; none were recorded for the other types. These count attempted constructions, not distinct excluded questions or patients. Retaining only the first successful pair per template and type selects faults that this data and construction procedure can express.
+
 \subsection{RQ1: Inconsistencies That Pass Local Validation}
 
-Local validation accepted every inconsistent candidate across all eight types, producing a leakage rate of 100.00\%. Each candidate was constructed to remain valid as read-only executable SQL and to have an independently valid result and presentation component. The result shows that individually checking syntax, schemas, and renderability does not detect patient or time errors, presentation errors, data-presentation misconnection, or stale results.
+Local validation accepted all included inconsistent candidates, as required by the construction gate. This confirms that the gate operated as specified; it is not an empirical discovery that local validation misses all real errors. The comparison asks which additional checks detect these deliberately selected faults.
 
-Leakage under artifact-level contracts varied by inconsistency type. As Table~\ref{tab:mutation-results} shows, artifact-level contracts rejected every source, presentation, and stale-result inconsistency. In contrast, 92.73\% to 98.08\% of patient, item, time, and aggregation inconsistencies leaked, as did every connection inconsistency. Conditions expressible inside an artifact were checked, but cross-artifact correspondences between the need and SQL or between a data node and presentation remained weak points.
+Leakage under artifact-level contracts varied by inconsistency type (Table~\ref{tab:mutation-results}). Its three additional checks rejected every provenance-metadata, presentation-rule, and stale-result fault. In contrast, 92.73\% to 98.08\% of patient, item, time, and aggregation faults leaked, as did every connection fault. These checks omit target-request and target-binding comparisons; some semantic injections were nevertheless rejected because the resulting artifact also violated a checked shape or mapping rule.
 
 \begin{table}[t]
   \caption{Inconsistencies accepted by artifact-level contracts}
@@ -291,7 +328,7 @@ Leakage under artifact-level contracts varied by inconsistency type. As Table~\r
   \end{tabularx}
 \end{table}
 
-\subsection{RQ2: Detection, Acceptance, and Localization}
+\subsection{RQ2: Detection, Acceptance, and Type Coverage}
 
 Table~\ref{tab:main-results} presents the primary and secondary results. The graph-based and tabular cross-layer contracts rejected all 763 inconsistent candidates and accepted all 763 valid candidates. Compared with local validation, the leakage difference was $-100.00$ percentage points with a 95\% confidence interval of $[-100.00,-100.00]$. Compared with artifact-level contracts, it was $-48.10$ points, with a 95\% confidence interval of $[-49.56,-46.53]$. Valid-update acceptance was 100.00\% for all four conditions, yielding no condition difference.
 
@@ -300,7 +337,7 @@ Table~\ref{tab:main-results} presents the primary and secondary results. The gra
   \label{tab:main-results}
   \begin{tabularx}{\linewidth}{Yrrrr}
     \toprule
-    Condition & Leakage & Valid accepted & Localized & Mean time \\
+    Condition & Leakage & Valid accepted & Type covered & Mean time \\
     \midrule
     Local validation & 763/763 & 763/763 & 0/763 & 2.152 ms \\
     Artifact-level & 367/763 & 763/763 & 387/763 & 7.441 ms \\
@@ -310,83 +347,112 @@ Table~\ref{tab:main-results} presents the primary and secondary results. The gra
   \end{tabularx}
 \end{table}
 
-Artifact-level contracts correctly localized the injection in 387 of the 396 inconsistent candidates that they rejected, for an overall localization rate of 50.72\%. Graph-based and tabular cross-layer contracts localized the type and location in all 763 cases. The two cross-layer contracts disagreed on zero decisions, and their difference in leakage was zero points. Mean validation time per candidate was 2.152 ms for local validation, 7.441 ms for artifact-level contracts, 9.339 ms for the graph-based contract, and 9.296 ms for the tabular contract. In this implementation and environment, the difference between the two cross-layer contracts was 0.043 ms.
+Artifact-level contracts rejected 396 inconsistent candidates and reported the injected type in 387, giving 50.72\% coverage over all 763 injections. Both full conditions included the injected type in their reports for all cases. This score does not establish exact location accuracy or diagnosis precision. Mean validation times were 2.152, 7.441, 9.339, and 9.296 ms for local, artifact-level, graph-based, and tabular conditions. These times exclude query execution, mutation generation, restoration, and rendering. The 0.043 ms difference between the full conditions is descriptive; no repeated-run performance comparison was conducted.
 
-\subsection{RQ3: One-Step Repair}
+\subsection{RQ3: One-Step Reference-Assisted Restoration}
 
-Local validation did not detect inconsistent candidates and therefore attempted no repair. Artifact-level contracts attempted one repair on each of the 396 candidates they rejected, after which 387 satisfied every predicate of the independent oracle. The repair success rate among attempted cases was 97.73\%. Nine remained inconsistent after the single repair.
+Local validation rejected no inconsistent candidate and attempted no restoration. Artifact-level contracts triggered 396 attempts; 387 passed both the validator and reference oracle, or 97.73\% of attempts and 50.72\% of all injections. In the other nine cases, the reported types did not include the injected type, so the restoration routine returned the unchanged candidate.
 
-Graph-based and tabular cross-layer contracts localized all 763 inconsistent candidates, and all 763 satisfied every integrity predicate after one repair. Neither condition rejected a valid candidate, and no repair was applied to valid candidates. This 100\% result is bounded by our use of one known fault, a known contract, and a deterministic repair rule. It does not generalize to compound or naturally occurring generation errors.
+Both full conditions enabled restoration of all 763 injections using the saved valid data artifact or widget. Because restoration is gated by correct type reporting and copies a known valid component, these successes are coupled to the type-coverage result. They do not constitute an independent demonstration of automatic repair capability. No valid candidate was rejected, and the protocol would not attempt restoration of a candidate labeled valid even if it were rejected.
+
+\subsection{Exploratory Results on Reference Dependence}
+\label{sec:stress-results}
+
+Replaying the saved diagnostic codes produces zero leakage after removing either query equality or annotation checks alone: 0/763 on test and 0/758 on validation. Removing both produces 238/763 and 237/758 leakage, respectively. Artifact-level checks plus query equality and target binding reproduce the full graph's acceptance decisions on all 3,042 valid and inconsistent candidates across these splits. These are acceptance-only reconstructions, not measurements of diagnostic or representation equivalence.
+
+The SQL stress test excludes 286 of 934 cases containing current-time expressions under the fixed nondeterminism rule. The remaining 648 cases cover 126 templates. Original queries and whitespace controls are accepted under every condition. All 648 wrappers preserve column names and typed result multisets, yet both full conditions reject every wrapper solely with \texttt{target\_query\_mismatch}. These are false rejections under the result-based criterion in Section~\ref{sec:stress-method}, although they correctly enforce the stricter reference-encoding contract.
+
+For equality inversion, 60 cases have no applicable equality, 42 change column names, and 70 retain the same result; we do not score these as result-changing faults. The remaining 476 cases span 96 templates and change the result while preserving column names; 147 yield empty results. No execution failure or row cap occurs. Table~\ref{tab:stress-results} reports the retained candidates. Reconstructed decisions without query equality let 329/476 result-changing candidates pass. Annotation checks report no mismatch on these candidates; the 147 remaining rejections arise from result-shape checks, including 143 also caught locally.
+
+\begin{table}[t]
+  \caption{Exploratory SQL stress test. The last three rows reconstruct acceptance by removing graph diagnostic codes; they do not rerun modified validators. Denominators exclude the separately reported cases.}
+  \label{tab:stress-results}
+  \centering
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Condition & Valid wrappers rejected & Result changes accepted \\
+    \midrule
+    Local validation & 0/648 & 333/476 \\
+    Artifact-level contracts & 0/648 & 329/476 \\
+    Graph contract & 648/648 & 0/476 \\
+    Tabular contract & 648/648 & 0/476 \\
+    Graph codes minus query equality & 0/648 & 329/476 \\
+    Graph codes minus annotations & 648/648 & 0/476 \\
+    Graph codes minus both & 0/648 & 329/476 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Generated Outputs Expose a Preservation Failure but No Added Discrimination}
+
+All 20 model calls returned parseable artifacts in approximately 194 seconds. Eighteen conformed to the finite audit; two requests for the latest one or three weight measurements dropped both time bounds. The prompt required preserving the existing one-day interval and fixed upper timestamp. Both outputs displayed a synthetic row later than that timestamp. Structural checks accepted both outputs, while the one-state and three-state execution checks rejected them and accepted all 18 conforming outputs. Strict reference matching rejected three conforming outputs: two used an integer rather than decimal multiplication constant with a REAL column, and one omitted redundant aliases.
+
+After observing the failures, we added a diagnostic that checks mandatory inclusive time predicates in the SQL syntax tree, together with structural validity. It made the same decisions on all 20 outputs as both execution-based checks. It does not validate patients, units, or arbitrary SQL forms. Because both observed errors concern the same temporal-preservation failure, the pilot provides no evidence of added discrimination over this simple check or from additional database states. This post-hoc result limits the interpretation; it is not a preregistered comparison.
+
+All 20 artifacts rendered without application exceptions or warnings. We compared the data passed to 39 tables and one line chart with their SQL results, including table columns and chart axes. Rendering success therefore coexisted with the two requirement violations. This verifies rendering data, not visual usability or clinical correctness. The pilot supplies a concrete preservation failure and reference-matching limitations, not evidence of general robustness.
+
+\subsection{Sequential Updates Propagate Drift and Expose Generation Failures}
+
+The follow-up made 24 model calls in approximately 207 seconds without API errors. Of 18 planned steps, 12 were attempted: nine completed and three failed application schema validation, leaving six dependent steps unattempted. Seven completed states conformed to the finite audit. In one sequence, requesting the latest three records removed the previously requested seven-day window; the subsequent unit conversion preserved that incorrect query scope. These are two nonconforming states in one sequence, not two independent origins of drift. Structural checks accepted both. The simple SQL, one-state, and three-state checks made identical decisions across all 12 attempts: each accepted the seven conforming states and rejected the two completed violations and three pipeline failures. Neither broader execution nor additional states improved discrimination in this sample.
+
+The failed average, count, and chart edits all returned a Markdown widget without content or a data binding. A post-hoc diagnosis found that these responses satisfied the JSON schema actually sent to the model but violated an application-level Pydantic validator. The chart request also conflicted with a generation plan that retained the existing dataframe type; this is a documented prompt inconsistency, not an experimentally established cause of that response. In all three failures, the final graph and context remained unchanged. Replaying recorded responses reproduced all 12 attempts and intermediate states without new model calls. All 12 terminal screens rendered, and the data passed to their 24 display tables matched the recorded cache. This includes retained old screens after failed edits and does not imply successful task completion. The result motivates fixing generation-contract inconsistencies before expanding this evaluation; it does not establish superiority of the proposed checks.
 
 \section{Discussion}
 
-\subsection{From Correct SQL to a Correct Process for Generating UX}
+\subsection{What the Controlled Comparison Establishes}
 
-All eight inconsistency types passed local validation. SQL, results, and presentation components must each work, but their independent operation does not ensure that a clinician receives the requested information. The appropriate unit of evaluation is therefore the process that begins with a clinical scenario, specifies an information need, retrieves data, and presents the result, rather than the query or screen alone.
+The benchmark identifies gaps between the specified checks under a known-target assumption. Artifact-level checks detect provenance metadata, baseline presentation mapping, and query-result version mismatches. They can also reject a semantic-query mutation when it changes result shape, without reporting the injected semantic type. The full conditions add target-query and binding checks and reject all retained injections.
 
-Within this framing, improvement in SQL generation is one component of a longer process. A previously correct query can be followed by an incremental update that misaligns patient, time window, result version, or presentation target. The final screen then fails to answer the request. Conversely, a visually polished screen cannot be judged appropriate if its data source and provenance are unavailable for inspection. Generative-interface research should distinguish surface quality, artifact executability, information provenance, and user verification, and reconnect these evaluations to the same clinical task.
+This is evidence about coverage of the implemented fault model. Both the fault generator and the check designer know the relationships to change or preserve. The diagnostic replay shows that query equality and annotation checks overlap on that suite. The exploratory stress test separates them: exact-query matching rejects result-equivalent wrappers, while retaining annotation checks without exact-query matching misses 329 result-changing candidates. Removing query equality alone is therefore not a sufficient remedy. The current target-result comparison is also conditional on matching the reference query version. A broader contract must specify which alternative queries and outputs are permissible, then be evaluated on cases not used to design it.
 
-\subsection{Why Cross-Layer Contracts Detected the Errors}
+\subsection{Implications for Data-Backed Interface Updates}
 
-Artifact-level contracts rejected all source, presentation, and stale-result inconsistencies but missed most patient, item, time, and aggregation inconsistencies and all connection inconsistencies. The former can be constrained within a single artifact through an allowlist, result shape, or version. The latter require a comparison between the request and query or between a data node and presentation component.
+The practical design question is where a system obtains trustworthy expectations. A stored binding or query-result version may be available after an update, while the correct SQL for a new natural-language request may not be. Our full validators receive both. A system that generates expectations with the same model that generates its output can produce mutually consistent but jointly wrong artifacts. The present evaluation does not resolve that problem.
 
-Cross-layer contracts retained patient, item, time, aggregation, source, and presentation as semantic keys and compared them between adjacent artifacts together with versions and references. They did not merely execute SQL again; they determined whether a value inherited from the request remained equivalent across an artifact boundary. Associating a failed predicate with the relation it checked enabled both localization and repair. This mechanism is necessary for interpreting a leakage rate of zero: the result came from explicitly testable correspondences, not from the storage structure alone.
+For developers, the fault model provides a way to specify which reference fields a check needs and which change it can detect. It also makes a distinction visible: provenance metadata disagreeing with SQL is different from SQL querying an inappropriate source, and violating a baseline widget rule is different from misleading a user. Evaluations should name those distinctions rather than combine all rejections as evidence of clinical correctness.
 
-\subsection{Clinical Scenarios Expose Domain-Specific Requirements}
+\subsection{What the Graph and Tabular Agreement Means}
 
-The contrast between preoperative assessment and post-thyroidectomy follow-up explains why a clinical interface rarely has one universally correct view. A preoperative clinic assembles broad patient context and recent tests for one assessment. Thyroid follow-up repeatedly compares a narrower set of examinations and medications over time. The latest value may be appropriate in one task and a longitudinal trend in another, while the temporal anchor may be a surgery date or a visit date. Appropriate presentation follows from the scenario and task.
+Both full conditions access the same target contract and call shared query, data, and widget checks. Their identical results show that the two tested access paths give consistent outcomes on this suite. They do not establish storage-independent performance, scalable graph propagation, or an advantage for either representation. Those questions require independent implementations and measurements of their intended tasks.
 
-In medicine, whether information is displayed is insufficient: whose information it is, what it measures, when it was recorded, and where it came from can affect the evidence available for judgment. Showing another patient's data, an inappropriate time window, or a stale result cannot be treated as a minor rendering defect. A generated interface must connect expert-defined information needs, safety-relevant information, and task-completion criteria to provenance and update time. Our benchmark does not establish the clinical validity of the two scenarios or show that cross-layer contracts reduce clinical errors. The scenarios make design requirements concrete and identify what a subsequent expert evaluation must establish.
+Prior generative-interface work uses intermediate representations to support inspection and editing~\cite{cao2025jelly,park2026bridging,kaputa2026simstep}. Our benchmark focuses on a narrower developer-facing problem: checking data correspondence against a reference. Whether those checks improve how people inspect and edit generated interfaces remains open.
 
-\subsection{Relational Content, Not Graph Storage, Produced the Result}
+\subsection{Evaluating Use in Generated Interfaces}
 
-Graph-based and tabular cross-layer contracts produced identical decisions, localizations, and one-step repairs. The detection result supports only the claim that explicitly storing and checking the eight relationships allowed either representation to reject the tested candidates. Graph storage by itself cannot serve as evidence of safety or better performance.
+The present artifact is designed for developer regression checks. Extending it to generation-time validation requires testing naturally generated failures and the availability of trusted expectations. The illustrative clinical scenarios do not establish how often the eight faults occur or how consequential they are in practice.
 
-This null result separates the storage representation from the capability presented to users. A graph may support impact exploration, propagation of partial updates, or visualization of relations, but our benchmark did not measure editing efficiency or comprehensibility. A future comparison should give both conditions the same atomic information and repair actions, then test whether presenting cross-layer paths as a graph helps clinicians locate and repair problems.
+A subsequent technical study should freeze validators before collecting naturally generated updates, include valid alternatives, obtain reference judgments independent of validator design, and compare against established checking methods. If the contribution concerns clinician verification, an additional study should compare the same interface with and without diagnoses, using expert-reviewed scenarios and reporting faulty-update acceptance, valid-update acceptance, review time, and repair quality separately. Such studies may show a benefit, a cost, or no effect.
 
-Jelly, Bridging Gulfs, and SimStep use intermediate representations as points at which users can inspect intent and edit generated artifacts~\cite{cao2025jelly,park2026bridging,kaputa2026simstep}. Our result adds a requirement for those contact points in data-backed systems: the represented relations should remain testable through execution results and presentation. The value of an intermediate representation depends not only on its structure, but on which relations connect user verification to system execution.
+\subsection{Restoration Is a Different Capability from Repair}
 
-\subsection{Connecting Detection to User Value}
-
-Successful machine detection is not itself a user benefit. Our results directly show that known single inconsistencies could be stopped before presentation and returned as machine-readable locations. To return that capability to clinicians, a system should include the diagnosis in the update interaction and allow users to accept, reject, or partially repair a proposed update.
-
-A diagnosis such as ``the patient in the request does not match the patient condition in SQL'' or ``the presentation refers to a result from the previous version'' may narrow what a user must inspect compared with a generic ``invalid interface'' message. Whether diagnosis reduces review time, reduces acceptance of faulty updates, or instead causes excessive rejection of valid updates requires a human-participant comparison. Such a study could compare a final-screen-only condition against the same screen with cross-layer paths and diagnoses, reporting incorrect acceptance, valid acceptance, fault localization, semantically correct repair, time, and cognitive load separately.
-
-Work on how clinicians ignore, trust, or negotiate generated suggestions~\cite{sivaraman2023ignore} also cautions against combining all decisions into one accuracy measure. A study should mix faulty and valid updates and report incorrect acceptance of faulty updates separately from acceptance of valid updates. This distinction reveals whether cross-layer information improves discrimination or merely increases a tendency to reject.
-
-\subsection{Separating Automatic Repair from Human Judgment}
-
-The two cross-layer contracts repaired all 763 known single faults in one step. When a contract uniquely specifies a patient condition, reference, result version, or presentation form, the system can mechanically restore a minimal difference. Validation can therefore produce a repair candidate rather than ending with rejection.
-
-An ambiguous natural-language request, a choice of clinically appropriate presentation granularity, or simultaneous changes to several artifacts may not have a unique repair. Generated interfaces should distinguish relations that can be repaired mechanically, relations that require presenting alternatives, and relations that require domain-expert judgment. The 100\% repair result does not demonstrate the general safety of automatic repair. It characterizes the bounded case in which a known contract identifies one value to restore.
-
-\subsection{Applying the Approach Beyond Healthcare}
-
-The approach may extend to other systems that retrieve data from a user's request and generate a dashboard, table, or visualization. In finance, an interface may need to preserve the account or instrument, valuation period, currency, and price source from request to display. In aviation and industrial maintenance, it may need to preserve the aircraft or asset identifier, observation window, sensor, aggregation, and data version. In each case, an executable query and renderable screen can still refer to the wrong entity, period, source, or version.
-
-The eight healthcare-oriented inconsistency types should not be transferred unchanged. An application domain must permit a task to be decomposed into testable fields, record correspondences from retrieval through presentation, and distinguish mechanically checkable relations from judgments that require a person. Domain-specific relations also matter: finance may require valuation timestamps and currencies, whereas aviation may require aircraft identifiers and sensor-calibration status. Future work should rebuild the inconsistency taxonomy with domain experts and test whether cross-layer diagnoses change error acceptance, fault localization, and verification time. The broader HCI implication is that evaluations of data-backed generated interfaces should include traceability from a user's task to the final presentation and explain where that correspondence breaks, rather than stopping at appearance or executability.
+Copying a saved valid artifact is useful when a trusted target state exists, but it does not solve correction of an unknown generated state. Our routine also receives the injected type, and replaces a whole data artifact or widget rather than computing a minimal patch. A practical repair evaluation must hide injection metadata, withhold the complete valid target, test collateral changes, and judge correctness independently. The current 100\% restoration result should not be used as a claim that a diagnosis alone supports reliable automatic repair.
 
 \section{Limitations and Ethics}
 
 First, we inject one inconsistency at a time using deterministic rules. The generated candidates do not represent the distribution of errors that a generative model produces naturally. A condition that achieved 100\% on single faults may not perform similarly on compound failures, ambiguous requests, or unknown presentation components. Future work should apply the frozen validators to naturally occurring candidates and qualitatively analyze failures outside the taxonomy.
 
-Second, the benchmark begins with reference SQL and therefore excludes initial errors from a text-to-SQL model. Question interpretation and query generation can fail in practice. Our result is limited to incremental updates after a valid reference is available. Evaluation that includes initial SQL generation must separately address abstention, multiple interpretations, and the clinical appropriateness of a query.
+Second, the benchmark uses the known target query and its executed result, not merely a previously valid query. It therefore assumes that a trusted state is available for the requested update. This assumption is restrictive for generative interfaces. Question interpretation, initial generation, abstention, and alternative valid realizations require separate evaluation.
 
-Third, we use only MIMIC-IV Demo v2.2 and EHRSQL-2024 question templates. The preoperative anesthesia and post-thyroidectomy scenarios illustrate the problem but are not formal evaluation cases. Candidate counts differ across inconsistency types because result shapes and valid alternatives differ. We cannot generalize the findings to other clinical scenarios, data models, institutions, complex visualizations, or updates spanning multiple sources. We also evaluated no non-healthcare dataset or workflow, so the examples beyond healthcare are design hypotheses for future study rather than evidence of transfer.
+Third, the primary benchmark uses MIMIC-IV Demo v2.2 and EHRSQL-2024 question templates. The preoperative anesthesia and post-thyroidectomy scenarios illustrate the problem but are not formal evaluation cases. Candidate counts differ across inconsistency types because result shapes and valid alternatives differ. We cannot generalize the findings to other clinical scenarios, data models, institutions, complex visualizations, or updates spanning multiple sources. Applicability to non-healthcare data and workflows is also untested.
 
-Fourth, we intentionally give the graph-based and tabular cross-layer contracts equivalent relational content to isolate storage form. This comparison does not test editing at scale, implementation maintainability, or the understandability of explanations. Validation times come from one implementation and environment and should not be interpreted as general performance differences between representations.
+Fourth, full validation and the oracle share the target reference; graph and tabular implementations additionally share core checking functions. This common dependency limits evidence from agreement. The exploratory reconstructions concern acceptance only. The SQL stress test uses one wrapper rule and one equality inversion on a single database state, excludes 286 time-dependent cases, and ignores row order. Its comparison code avoids the original oracle and digest, but still shares the reference SQL and SQLite engine. The observed false-rejection and leakage counts cannot estimate performance across naturally generated queries or all semantically equivalent interfaces.
 
-Fifth, this is a technical evaluation on publicly available deidentified demo data. Reference SQL is a technical baseline, not a clinically validated definition of appropriate presentation. We did not measure effects on verification burden, acceptance of faulty updates, or clinical judgment. We make no claims about clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, deployment, or generalization across institutions. Any human-participant study will be separate work conducted only after applicable ethics review, permission, recruitment, consent, withdrawal, and data-management procedures are established.
+Fifth, this is a technical evaluation on publicly available deidentified demo data and fully synthetic pilot fixtures. Reference SQL is a technical baseline, not a clinically validated definition of appropriate presentation. We did not measure effects on verification burden, acceptance of faulty updates, or clinical judgment. We make no claims about clinical safety, diagnostic accuracy, usability, cognitive load, clinical outcomes, deployment, or generalization across institutions. Any human-participant study will be separate work conducted only after applicable ethics review, permission, recruitment, consent, withdrawal, and data-management procedures are established.
 
 Released artifacts contain no question text, reference SQL, patient identifiers, or patient-level result values. We state the conditions of use and provenance for MIMIC-IV Demo and EHRSQL-2024 and include only releaseable checksums, categories, decisions, and aggregate statistics in reproducibility materials.
 
+Both generation studies use one model and purposively authored requirements. The initial pilot bypasses the full application pipeline; its two failures belong to one request family, and a post-hoc time-filter check explains all observed discrimination. The follow-up uses the existing updater with synthetic dependencies, but only nine of 18 planned steps complete because three generation failures prevent six dependent attempts. Its two completed violations belong to one sequence, and the pre-fixed simple baseline matches both execution checks. Shared specifications, fixture construction, and display checking limit audit independence. These results do not establish improved detection over strong existing validators, tolerance of arbitrary equivalent programs, or benefits to clinicians.
+
 \section{Conclusion}
 
-Generating an interface appropriate for a clinical scenario requires more than retrieving data with executable SQL. The requested information must remain consistent through execution and presentation. We operationalized failures in that process as eight cross-layer inconsistencies, generated them deterministically on public demo data, and compared four validation conditions on the same candidates.
+We present a reference-based regression-testing artifact for request, query, result, and presentation correspondence in clinical interface updates. Eight deterministic injection rules yielded 763 paired updates and 6,104 validations on EHRSQL-2024 and MIMIC-IV Demo. The artifact makes construction gates, expected fields, diagnostic scoring, and restoration inputs explicit.
 
-Across 763 update pairs and 6,104 validations, local validation accepted every inconsistency and artifact-level contracts accepted 48.10\%. Graph-based and tabular cross-layer contracts with equivalent content rejected every inconsistent candidate and accepted every valid one. Their identical results indicate that detection was supported by executable relations over patient, item, time, aggregation, source, presentation, connection, and version, rather than by graph storage itself.
+All injected candidates passed local checks by construction. Artifact-level contracts accepted 48.10\% of them. The two full conditions rejected every injected inconsistency and accepted every reference-valid candidate while sharing target information and checking functions. These results describe coverage of this predefined fault model. Type reporting and copying saved valid components do not establish fault localization or repair of unknown generated states.
 
-A generated interface that will continue to change should be evaluated not only for its visible output and artifact-level validity, but also for provenance from a scenario-grounded information need to presentation and for diagnoses that explain failures. This study identifies a technical prerequisite and its detection mechanism before evaluating a clinically appropriate user experience. The next step is to apply it to expert-reviewed scenarios and test, with human participants, how cross-layer diagnoses affect acceptance of faulty updates, fault localization, repair, and verification burden. Beyond healthcare, future work should redefine the checked relations for each domain and determine where the same design principle holds.
+The exploratory stress test exposes a limit hidden by the primary candidate set: full validation rejects 648 result-equivalent query wrappers, whereas reconstructed decisions without query equality accept 329 of 476 result-changing queries. The practical question is which trusted expectations an interface developer can obtain and how those expectations distinguish permissible alternatives from changed information. Broader contracts require evaluation on held-out and naturally generated updates with independently assessed outcomes. Whether these checks help people inspect and correct an interface remains open.
+
+The 20-update generation pilot identifies two lost time windows and three strict-matching rejections of conforming outputs. Its simpler post-hoc check makes identical decisions. The sequential follow-up reproduces temporal drift in one application-update sequence, but a pre-fixed simple baseline again matches execution-based checking. Generation failures further restrict the attempted cases. We therefore do not recommend interpreting these studies as evidence of added validation capability. Resolving generation-contract inconsistencies and obtaining independent task judgments precede a stronger comparison.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

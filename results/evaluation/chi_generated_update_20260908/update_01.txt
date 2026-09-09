@@ -1,0 +1,40 @@
+{
+  "queries": [
+    {
+      "id": "main_data",
+      "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-01 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+    },
+    {
+      "id": "stable_data",
+      "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "main",
+      "title": "主表示",
+      "kind": "dataframe",
+      "data_key": "main_data",
+      "columns": [
+        "observed_at",
+        "value",
+        "unit"
+      ],
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "stable",
+      "title": "保持する脈拍",
+      "kind": "dataframe",
+      "data_key": "stable_data",
+      "columns": [
+        "observed_at",
+        "value",
+        "unit"
+      ],
+      "x": null,
+      "y": null
+    }
+  ]
+}

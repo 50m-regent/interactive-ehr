@@ -1,0 +1,671 @@
+{
+  "all_rendered_data_match": true,
+  "hashes_match": true,
+  "independent_recount": {
+    "audit_invalid": 2,
+    "audit_valid": 18,
+    "one_state:accepted": 18,
+    "one_state:invalid_accepted": 0,
+    "one_state:valid_rejected": 0,
+    "reference:accepted": 15,
+    "reference:invalid_accepted": 0,
+    "reference:valid_rejected": 3,
+    "structure:accepted": 20,
+    "structure:invalid_accepted": 2,
+    "structure:valid_rejected": 0,
+    "three_states:accepted": 18,
+    "three_states:invalid_accepted": 0,
+    "three_states:valid_rejected": 0
+  },
+  "render_checks": [
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_01",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 9
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_02",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 7
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_03",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 11
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_04",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 13
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_05",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_06",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_07",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_08",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 1
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_09",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 3
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_10",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_11",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 1,
+      "exceptions": 0,
+      "id": "update_12",
+      "matched": true,
+      "table_count": 1,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "line_chart",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_13",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 9
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_14",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 11
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_15",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 9
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_16",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 7
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_17",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 9
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_18",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 13
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_19",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 4
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "chart_count": 0,
+      "exceptions": 0,
+      "id": "update_20",
+      "matched": true,
+      "table_count": 2,
+      "warnings": 0,
+      "widgets": [
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "main_data",
+          "id": "main",
+          "kind": "dataframe",
+          "rows": 3
+        },
+        {
+          "columns": [
+            "observed_at",
+            "value",
+            "unit"
+          ],
+          "data_key": "stable_data",
+          "id": "stable",
+          "kind": "dataframe",
+          "rows": 4
+        }
+      ]
+    }
+  ],
+  "usage_totals": {
+    "candidates_token_count": 8045,
+    "prompt_token_count": 15407,
+    "thoughts_token_count": 16745,
+    "total_token_count": 40197
+  },
+  "verification_source_sha256": "8206d5fc761a198e37422bbd78f57df8f6f2c9c36b654ae0fdbb4173aa38cc2a",
+  "verified_at": "2026-09-08T04:23:17.046669+00:00",
+  "verified_records": 20
+}

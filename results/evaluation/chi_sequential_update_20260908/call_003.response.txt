@@ -1,0 +1,7 @@
+{
+  "scope": "data",
+  "rationale": "ユーザーの要望は「主表示の最新3件までを新しい順に表示」することです。これは、`main` widget が参照している `main_data` data node の SQL クエリを修正することで実現できます。具体的には、`ORDER BY` を `DESC` に変更し、`LIMIT 3` を追加します。SQL のみの変更であるため、scope は `data` とし、対象ノードIDとして `main_data` を指定します。",
+  "target_node_ids": [
+    "main_data"
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "sql": "SELECT \"observed_at\", \"value\" * 1000 AS \"value\", 'g' AS \"unit\" FROM \"measurements\" WHERE \"patient\" = 'SYN_A' AND \"measure\" = 'weight' ORDER BY \"observed_at\" DESC LIMIT 3"
+}

@@ -1,0 +1,290 @@
+[
+  {
+    "id": "sequence_01_step_1",
+    "index": 1,
+    "request": "主表示を直近7日間に広げてください。",
+    "sequence": "window_latest_unit",
+    "target": {
+      "aggregate": "rows",
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_01_step_2",
+    "index": 2,
+    "request": "主表示の最新3件までを新しい順に表示してください。",
+    "sequence": "window_latest_unit",
+    "target": {
+      "aggregate": "rows",
+      "days": 7,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": 3,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_01_step_3",
+    "index": 3,
+    "request": "主表示をkgからgに変換し、値と単位を合わせてください。",
+    "sequence": "window_latest_unit",
+    "target": {
+      "aggregate": "rows",
+      "days": 7,
+      "descending": true,
+      "grams": true,
+      "kind": "dataframe",
+      "limit": 3,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_02_step_1",
+    "index": 1,
+    "request": "主表示だけを患者SYN_Bへ切り替えてください。",
+    "sequence": "patient_window_latest",
+    "target": {
+      "aggregate": "rows",
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "id": "sequence_02_step_2",
+    "index": 2,
+    "request": "主表示を直近3日間に広げてください。",
+    "sequence": "patient_window_latest",
+    "target": {
+      "aggregate": "rows",
+      "days": 3,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "id": "sequence_02_step_3",
+    "index": 3,
+    "request": "主表示の最新1件だけを新しい順に表示してください。",
+    "sequence": "patient_window_latest",
+    "target": {
+      "aggregate": "rows",
+      "days": 3,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": 1,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "id": "sequence_03_step_1",
+    "index": 1,
+    "request": "主表示を直近7日間の体重の平均値にしてください。NULLは除外し、対象がなければNULLとします。表はvalue,unitの2列です。",
+    "sequence": "average_patient_unit",
+    "target": {
+      "aggregate": "average",
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_03_step_2",
+    "index": 2,
+    "request": "主表示だけを患者SYN_Cへ切り替えてください。",
+    "sequence": "average_patient_unit",
+    "target": {
+      "aggregate": "average",
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_C"
+    }
+  },
+  {
+    "id": "sequence_03_step_3",
+    "index": 3,
+    "request": "主表示をkgからgに変換し、値と単位を合わせてください。",
+    "sequence": "average_patient_unit",
+    "target": {
+      "aggregate": "average",
+      "days": 7,
+      "descending": false,
+      "grams": true,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_C"
+    }
+  },
+  {
+    "id": "sequence_04_step_1",
+    "index": 1,
+    "request": "主表示をvalueが欠損していない測定の件数にしてください。対象がなければ0です。表はvalue,unitの2列で、unitはcountです。",
+    "sequence": "count_window_patient",
+    "target": {
+      "aggregate": "count",
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_04_step_2",
+    "index": 2,
+    "request": "主表示の期間を直近7日間に広げてください。",
+    "sequence": "count_window_patient",
+    "target": {
+      "aggregate": "count",
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_04_step_3",
+    "index": 3,
+    "request": "主表示だけを患者SYN_Bへ切り替えてください。",
+    "sequence": "count_window_patient",
+    "target": {
+      "aggregate": "count",
+      "days": 7,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_B"
+    }
+  },
+  {
+    "id": "sequence_05_step_1",
+    "index": 1,
+    "request": "主表示を折れ線グラフにしてください。横軸はobserved_at、縦軸はvalueです。",
+    "sequence": "chart_window_patient",
+    "target": {
+      "aggregate": "rows",
+      "days": 1,
+      "descending": false,
+      "grams": false,
+      "kind": "line_chart",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_05_step_2",
+    "index": 2,
+    "request": "主表示を直近14日間に広げてください。",
+    "sequence": "chart_window_patient",
+    "target": {
+      "aggregate": "rows",
+      "days": 14,
+      "descending": false,
+      "grams": false,
+      "kind": "line_chart",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_05_step_3",
+    "index": 3,
+    "request": "主表示だけを患者SYN_Cへ切り替えてください。",
+    "sequence": "chart_window_patient",
+    "target": {
+      "aggregate": "rows",
+      "days": 14,
+      "descending": false,
+      "grams": false,
+      "kind": "line_chart",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_C"
+    }
+  },
+  {
+    "id": "sequence_06_step_1",
+    "index": 1,
+    "request": "主表示を直近3日間に広げてください。",
+    "sequence": "window_measure_columns",
+    "target": {
+      "aggregate": "rows",
+      "days": 3,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "weight",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_06_step_2",
+    "index": 2,
+    "request": "主表示だけを体重から脈拍へ切り替えてください。値と単位は脈拍に合わせてください。",
+    "sequence": "window_measure_columns",
+    "target": {
+      "aggregate": "rows",
+      "days": 3,
+      "descending": false,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "pulse",
+      "patient": "SYN_A"
+    }
+  },
+  {
+    "id": "sequence_06_step_3",
+    "index": 3,
+    "request": "主表示を新しい日時から順に並べてください。",
+    "sequence": "window_measure_columns",
+    "target": {
+      "aggregate": "rows",
+      "days": 3,
+      "descending": true,
+      "grams": false,
+      "kind": "dataframe",
+      "limit": null,
+      "measure": "pulse",
+      "patient": "SYN_A"
+    }
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "call": "call_013",
+  "elapsed_seconds": 9.722676624998712,
+  "finish_reasons": [
+    "FinishReason.STOP"
+  ],
+  "model_version": "gemini-2.5-pro",
+  "request_sha256": "985e760dbf26c19b1378e3ecff56e445c74557c1258d71aa5ac797fd33d00b5b",
+  "reserved_usd": 0.10171125,
+  "response_sha256": "26ce34945e53e888ebd1836e7e1ef803e9b7f2901e8c2e8a77c66c43314d0719",
+  "started_at": "2026-09-08T07:49:51.685424+00:00",
+  "status": "returned",
+  "step": "sequence_03_step_1",
+  "usage": {
+    "cache_tokens_details": null,
+    "cached_content_token_count": null,
+    "candidates_token_count": 153,
+    "candidates_tokens_details": [
+      {
+        "modality": "TEXT",
+        "token_count": 153
+      }
+    ],
+    "prompt_token_count": 1281,
+    "prompt_tokens_details": [
+      {
+        "modality": "TEXT",
+        "token_count": 1281
+      }
+    ],
+    "thoughts_token_count": 805,
+    "tool_use_prompt_token_count": null,
+    "tool_use_prompt_tokens_details": null,
+    "total_token_count": 2239,
+    "traffic_type": "ON_DEMAND"
+  }
+}

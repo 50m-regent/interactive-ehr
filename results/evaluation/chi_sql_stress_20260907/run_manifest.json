@@ -1,0 +1,29 @@
+{
+  "analysis": "exploratory_sql_stress",
+  "version": "1.0.0",
+  "executed_at": "2026-09-07T13:15:20.427526+00:00",
+  "duration_seconds": 146.15305970900044,
+  "dataset_commit": "f9e1aa02160d39e3f8df52bf5c69c5cf2e472499",
+  "split": "test",
+  "answerable_cases": 934,
+  "timeout_seconds": 5.0,
+  "max_result_rows": 10000,
+  "python": "3.12.9",
+  "sqlite": "3.47.1",
+  "code_commit": "a50441645589c2253a00c9bc9cbc93276b36364b",
+  "input_checksums": {
+    "annotated.json": "f835acf43037d6857dd41a69e7716ed324ad899cd6abeb69be4743bd762d4f4d",
+    "data.json": "b141da1fd5fa7e7ba8179ce87528653daa8eaa68d5510662e7a65b51cc626b42",
+    "database": "a26a60261d7e3bbf1869ffd92efe1803abdbce3eb256a2883fc0439c63427796"
+  },
+  "implementation_checksums": {
+    "validator": "dd70e0a38172cb625ac8f99d1b94fbe6ed817bb52187455a00dd996c517b1b3a",
+    "analysis": "7f9cc1ceee91ac114f31d089d2a837672a374fa10cee177333227124d62ad6ed",
+    "protocol": "08d6c51e016284b942cf859a7a666dd74ceb724c97c01596a2366a3d537491fd",
+    "uv.lock": "36c7eb548c3a543bb26f6c8fe94cb632eb43b51b1ac9bd1e45a99bc4b5b8d4e6"
+  },
+  "output_checksums": {
+    "summary.json": "5a92219f8cce781658d49a9d966e4677b5dc3bbdedca04c72d0b1f691dbb636e",
+    "candidate_records.jsonl": "db3b73b9746b00bdb79a60802b927cdcebdb45ebe399bfa4e25d8ec4e24adef4"
+  }
+}

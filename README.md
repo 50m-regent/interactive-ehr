@@ -14,6 +14,12 @@ PRの統合によってIssueが完了する場合は`Closes #番号`、作業が
 
 ## 概要
 
+2026年9月9日に、[連続編集の実験計画](experiments/chi-intent-preservation-plan-20260909/PLAN.md)を整理しました。同じ候補に対する検査、実アプリの連続更新、利用者の確認・修正を分けて評価します。今回は計画の作成だけで、新しい実験は実行していません。課題、独立した採点確認、必要件数、モデル版と費用上限、人対象の実施条件は、本評価前に確定します。[Issue #55](https://github.com/50m-regent/interactive-ehr/issues/55)で追跡します。
+
+実アプリの連続更新による追加評価を [experiments/chi-sequential-update-20260908/REPORT.md](experiments/chi-sequential-update-20260908/REPORT.md) に記録しました。計画18更新のうち12件を試行し、9件が処理を完了、3件が表示部品の形式検証で失敗しました。後続6件は未実行です。適合7件と、1系列で期間条件が消えて次へ残った不適合2状態を確認しましたが、簡単なSQL検査と1状態・3状態の結果検査は同じ判定でした。保存した24応答から全イベントを再現し、24個の表の描画データも照合しました。[Issue #54](https://github.com/50m-regent/interactive-ehr/issues/54)で追跡します。次は生成先のスキーマとアプリの必須条件、表示種別を変える計画の整合を修正する必要があります。
+
+実行入口は `scripts/run_sequential_update_pilot.py`、照合は `scripts/verify_sequential_update_pilot.py`、事後の形式診断は `scripts/diagnose_sequential_update_failures.py` です。固定条件、停止条件、再実行のコマンドは[実験計画](experiments/chi-sequential-update-20260908/PROTOCOL.md)を参照してください。既存のアプリ実装と正式評価の結果は変更していません。
+
 電子カルテの膨大な情報量による医療従事者の認知負荷を軽減するため、ユーザのタスクに基づいて適切な情報を抽出し、UIを動的に生成するシステム。
 
 現在は麻酔科術前外来と慢性疾患外来の合成サンプルをStreamlit上で切り替えて表示できます。初期表示は麻酔科術前外来です。表示データは `data/dwh/*.csv` と慢性疾患外来用の合成サンプルから作成したローカルSQLite DBをSQLで参照します。
@@ -173,6 +179,8 @@ uv run python scripts/run_ehrsql_feasibility.py \
 
 正式結果は `results/evaluation/tracebench_ehr_v1.1/test/`、パイロット結果は `results/evaluation/tracebench_ehr_v1.1/validation/` に保存しています。完全な変異別集計と実行時間は各 `summary.json` を参照してください。
 
+全体査読後の追加評価は [experiments/chi-additional-20260907/](experiments/chi-additional-20260907/README.md) で管理します。保存済みログの診断除去を再構成し、同じ固定データを使ってSQLの別解と等号を反転した候補を評価します。追加コードは `src/interactive_ehr/evaluation/chi_sql_stress.py`、入口は `scripts/run_chi_sql_stress.py` です。正式評価と追加評価の結果は分けて報告します。
+
 保存済みの正式結果を表計算ソフトで確認する場合は、元のJSONとJSON Linesを変更せずTSVへ変換します。この処理は正式評価を再実行しません。元成果物のチェックサム、候補単位から再計算した主要指標、95%信頼区間を照合してから出力します。
 
 ```bash
@@ -217,6 +225,12 @@ uv run python scripts/run_tracebench_ehr.py \
 - `run_manifest.json` は入力、コード、設定、出力のチェックサムを記録します。
 
 成果物には、生データ、質問文、正解SQL、患者ID、患者単位の結果値を保存しません。匿名化済みデモデータ上の技術評価であり、臨床上の安全性、使いやすさ、認知負荷、臨床転帰、実運用、他施設への一般化は評価していません。
+
+## 実生成による更新の予備評価
+
+Gemini 2.5 Proで20件の合成UI更新を生成し、検証しました。最新件数を求めた2件で期間条件が消え、構造・実行検査は通過しました。要求に応じた結果の検査は両方を拒否して適合18件を受理しましたが、事後に追加した簡単な期間条件の検査と20件すべてで判定が一致しました。1状態と3状態の判定にも差はありません。参照SQLとの厳密な一致は適合3件も拒否しました。[結果と制約](experiments/chi-generated-update-20260908/REPORT.md)に、原稿への影響と次の評価を記録しています。
+
+既存の正式評価と異なる小さなSQL・表示仕様を用い、既存レンダラへ渡された表39個・グラフ1個のデータを照合しました。アプリの更新範囲判定とグラフの増分生成は通していません。本アプリ全体の性能と臨床的な有効性は未評価です。[Issue #53](https://github.com/50m-regent/interactive-ehr/issues/53)、[実験計画](experiments/chi-generated-update-20260908/PROTOCOL.md)、`scripts/run_generated_update_pilot.py`から再現条件を確認できます。応答と集計は `results/evaluation/chi_generated_update_20260908/`、結果の別集計と描画データの照合は `scripts/verify_generated_update_pilot.py`、事後の期間条件の診断は `scripts/check_generated_update_time_filters.py` です。テストは `tests/test_generated_update_*.py` にあります。
 
 ## セットアップ
 
@@ -338,7 +352,7 @@ latexmk main-revised.tex
 
 ## CHI 2027 Papers 確認稿
 
-`papers/chi-2027/`には、正式技術評価の結果を反映した匿名・単一カラムの日本語版と英語版があります。評価基盤には固有名称を付けません。診療シナリオによって必要な情報と表示が変わることを出発点に、層間整合性を妥当な臨床UXの前提として位置付け、比較結果、検知メカニズム、利用者価値へつなぐための評価課題を整理しています。図はHTML内のSVGから日本語版と英語版を再生成できます。編集元のLaTeXと確認用PDFだけを版管理します。
+`papers/chi-2027/`には、正式技術評価を反映した匿名・単一カラムの日英原稿があります。2026年9月7日の全体査読で、既知の参照情報を使う回帰テストとして説明を改訂しました。局所検査を通る候補だけを選ぶ条件、正解判定と層間検査の共有情報、種類の採点、保存済みの妥当部品を使う復元を明記しています。正式評価のコードと結果は変更していません。追加評価のSQL別解648件の拒否と、SQL一致を外した判定での結果変更329/476件の流出を日英原稿へ反映しました。実際の生成更新への有効性と既存手法との差は未検証で、投稿準備は完了していません。[査読報告](papers/chi-2027/reviews/2026-09-07-review.md)と[原稿README](papers/chi-2027/README.md)に根拠と残る作業を記録しています。図はHTML内のSVGから再生成でき、LaTeX、図のソース、参考文献、設定、確認用PDFを版管理します。
 
 ```bash
 cd papers/chi-2027

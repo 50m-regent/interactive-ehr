@@ -1,0 +1,154 @@
+{
+  "original": {
+    "attempted": 934,
+    "statuses": {
+      "equivalent_result": 648,
+      "excluded_nondeterministic_function": 286
+    },
+    "evaluated": 648,
+    "evaluated_templates": 126,
+    "baseline_empty": 0,
+    "transformed_empty": 0,
+    "normalized_same": 648,
+    "accepted": {
+      "artifact_contracts": 648,
+      "graph_contract": 648,
+      "local_checks": 648,
+      "sidecar_contract": 648,
+      "without_annotations": 648,
+      "without_query_and_annotations": 648,
+      "without_query_equality": 648
+    },
+    "issues": {
+      "artifact_contracts": {},
+      "graph_contract": {},
+      "local_checks": {},
+      "sidecar_contract": {},
+      "without_annotations": {},
+      "without_query_and_annotations": {},
+      "without_query_equality": {}
+    }
+  },
+  "whitespace": {
+    "attempted": 934,
+    "statuses": {
+      "equivalent_result": 648,
+      "excluded_nondeterministic_function": 286
+    },
+    "evaluated": 648,
+    "evaluated_templates": 126,
+    "baseline_empty": 0,
+    "transformed_empty": 0,
+    "normalized_same": 648,
+    "accepted": {
+      "artifact_contracts": 648,
+      "graph_contract": 648,
+      "local_checks": 648,
+      "sidecar_contract": 648,
+      "without_annotations": 648,
+      "without_query_and_annotations": 648,
+      "without_query_equality": 648
+    },
+    "issues": {
+      "artifact_contracts": {},
+      "graph_contract": {},
+      "local_checks": {},
+      "sidecar_contract": {},
+      "without_annotations": {},
+      "without_query_and_annotations": {},
+      "without_query_equality": {}
+    }
+  },
+  "wrapper": {
+    "attempted": 934,
+    "statuses": {
+      "equivalent_result": 648,
+      "excluded_nondeterministic_function": 286
+    },
+    "evaluated": 648,
+    "evaluated_templates": 126,
+    "baseline_empty": 0,
+    "transformed_empty": 0,
+    "normalized_same": 0,
+    "accepted": {
+      "artifact_contracts": 648,
+      "graph_contract": 0,
+      "local_checks": 648,
+      "sidecar_contract": 0,
+      "without_annotations": 0,
+      "without_query_and_annotations": 648,
+      "without_query_equality": 648
+    },
+    "issues": {
+      "artifact_contracts": {},
+      "graph_contract": {
+        "target_query_mismatch": 648
+      },
+      "local_checks": {},
+      "sidecar_contract": {
+        "target_query_mismatch": 648
+      },
+      "without_annotations": {
+        "target_query_mismatch": 648
+      },
+      "without_query_and_annotations": {},
+      "without_query_equality": {}
+    }
+  },
+  "invert_equality": {
+    "attempted": 934,
+    "statuses": {
+      "changed_result": 476,
+      "excluded_nondeterministic_function": 286,
+      "not_applicable": 60,
+      "schema_changed": 42,
+      "unchanged_result": 70
+    },
+    "evaluated": 476,
+    "evaluated_templates": 96,
+    "baseline_empty": 0,
+    "transformed_empty": 147,
+    "normalized_same": 0,
+    "accepted": {
+      "artifact_contracts": 329,
+      "graph_contract": 0,
+      "local_checks": 333,
+      "sidecar_contract": 0,
+      "without_annotations": 0,
+      "without_query_and_annotations": 329,
+      "without_query_equality": 329
+    },
+    "issues": {
+      "artifact_contracts": {
+        "invalid_metric_shape": 143,
+        "widget_shape_mismatch": 147
+      },
+      "graph_contract": {
+        "invalid_metric_shape": 143,
+        "target_query_mismatch": 476,
+        "widget_shape_mismatch": 147
+      },
+      "local_checks": {
+        "invalid_metric_shape": 143
+      },
+      "sidecar_contract": {
+        "invalid_metric_shape": 143,
+        "target_query_mismatch": 476,
+        "widget_shape_mismatch": 147
+      },
+      "without_annotations": {
+        "invalid_metric_shape": 143,
+        "target_query_mismatch": 476,
+        "widget_shape_mismatch": 147
+      },
+      "without_query_and_annotations": {
+        "invalid_metric_shape": 143,
+        "widget_shape_mismatch": 147
+      },
+      "without_query_equality": {
+        "invalid_metric_shape": 143,
+        "widget_shape_mismatch": 147
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "evaluated_at": "2026-09-08T04:23:08.587888+00:00",
+  "input_manifest_sha256": "c960f031d6caed57d1d08d797caf99381452fc49ee8df1ad398f358f0425b772",
+  "outputs_sha256": {
+    "candidate_results.jsonl": "7d8a906cb414ccb749c676937e748a45eb8efe7dc844826f247ee4ab53105599",
+    "summary.json": "37e4ee4b00574797d0500f20a3b6863b8f45cd22a6a5cfd51f61820f68e5e714"
+  },
+  "source_sha256": {
+    "experiments/chi-generated-update-20260908/PROTOCOL.md": "70a2c92c1be3677983f1a4c8244b0b0dec69054a5e0b03dac841839b53910eb0",
+    "scripts/run_generated_update_pilot.py": "7d0d17234ba407066a7e7e64f6853bc9c9914f6658b8b76ad589fe6993330ec1",
+    "src/interactive_ehr/evaluation/generated_update_pilot.py": "bfb39d9316989e89712c9cefed872a20383cfc292f67f883cd5bcf43f69d009b",
+    "src/interactive_ehr/llm/schema_utils.py": "cf13b82d2e1de059ee1f7e2b4ed7c7196bff4d7738a8fa7ebc782cebabfe3a0a",
+    "src/interactive_ehr/widgets/chart.py": "461657e0ca5fdaf3c30eeb2591c59b7283b36f2b4e2a927526e2107ba8fb1d3c",
+    "src/interactive_ehr/widgets/display.py": "bde35f77d1f1e5bcd82c646b4bcb8503857de8798e62d13606671a4a389e776c",
+    "src/interactive_ehr/widgets/renderer.py": "1d9881a5afda7d86bb77a6c66db8a1a1f4c9bae3d31bce5d92a2eaa5584ef8d1",
+    "tests/test_generated_update_pilot.py": "81567cb1a3956283a1e7f873901467a3acb953935da14b5e7982f28bca806caa",
+    "tests/test_generated_update_runner.py": "a2268e851b8602a7935c652ca0b0199efde445f57c7a604a215d5ffb6b324567",
+    "uv.lock": "36c7eb548c3a543bb26f6c8fe94cb632eb43b51b1ac9bd1e45a99bc4b5b8d4e6"
+  }
+}

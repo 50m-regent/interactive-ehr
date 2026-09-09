@@ -1,0 +1,1537 @@
+{
+  "config": {
+    "max_output_tokens": 8192,
+    "response_json_schema": {
+      "$defs": {
+        "BarChartSpec": {
+          "description": "st.bar_chart — 棒チャート.\n\n検査項目ごとの集計、診療科別統計など集計データの可視化に使用。",
+          "properties": {
+            "data_key": {
+              "description": "チャートデータのキー",
+              "title": "Data Key",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "チャートの高さ（px）",
+              "title": "Height"
+            },
+            "horizontal": {
+              "description": "横向き棒グラフにするか",
+              "title": "Horizontal",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "bar_chart"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            },
+            "x": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "X軸のカラム名。Noneでインデックス使用",
+              "title": "X"
+            },
+            "x_label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "X軸のラベル",
+              "title": "X Label"
+            },
+            "y": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Y軸のカラム名。Noneで全数値カラム使用",
+              "title": "Y"
+            },
+            "y_label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Y軸のラベル",
+              "title": "Y Label"
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "title": "BarChartSpec",
+          "type": "object"
+        },
+        "CheckboxSpec": {
+          "description": "st.checkbox — チェックボックス.\n\n表示/非表示の切り替え、オプション有効化に使用。",
+          "properties": {
+            "default_value": {
+              "description": "デフォルト値",
+              "title": "Default Value",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "widget_type": {
+              "enum": [
+                "checkbox"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "CheckboxSpec",
+          "type": "object"
+        },
+        "ColumnsSpec": {
+          "description": "st.columns — カラムレイアウト.\n\nメトリクスの横並び表示、テーブルとチャートの並列表示などに使用。",
+          "properties": {
+            "columns": {
+              "description": "各カラムに配置するウィジェットのリスト",
+              "items": {
+                "description": "カラム内のウィジェット",
+                "items": {
+                  "additionalProperties": true,
+                  "description": "WidgetSpec object validated by the application after generation.",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "minItems": 1,
+              "title": "Columns",
+              "type": "array"
+            },
+            "gap": {
+              "description": "カラム間のギャップ",
+              "enum": [
+                "small",
+                "medium",
+                "large"
+              ],
+              "title": "Gap",
+              "type": "string"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "columns"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            },
+            "widths": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "各カラムの相対幅。Noneで均等分割",
+              "title": "Widths"
+            }
+          },
+          "required": [
+            "columns"
+          ],
+          "title": "ColumnsSpec",
+          "type": "object"
+        },
+        "DataNode": {
+          "description": "A context data item referenced by widgets.",
+          "properties": {
+            "context_key": {
+              "description": "固定サンプル context のキー",
+              "title": "Context Key",
+              "type": "string"
+            },
+            "data_type": {
+              "description": "データ種別",
+              "title": "Data Type",
+              "type": "string"
+            },
+            "description": {
+              "description": "データ内容の説明",
+              "title": "Description",
+              "type": "string"
+            },
+            "id": {
+              "description": "データノードID",
+              "title": "Id",
+              "type": "string"
+            },
+            "model_name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "参照するDWH Pydanticモデル名",
+              "title": "Model Name"
+            },
+            "primary_fields": {
+              "description": "表形式データなどの主要フィールド",
+              "items": {
+                "type": "string"
+              },
+              "title": "Primary Fields",
+              "type": "array"
+            },
+            "sql": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "このデータを取得するSELECT SQL",
+              "title": "Sql"
+            }
+          },
+          "required": [
+            "id",
+            "context_key",
+            "data_type",
+            "description"
+          ],
+          "title": "DataNode",
+          "type": "object"
+        },
+        "DataframeSpec": {
+          "description": "st.dataframe — インタラクティブなテーブル表示.\n\n検査結果一覧、処方一覧などテーブルデータの表示に使用。",
+          "properties": {
+            "column_order": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "表示するカラムの順序。Noneで全カラム表示",
+              "title": "Column Order"
+            },
+            "data_key": {
+              "description": "表示するデータのキー（テーブル名やデータソースID）",
+              "title": "Data Key",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "テーブルの高さ（px）。Noneで自動",
+              "title": "Height"
+            },
+            "hide_index": {
+              "description": "インデックス列を非表示にするか",
+              "title": "Hide Index",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "dataframe"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "title": "DataframeSpec",
+          "type": "object"
+        },
+        "DateInputSpec": {
+          "description": "st.date_input — 日付ピッカー.\n\n期間フィルタ、検査日指定などに使用。",
+          "properties": {
+            "default_value": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "デフォルト値。Noneで今日の日付",
+              "title": "Default Value"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_value": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "選択可能な最大日付",
+              "title": "Max Value"
+            },
+            "min_value": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "選択可能な最小日付",
+              "title": "Min Value"
+            },
+            "widget_type": {
+              "enum": [
+                "date_input"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "DateInputSpec",
+          "type": "object"
+        },
+        "ExpanderSpec": {
+          "description": "st.expander — 折りたたみセクション.\n\n詳細情報の表示/非表示切替に使用。",
+          "properties": {
+            "children": {
+              "description": "セクション内のウィジェットリスト",
+              "items": {
+                "additionalProperties": true,
+                "description": "WidgetSpec object validated by the application after generation.",
+                "type": "object"
+              },
+              "minItems": 1,
+              "title": "Children",
+              "type": "array"
+            },
+            "expanded": {
+              "description": "初期状態で展開するか",
+              "title": "Expanded",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "セクションのラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "widget_type": {
+              "enum": [
+                "expander"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "children"
+          ],
+          "title": "ExpanderSpec",
+          "type": "object"
+        },
+        "JsonSpec": {
+          "description": "st.json — JSON表示.\n\n構造化データの詳細確認用。デバッグやデータ構造の可視化に使用。",
+          "properties": {
+            "data_key": {
+              "description": "表示するデータのキー",
+              "title": "Data Key",
+              "type": "string"
+            },
+            "expanded": {
+              "description": "JSONツリーを展開した状態で表示するか",
+              "title": "Expanded",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "json"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "title": "JsonSpec",
+          "type": "object"
+        },
+        "LineChartSpec": {
+          "description": "st.line_chart — 折れ線チャート.\n\nバイタル推移、検査値推移など時系列データの可視化に使用。",
+          "properties": {
+            "data_key": {
+              "description": "チャートデータのキー",
+              "title": "Data Key",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "チャートの高さ（px）",
+              "title": "Height"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "line_chart"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            },
+            "x": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "X軸のカラム名。Noneでインデックス使用",
+              "title": "X"
+            },
+            "x_label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "X軸のラベル",
+              "title": "X Label"
+            },
+            "y": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Y軸のカラム名。Noneで全数値カラム使用",
+              "title": "Y"
+            },
+            "y_label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Y軸のラベル",
+              "title": "Y Label"
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "title": "LineChartSpec",
+          "type": "object"
+        },
+        "MarkdownSpec": {
+          "description": "st.markdown — マークダウンテキスト表示.\n\nカルテ記事、所見テキスト、説明文などリッチテキストの表示に使用。",
+          "properties": {
+            "body": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "表示するマークダウンテキスト",
+              "title": "Body"
+            },
+            "data_key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "表示するマークダウン文字列のコンテキストキー",
+              "title": "Data Key"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "markdown"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "title": "MarkdownSpec",
+          "type": "object"
+        },
+        "MetricSpec": {
+          "description": "st.metric — メトリクス表示.\n\nバイタルサイン、検査値などの単一指標を大きく表示。差分表示も可能。",
+          "properties": {
+            "delta_color": {
+              "description": "差分の色。normalは正=緑/負=赤、inverseは逆、offは色なし",
+              "enum": [
+                "normal",
+                "inverse",
+                "off"
+              ],
+              "title": "Delta Color",
+              "type": "string"
+            },
+            "delta_key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "差分値を取得するフィールドのキー",
+              "title": "Delta Key"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "メトリクスのラベル（例: '体温', '血圧(最高)'）",
+              "title": "Label",
+              "type": "string"
+            },
+            "value_key": {
+              "description": "値を取得するデータフィールドのキー",
+              "title": "Value Key",
+              "type": "string"
+            },
+            "widget_type": {
+              "enum": [
+                "metric"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "value_key"
+          ],
+          "title": "MetricSpec",
+          "type": "object"
+        },
+        "MultiselectSpec": {
+          "description": "st.multiselect — 複数選択ドロップダウン.\n\n表示カラム選択、フィルタ条件の複数指定などに使用。",
+          "properties": {
+            "default_keys": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "デフォルトで選択される値のリスト",
+              "title": "Default Keys"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_selections": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "最大選択数。Noneで無制限",
+              "title": "Max Selections"
+            },
+            "options_key": {
+              "description": "選択肢リストのデータキー",
+              "title": "Options Key",
+              "type": "string"
+            },
+            "placeholder": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "未選択時のプレースホルダー",
+              "title": "Placeholder"
+            },
+            "widget_type": {
+              "enum": [
+                "multiselect"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "options_key"
+          ],
+          "title": "MultiselectSpec",
+          "type": "object"
+        },
+        "NumberInputSpec": {
+          "description": "st.number_input — 数値入力.\n\n検査値の閾値設定、数量指定などに使用。",
+          "properties": {
+            "default_value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "デフォルト値",
+              "title": "Default Value"
+            },
+            "format_str": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "表示フォーマット（例: '%.2f'）",
+              "title": "Format Str"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "最大値",
+              "title": "Max Value"
+            },
+            "min_value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "最小値",
+              "title": "Min Value"
+            },
+            "step": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "増減ステップ",
+              "title": "Step"
+            },
+            "widget_type": {
+              "enum": [
+                "number_input"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "NumberInputSpec",
+          "type": "object"
+        },
+        "RadioSpec": {
+          "description": "st.radio — ラジオボタン.\n\n排他的な選択肢（表示モード切替、ソート順選択など）に使用。",
+          "properties": {
+            "default_index": {
+              "description": "デフォルトで選択されるインデックス",
+              "minimum": 0,
+              "title": "Default Index",
+              "type": "integer"
+            },
+            "horizontal": {
+              "description": "選択肢を横並びにするか",
+              "title": "Horizontal",
+              "type": "boolean"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "options_key": {
+              "description": "選択肢リストのデータキー",
+              "title": "Options Key",
+              "type": "string"
+            },
+            "widget_type": {
+              "enum": [
+                "radio"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "options_key"
+          ],
+          "title": "RadioSpec",
+          "type": "object"
+        },
+        "SelectboxSpec": {
+          "description": "st.selectbox — ドロップダウン単一選択.\n\n患者選択、テーブル選択、診療科選択などに使用。",
+          "properties": {
+            "default_index": {
+              "description": "デフォルトで選択されるインデックス",
+              "minimum": 0,
+              "title": "Default Index",
+              "type": "integer"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "options_key": {
+              "description": "選択肢リストのデータキー",
+              "title": "Options Key",
+              "type": "string"
+            },
+            "placeholder": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "未選択時のプレースホルダー",
+              "title": "Placeholder"
+            },
+            "widget_type": {
+              "enum": [
+                "selectbox"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "options_key"
+          ],
+          "title": "SelectboxSpec",
+          "type": "object"
+        },
+        "SliderSpec": {
+          "description": "st.slider — スライダー.\n\n数値範囲フィルタ、日付範囲選択などに使用。",
+          "properties": {
+            "default_value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "デフォルト値。タプルで範囲スライダー。Noneで最小値",
+              "title": "Default Value"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_value": {
+              "description": "最大値",
+              "title": "Max Value",
+              "type": "number"
+            },
+            "min_value": {
+              "description": "最小値",
+              "title": "Min Value",
+              "type": "number"
+            },
+            "step": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ステップ",
+              "title": "Step"
+            },
+            "widget_type": {
+              "enum": [
+                "slider"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label",
+            "min_value",
+            "max_value"
+          ],
+          "title": "SliderSpec",
+          "type": "object"
+        },
+        "TableSpec": {
+          "description": "st.table — 静的テーブル表示.\n\n少量データの確認用。ソートやフィルタ不要な場合に使用。",
+          "properties": {
+            "data_key": {
+              "description": "表示するデータのキー",
+              "title": "Data Key",
+              "type": "string"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "table"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "title": "TableSpec",
+          "type": "object"
+        },
+        "TabsSpec": {
+          "description": "st.tabs — タブレイアウト.\n\nカテゴリ別データ表示（検査結果/処方/バイタル等）の切り替えに使用。",
+          "properties": {
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "labels": {
+              "description": "タブのラベルリスト",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Labels",
+              "type": "array"
+            },
+            "tabs": {
+              "description": "各タブに配置するウィジェットのリスト",
+              "items": {
+                "description": "タブ内のウィジェット",
+                "items": {
+                  "additionalProperties": true,
+                  "description": "WidgetSpec object validated by the application after generation.",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "minItems": 1,
+              "title": "Tabs",
+              "type": "array"
+            },
+            "widget_type": {
+              "enum": [
+                "tabs"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "labels",
+            "tabs"
+          ],
+          "title": "TabsSpec",
+          "type": "object"
+        },
+        "TextAreaSpec": {
+          "description": "st.text_area — 複数行テキスト入力.\n\n所見テキストの入力、メモ記入などに使用。",
+          "properties": {
+            "default_value": {
+              "description": "デフォルト値",
+              "title": "Default Value",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "テキストエリアの高さ（px）",
+              "title": "Height"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_chars": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "最大入力文字数",
+              "title": "Max Chars"
+            },
+            "placeholder": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "プレースホルダー",
+              "title": "Placeholder"
+            },
+            "widget_type": {
+              "enum": [
+                "text_area"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "TextAreaSpec",
+          "type": "object"
+        },
+        "TextInputSpec": {
+          "description": "st.text_input — 単一行テキスト入力.\n\nテキスト検索、患者ID入力などに使用。",
+          "properties": {
+            "default_value": {
+              "description": "デフォルト値",
+              "title": "Default Value",
+              "type": "string"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "max_chars": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "最大入力文字数",
+              "title": "Max Chars"
+            },
+            "placeholder": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "プレースホルダー",
+              "title": "Placeholder"
+            },
+            "widget_type": {
+              "enum": [
+                "text_input"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "TextInputSpec",
+          "type": "object"
+        },
+        "TextSpec": {
+          "description": "st.text — プレインテキスト表示.\n\n等幅フォントでのテキスト表示。コードやフォーマット済みテキストに使用。",
+          "properties": {
+            "body": {
+              "description": "表示するプレインテキスト",
+              "title": "Body",
+              "type": "string"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "widget_type": {
+              "enum": [
+                "text"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "body"
+          ],
+          "title": "TextSpec",
+          "type": "object"
+        },
+        "TimeInputSpec": {
+          "description": "st.time_input — 時刻ピッカー.\n\n時刻フィルタ、投薬時刻指定などに使用。",
+          "properties": {
+            "default_value": {
+              "anyOf": [
+                {
+                  "format": "time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "デフォルト値。Noneで現在時刻",
+              "title": "Default Value"
+            },
+            "key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Streamlit widget key（セッション内で一意にする必要あり）",
+              "title": "Key"
+            },
+            "label": {
+              "description": "ラベル",
+              "title": "Label",
+              "type": "string"
+            },
+            "step_seconds": {
+              "description": "時刻のステップ（秒）。デフォルト15分",
+              "title": "Step Seconds",
+              "type": "integer"
+            },
+            "widget_type": {
+              "enum": [
+                "time_input"
+              ],
+              "title": "Widget Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "title": "TimeInputSpec",
+          "type": "object"
+        },
+        "WidgetNode": {
+          "description": "A graph node wrapping an existing WidgetSpec.",
+          "properties": {
+            "data_nodes": {
+              "description": "このウィジェットが参照するデータノード",
+              "items": {
+                "$ref": "#/$defs/DataNode"
+              },
+              "title": "Data Nodes",
+              "type": "array"
+            },
+            "id": {
+              "description": "ウィジェットノードID",
+              "title": "Id",
+              "type": "string"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ウィジェットの表示上の説明",
+              "title": "Title"
+            },
+            "widget": {
+              "description": "既存 WidgetSpec",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/DataframeSpec"
+                },
+                {
+                  "$ref": "#/$defs/TableSpec"
+                },
+                {
+                  "$ref": "#/$defs/MetricSpec"
+                },
+                {
+                  "$ref": "#/$defs/JsonSpec"
+                },
+                {
+                  "$ref": "#/$defs/MarkdownSpec"
+                },
+                {
+                  "$ref": "#/$defs/TextSpec"
+                },
+                {
+                  "$ref": "#/$defs/LineChartSpec"
+                },
+                {
+                  "$ref": "#/$defs/BarChartSpec"
+                },
+                {
+                  "$ref": "#/$defs/SelectboxSpec"
+                },
+                {
+                  "$ref": "#/$defs/MultiselectSpec"
+                },
+                {
+                  "$ref": "#/$defs/DateInputSpec"
+                },
+                {
+                  "$ref": "#/$defs/TimeInputSpec"
+                },
+                {
+                  "$ref": "#/$defs/TextInputSpec"
+                },
+                {
+                  "$ref": "#/$defs/TextAreaSpec"
+                },
+                {
+                  "$ref": "#/$defs/NumberInputSpec"
+                },
+                {
+                  "$ref": "#/$defs/CheckboxSpec"
+                },
+                {
+                  "$ref": "#/$defs/RadioSpec"
+                },
+                {
+                  "$ref": "#/$defs/SliderSpec"
+                },
+                {
+                  "$ref": "#/$defs/ColumnsSpec"
+                },
+                {
+                  "$ref": "#/$defs/TabsSpec"
+                },
+                {
+                  "$ref": "#/$defs/ExpanderSpec"
+                }
+              ],
+              "title": "Widget"
+            }
+          },
+          "required": [
+            "id",
+            "widget"
+          ],
+          "title": "WidgetNode",
+          "type": "object"
+        }
+      },
+      "description": "Generated widget node and the SELECT SQL that feeds it.",
+      "properties": {
+        "sql": {
+          "description": "widget 専用 data node に保存するSELECT SQL",
+          "title": "Sql",
+          "type": "string"
+        },
+        "widget_node": {
+          "$ref": "#/$defs/WidgetNode",
+          "description": "生成した widget node"
+        }
+      },
+      "required": [
+        "widget_node",
+        "sql"
+      ],
+      "title": "WidgetNodeSqlGeneration",
+      "type": "object"
+    },
+    "response_mime_type": "application/json",
+    "seed": 20260998,
+    "temperature": 0.2,
+    "thinking_config": {
+      "thinking_budget": 1024
+    },
+    "top_p": 1.0
+  },
+  "contents": "あなたは電子カルテ UI のタスクグラフをノード単位で生成するアシスタントです。\n指定された計画に一致する WidgetNodeSqlGeneration JSON だけを出力してください。\n\n制約:\n- node_plan の id と参照関係を変更しないでください。\n- データ本体、患者名、検査値、処方内容、カルテ本文などの実データ値をJSONに埋め込まないでください。\n- DataNode は node_plan.model_name のDWHモデルだけを参照してください。SQLやデータ本体は入れないでください。\n- WidgetNode 生成では WidgetNodeSqlGeneration JSON を出力してください。\n- WidgetNodeSqlGeneration.sql は widget 専用 data node のための単一SELECT文にしてください。\n- SQLではテーブル名と列名をダブルクォートしてください。例: SELECT \"匿名ID\" FROM \"患者基本\" LIMIT 20\n- SQLは読み取り専用のSELECTだけにしてください。INSERT/UPDATE/DELETE/DDLは使わないでください。\n- WidgetNode の data_key は生成済み data node の context_key だけを使ってください。\n- chart/table/dataframe widget の x/y/column_order は参照先DWHモデルのフィールド名だけを使ってください。\n- WidgetNode の widget.widget_type は node_plan.widget_type と一致させてください。\n- 現在の partial graph と矛盾しない node を生成してください。\n\n生成済み data node の context key と列:\n- main_data (model_name: measurements, columns: patient, measure, observed_at, value, unit)\n- stable_data (model_name: measurements, columns: patient, measure, observed_at, value, unit)\n\n全体計画:\n{\n  \"id\": \"synthetic_sequence\",\n  \"title\": \"合成データの連続更新\",\n  \"description\": null,\n  \"tasks\": [\n    {\n      \"id\": \"overview\",\n      \"title\": \"測定の確認\",\n      \"description\": null,\n      \"order\": 0,\n      \"widget_ids\": [\n        \"main\",\n        \"stable\"\n      ]\n    }\n  ],\n  \"data_nodes\": [\n    {\n      \"id\": \"main_data\",\n      \"model_name\": \"measurements\",\n      \"context_key\": \"main_data\",\n      \"data_type\": \"dataframe\",\n      \"description\": \"独立した合成測定データ\",\n      \"primary_fields\": [\n        \"observed_at\",\n        \"value\",\n        \"unit\"\n      ]\n    },\n    {\n      \"id\": \"stable_data\",\n      \"model_name\": \"measurements\",\n      \"context_key\": \"stable_data\",\n      \"data_type\": \"dataframe\",\n      \"description\": \"独立した合成測定データ\",\n      \"primary_fields\": [\n        \"observed_at\",\n        \"value\",\n        \"unit\"\n      ]\n    }\n  ],\n  \"widget_nodes\": [\n    {\n      \"id\": \"main\",\n      \"task_id\": \"overview\",\n      \"title\": \"主表示\",\n      \"widget_type\": \"dataframe\",\n      \"data_node_ids\": [\n        \"main_data\"\n      ]\n    }\n  ]\n}\n\n現在の partial graph:\n{\n  \"id\": \"synthetic_sequence\",\n  \"title\": \"合成データの連続更新\",\n  \"description\": null,\n  \"patient_context_key\": null,\n  \"tasks\": [\n    {\n      \"id\": \"overview\",\n      \"title\": \"測定の確認\",\n      \"description\": null,\n      \"order\": 0,\n      \"widgets\": [\n        {\n          \"id\": \"main\",\n          \"title\": \"主表示\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"main_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"main_data\",\n              \"context_key\": \"main_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n            }\n          ]\n        },\n        {\n          \"id\": \"stable\",\n          \"title\": \"保持する脈拍\",\n          \"widget\": {\n            \"widget_type\": \"dataframe\",\n            \"key\": null,\n            \"data_key\": \"stable_data\",\n            \"column_order\": [\n              \"observed_at\",\n              \"value\",\n              \"unit\"\n            ],\n            \"hide_index\": true,\n            \"height\": null\n          },\n          \"data_nodes\": [\n            {\n              \"id\": \"stable_data\",\n              \"context_key\": \"stable_data\",\n              \"model_name\": \"measurements\",\n              \"data_type\": \"dataframe\",\n              \"description\": \"独立した合成測定データ\",\n              \"primary_fields\": [\n                \"observed_at\",\n                \"value\",\n                \"unit\"\n              ],\n              \"sql\": \"SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC\"\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n\n生成する node_plan:\n{\n  \"id\": \"main\",\n  \"task_id\": \"overview\",\n  \"title\": \"主表示\",\n  \"widget_type\": \"dataframe\",\n  \"data_node_ids\": [\n    \"main_data\"\n  ]\n}\n\nユーザー要望:\n合成データだけのUI更新課題です。利用できるテーブルとDWHモデルはmeasurementsです。\nスキーマ: CREATE TABLE measurements (patient TEXT, measure TEXT, observed_at TEXT, value REAL, unit TEXT)\npatientはSYN_A/SYN_B/SYN_C、measureはweightまたはpulseです。\nweightはkg、pulseはbpmです。valueがNULLなら欠損です。\nobserved_atはYYYY-MM-DD HH:MM:SSのTEXTです。基準日時は2026-09-08 12:00:00です。\n直近N日間は基準日時-N日以上、基準日時以下の両端を含む範囲です。\n明示していない条件は現在のまま保持してください。stableの脈拍表示は変更対象外です。\noverview/main/stable/main_data/stable_dataのIDと対応関係を保持してください。\n測定値の一覧はobserved_at,value,unitをこの順で返します。集約ではvalue,unitを返します。\n表はSQL結果の列を順にすべて表示します。折れ線はx=observed_at,y=valueです。\n新しい表示部品や説明文は追加しません。タイトルの言い換えは許容します。\n今回の更新要求:\n主表示を折れ線グラフにしてください。横軸はobserved_at、縦軸はvalueです。\n\n",
+  "model": "gemini-2.5-pro"
+}

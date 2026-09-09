@@ -1,0 +1,60 @@
+合成データだけを使う電子カルテ風のUI更新課題です。
+以下の現在のUIを要求に沿って更新し、Interface JSONだけを返してください。
+SQLはローカルSQLiteで実行し、widgetsを既存レンダラで表示します。
+
+利用可能なスキーマ: CREATE TABLE measurements (patient TEXT, measure TEXT, observed_at TEXT, value REAL, unit TEXT)
+patientはSYN_A/SYN_B/SYN_C、measureはweightまたはpulseです。
+weightのvalueはkg、pulseのvalueはbpmです。valueがNULLの場合は欠損のまま残します。
+observed_atはYYYY-MM-DD HH:MM:SS形式のTEXTです。
+基準日時は2026-09-08 12:00:00です。直近N日間は、基準日時-N日以上、基準日時以下の両端を含む範囲です。
+患者の実データや行の例は渡しません。取得結果の値をSQLへ埋め込まないでください。
+
+明示されていない条件は現在のまま保持してください。stableウィジェットは常に変更対象外です。
+main/stableとmain_data/stable_dataのID、対応関係は保持してください。
+SQLは読み取り専用です。全クエリはobserved_at,value,unitをこの順で返してください。
+dataframeはこの3列を表示します。line_chartはx=observed_at,y=valueとしcolumnsも3列を保持します。
+新しい表示部品や補足文は追加しません。タイトルの言い換えは許容します。
+現在のUI:
+{
+  "queries": [
+    {
+      "id": "main_data",
+      "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'weight' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+    },
+    {
+      "id": "stable_data",
+      "sql": "SELECT observed_at, value AS value, unit AS unit FROM measurements WHERE patient = 'SYN_A' AND measure = 'pulse' AND observed_at >= '2026-09-07 12:00:00' AND observed_at <= '2026-09-08 12:00:00' ORDER BY observed_at ASC"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "main",
+      "title": "主表示",
+      "kind": "dataframe",
+      "data_key": "main_data",
+      "columns": [
+        "observed_at",
+        "value",
+        "unit"
+      ],
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "stable",
+      "title": "保持する脈拍",
+      "kind": "dataframe",
+      "data_key": "stable_data",
+      "columns": [
+        "observed_at",
+        "value",
+        "unit"
+      ],
+      "x": null,
+      "y": null
+    }
+  ]
+}
+
+更新要求:
+体重を直近7日間に広げてください。
