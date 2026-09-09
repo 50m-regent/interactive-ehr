@@ -14,6 +14,8 @@ PRの統合によってIssueが完了する場合は`Closes #番号`、作業が
 
 ## 概要
 
+2026年9月9日に、[連続編集の実験計画](experiments/chi-intent-preservation-plan-20260909/PLAN.md)を整理しました。同じ候補に対する検査、実アプリの連続更新、利用者の確認・修正を分けて評価します。今回は計画の作成だけで、新しい実験は実行していません。課題、独立した採点確認、必要件数、モデル版と費用上限、人対象の実施条件は、本評価前に確定します。[Issue #55](https://github.com/50m-regent/interactive-ehr/issues/55)で追跡します。
+
 実アプリの連続更新による追加評価を [experiments/chi-sequential-update-20260908/REPORT.md](experiments/chi-sequential-update-20260908/REPORT.md) に記録しました。計画18更新のうち12件を試行し、9件が処理を完了、3件が表示部品の形式検証で失敗しました。後続6件は未実行です。適合7件と、1系列で期間条件が消えて次へ残った不適合2状態を確認しましたが、簡単なSQL検査と1状態・3状態の結果検査は同じ判定でした。保存した24応答から全イベントを再現し、24個の表の描画データも照合しました。[Issue #54](https://github.com/50m-regent/interactive-ehr/issues/54)で追跡します。次は生成先のスキーマとアプリの必須条件、表示種別を変える計画の整合を修正する必要があります。
 
 実行入口は `scripts/run_sequential_update_pilot.py`、照合は `scripts/verify_sequential_update_pilot.py`、事後の形式診断は `scripts/diagnose_sequential_update_failures.py` です。固定条件、停止条件、再実行のコマンドは[実験計画](experiments/chi-sequential-update-20260908/PROTOCOL.md)を参照してください。既存のアプリ実装と正式評価の結果は変更していません。
